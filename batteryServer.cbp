@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="batteryServer" />
+		<Option execution_dir="D:\Marcin\Programowanie\batteryServer\batteryServer\" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="Release\batteryServer" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\_tmp\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lws2_32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="..\..\battery-server\source\batteryServer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\include\server_base64.h" />
+		<Unit filename="..\..\battery-server\source\include\server_cgi_manager.h" />
+		<Unit filename="..\..\battery-server\source\include\server_core.h" />
+		<Unit filename="..\..\battery-server\source\include\server_create_session.h" />
+		<Unit filename="..\..\battery-server\source\include\server_files_io.h" />
+		<Unit filename="..\..\battery-server\source\include\server_htaccess_manager.h" />
+		<Unit filename="..\..\battery-server\source\include\server_http_protocol.h" />
+		<Unit filename="..\..\battery-server\source\include\server_log.h" />
+		<Unit filename="..\..\battery-server\source\include\server_mem_manager.h" />
+		<Unit filename="..\..\battery-server\source\include\server_mime_types.h" />
+		<Unit filename="..\..\battery-server\source\include\server_portable.h" />
+		<Unit filename="..\..\battery-server\source\include\server_shared.h" />
+		<Unit filename="..\..\battery-server\source\include\server_socket_io.h" />
+		<Unit filename="..\..\battery-server\source\include\server_strings_util.h" />
+		<Unit filename="..\..\battery-server\source\include\server_time_util.h" />
+		<Unit filename="..\..\battery-server\source\server_base64.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_cgi_manager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_core.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_create_session.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_files_io.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_htaccess_manager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_http_protocol.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_mem_manager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_mime_types.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_socket_io.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_strings_util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\..\battery-server\source\server_time_util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

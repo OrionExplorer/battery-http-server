@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">      
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />
+    <title>Blaind 2 alpha ver 0.1
+    </title>
+  </head>
+  <body>
+    <font face="Tahoma" size="2">
+
+
+<!-- Obsługa cookies -->
+<script language="JavaScript" SRC="javascript/cookies.js"></script>
+<!-- Obsługa błędów -->
+<script language="JavaScript" SRC="javascript/errors.js"></script>
+
+<script type="text/javascript">
+
+function numberValidation(fieldType, e, dec)
+{
+  var key;
+  var keychar;
+
+  if(window.event)
+    key = window.event.keyCode;
+  else if (e)
+    key = e.which;
+  else
+    return true;
+
+  keychar = String.fromCharCode(key);
+
+  if((key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27))
+    return true;
+
+  else if((("0123456789").indexOf(keychar) > -1)) 
+    return true;
+
+  else if(dec && (keychar == "."))
+  {
+    myfield.form.elements[dec].focus();
+    return false;
+  }
+  else
+    return false;
+}
+
+function formValidate()
+{
+  errfound = false;
+  str_Wybierz = "Wybierz...";
+  var str_ErrorMessage = "";
+
+  with(document.mainForm) 
+  {
+    f_Reg = /^[0-9]{8,9}$/;
+    /* Walidacja ID konta klienta */
+    if(id_konta.value.length < 8)
+      str_ErrorMessage += "Numer ID konta klienta jest za krótki.\n";
+
+    f_RegResult = id_konta.value.match(f_Reg);
+    if(f_RegResult == null)
+      str_ErrorMessage += "Numer ID konta jest nieprawidłowy.\n";
+
+    /* Walidacja numeru telefonu stacjonarnego */
+    if(tel_s.value.length < 9)
+      str_ErrorMessage += "Numer telefonu stacjonarnego jest za krótki.\n";
+
+    f_RegResult = tel_s.value.match(f_Reg);
+    if(f_RegResult == null)
+      str_ErrorMessage += "Numer telefonu stacjonarnego jest nieprawidłowy.\n";
+
+    /* Walidacja numeru telefonu kontaktowego */
+    if(tel_k.value.length < 9)
+      str_ErrorMessage += "Numer telefonu kontaktowego jest za krótki.\n";
+
+    f_RegResult = tel_k.value.match(f_Reg);
+    if(f_RegResult == null)
+      str_ErrorMessage += "Numer telefonu kontaktowego jest nieprawidłowy.\n";
+
+    /* Walidacja wyboru pola Typ usługi */
+    if(usluga.value == str_Wybierz)
+      str_ErrorMessage += "Nie wybrano rodzaju usługi.\n";
+    /* Walidacja uzupełnienia pola Numer ZD/WO/CTT */
+    if(nr_zgloszenia.value == "")
+      str_ErrorMessage += "Nie wpisano numeru zgłoszenia.\n";
+    /* Walidacja wyboru pola Typ problemu */
+    if(typ_problemu.value == str_Wybierz)
+      str_ErrorMessage += "Nie wybrano typu problemu.\n";
+    /* Walidacja uzupełnienia pola opisu */
+    if(opis_problemu.value == "")
+      str_ErrorMessage += "Nie opisano problemu.\n";
+    /* Walidacja wyboru pola Rodzaj zgłoszenia */
+    if(rodzaj_zgloszenia.value == str_Wybierz)
+      str_ErrorMessage += "Nie wybrano rodzaju zgłoszenia.\n"
+  }
+    if(str_ErrorMessage != "")
+      raiseError(str_ErrorMessage);
+    else register(agentDK);
+
+  return !errfound;
+}
+</script>
+
+    <form action="new_case.exe" method="post" onsubmit="return formValidate();" name="mainForm">
+      <fieldset>
+        <legend align="left">Nowe zgłoszenie
+        </legend>
+
+        ID konta <input type="text" name="id_konta" maxlength=8 onKeyPress="return numberValidation(this, event)" /><br />
+
+        Telefon stacjonarny <input type="text" name="tel_s" maxlength=9 onKeyPress="return numberValidation(this, event)" /><br />
+
+        Telefon kontaktowy <input type="text" name="tel_k" maxlength=9 onKeyPress="return numberValidation(this, event)" /><br />
+
+        Usługa <select name="usluga">	
+          <option>Wybierz...</option>	
+          <option>LLU</option>	
+          <option>Bitstream</option>	
+          <option>WLR</option>	
+          <option>ADSL</option>	
+          <option>POTS</option>	
+          <option>One Office</option>	
+          <option>WiMAX</option>	
+          <option>DLD/Netia 1055</option>	
+          <option>ISDN Duo</option>	
+          <option>ISDN Multi</option>	
+          <option>ISDN WLR</option>	
+          <option>Mobilny Internet</option>	
+        </select><br />
+
+        Nr WO/CTT/ZD <input type="text" name="nr_zgloszenia" maxlength=17 /><br />
+        Typ problemu <select name="typ_problemu">	
+          <option>Wybierz...</option>	
+          <option>Ponaglenie CTT</option>	
+          <option>Niezamknięte WO</option>	
+        </select><br />
+
+        Opis problemu:<br /><textarea name="opis_problemu" rows=5 cols=35 maxlength=150 ></textarea><br />
+
+        Rodzaj zgłoszenia: <select name="rodzaj_zgloszenia">		
+          <option>Wybierz...</option>		
+          <option>Do ponaglenia</option>		
+          <option>Do oddzwonienia</option>		
+          <option>Kontakt z przełożonym</option>	
+        </select> <br />
+      </fieldset>
+      <input type="submit" value="Zapisz" />  
+    </form>
+  </body>
+</html>
