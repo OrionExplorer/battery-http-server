@@ -20,9 +20,9 @@ void app_terminate(void);
 
 int main(void)
 {
-	signal(SIGABRT, (__sighandler_t)&app_terminate);
-	signal(SIGTERM, (__sighandler_t)&app_terminate);
-	signal(SIGINT, (__sighandler_t)&app_terminate);
+	signal(SIGABRT, (sighandler)&app_terminate);
+	signal(SIGTERM, (sighandler)&app_terminate);
+	signal(SIGINT, (sighandler)&app_terminate);
 	server_initialize();
 	return 0;
 }
