@@ -62,7 +62,7 @@ What you have to do to run this program:
 	- "<exec>" is extra parameter for your external script runner
 * if your script is already stand-alone CGI 1.0/1.1 then just give it "<exec>"
 
-3. HTTP authorization is under construction and should not be used for production development, but in file Release/configuration/ht_access.conf you can authorize access to any content, eg:
+3. HTTP authorization is under construction and should not be used for production environment, but in file Release/configuration/ht_access.conf you can authorize access to any content, eg:
 	"D:\battery-server\index.php my_login my_password"
 
 4. Compiling on Win32: link WinSock2 library (-lws2_32).
