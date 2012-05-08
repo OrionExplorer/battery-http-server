@@ -24,5 +24,9 @@ What you have to do to run this program:
 3. HTTP authorization is under construction and should not be used for production development, but in file Release/configuration/ht_access.conf you can authorize access to any content, eg:
 	"D:\battery-server\index.php my_login my_password"
 
+4. Compiling on Win32: link WinSock2 library (-lws2_32).
+
+5. Compiling on Linux: do not link WinSock2 library.
+
 
 FOR COPYRIGHT INFO PLEASE READ COPYING.txt
