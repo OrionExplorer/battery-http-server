@@ -13,6 +13,7 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 *******************************************************************/
 #include "include/server_core.h"
 #include "include/server_socket_io.h"
+#include "include/server_log.h"
 #include <signal.h>
 
 void app_terminate(void);
