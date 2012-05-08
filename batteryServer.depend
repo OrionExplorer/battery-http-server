@@ -1,0 +1,172 @@
+# depslib dependency file v1.0
+1320965532 source:d:\marcin\programowanie\battery-server\source\server_base64.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1320975156 source:d:\marcin\programowanie\battery-server\source\server_cgi_manager.c
+	"include/server_shared.h"
+	"include/server_cgi_manager.h"
+	"include/server_files_io.h"
+	"include/server_http_protocol.h"
+	"include/server_create_session.h"
+	"include/server_portable.h"
+	"include/server_log.h"
+	<stdio.h>
+	<stdlib.h>
+	<sys/stat.h>
+	<stdarg.h>
+	<string.h>
+
+1336514074 d:\marcin\programowanie\battery-server\source\include\server_shared.h
+	"server_portable.h"
+	"server_strings_util.h"
+	"server_time_util.h"
+	"server_mem_manager.h"
+	<time.h>
+	<WinSock2.h>
+	<WS2tcpip.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<netinet/in.h>
+	<netinet/tcp.h>
+	<arpa/inet.h>
+	<fcntl.h>
+	<sys/ioctl.h>
+	<unistd.h>
+
+1336515737 d:\marcin\programowanie\battery-server\source\include\server_portable.h
+	<direct.h>
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_strings_util.h
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_time_util.h
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_mem_manager.h
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_cgi_manager.h
+	"server_shared.h"
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_files_io.h
+	"server_shared.h"
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_http_protocol.h
+	"server_shared.h"
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_create_session.h
+	"server_shared.h"
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_log.h
+
+1336424231 source:d:\marcin\programowanie\battery-server\source\server_core.c
+	"include/server_core.h"
+	"include/server_shared.h"
+	"include/server_files_io.h"
+	"include/server_socket_io.h"
+	"include/server_base64.h"
+	"include/server_log.h"
+	"include/server_mime_types.h"
+	"include/server_cgi_manager.h"
+	"include/server_htaccess_manager.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/stat.h>
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_core.h
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_socket_io.h
+	"server_shared.h"
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_base64.h
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_mime_types.h
+	<stdio.h>
+
+1320965532 d:\marcin\programowanie\battery-server\source\include\server_htaccess_manager.h
+
+1320965532 source:d:\marcin\programowanie\battery-server\source\server_create_session.c
+	"include/server_create_session.h"
+	"include/server_socket_io.h"
+	"include/server_http_protocol.h"
+	"include/server_files_io.h"
+	"include/server_log.h"
+	"include/server_base64.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1336423617 source:d:\marcin\programowanie\battery-server\source\server_files_io.c
+	"include/server_files_io.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/stat.h>
+	<unistd.h>
+
+1320965532 source:d:\marcin\programowanie\battery-server\source\server_htaccess_manager.c
+	"include/server_shared.h"
+	"include/server_htaccess_manager.h"
+	"include/server_log.h"
+	"include/server_base64.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1320974206 source:d:\marcin\programowanie\battery-server\source\server_http_protocol.c
+	"include/server_http_protocol.h"
+	"include/server_create_session.h"
+	"include/server_files_io.h"
+	"include/server_cgi_manager.h"
+	"include/server_log.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/stat.h>
+
+1320975765 source:d:\marcin\programowanie\battery-server\source\server_log.c
+	"include/server_shared.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+
+1320965532 source:d:\marcin\programowanie\battery-server\source\server_mem_manager.c
+	"include/server_shared.h"
+	"include/server_mem_manager.h"
+	"include/server_log.h"
+	<stdio.h>
+	<stdlib.h>
+
+1320965532 source:d:\marcin\programowanie\battery-server\source\server_mime_types.c
+	"include/server_shared.h"
+	"include/server_log.h"
+	"include/server_mime_types.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1320976216 source:d:\marcin\programowanie\battery-server\source\server_socket_io.c
+	"include/server_socket_io.h"
+	"include/server_create_session.h"
+	"include/server_http_protocol.h"
+	"include/server_shared.h"
+	"include/server_log.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<signal.h>
+
+1320965532 source:d:\marcin\programowanie\battery-server\source\server_strings_util.c
+	"include/server_strings_util.h"
+	"include/server_shared.h"
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+
+1336422271 source:d:\marcin\programowanie\battery-server\source\server_time_util.c
+	"include/server_shared.h"
+	<stdio.h>
+	<string.h>
+
