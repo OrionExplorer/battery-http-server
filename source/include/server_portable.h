@@ -40,7 +40,7 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 
 	#define APP_NAME	"batteryServer (Win32)"
 #else
-	#define WSAGetLastError() errno
+	#define WSAGetLastError() -1
 /* �cie�ki do plik�w/folder�w na systemach LINUX s� oddzielone "/" */
 	#define SLASH		"/"
 	#define C_SLASH		'/'
