@@ -159,7 +159,11 @@ typedef struct
 	int						socket;
 #endif
 	fd_set					socket_data;
+#ifdef _WIN32
 	int						address_length;
+#else
+	socklen_t               	address_length;
+#endif
 	int						socket_descriptor;
 	HTTP_INFO				http_info;
 	LOCAL_INFO				local_info;
@@ -198,7 +202,7 @@ extern int					cgi_other_count;
 HT_ACCESS					ht_access[256];
 extern int					ht_access_count;
 
-/* Przechowuje wczytane rozszerzenia plików wraz z ich typami MIME */
+/* Przechowuje wczytane rozszerzenia plikï¿½w wraz z ich typami MIME */
 MIME_TYPE					mime_types[STD_BUFF_SIZE];
 extern int					mime_types_count;
 
