@@ -37,6 +37,7 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 	#define SHUT_RDWR	SD_BOTH
 	#define F_SETFL		FIONBIO
 	#define S_IXOTH		S_IEXEC
+	#define sighandler	__p_sig_fn_t
 
 	#define APP_NAME	"batteryServer (Win32)"
 #else
@@ -48,6 +49,7 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 	#define SOCKET_ERROR (-1)
 	#define EXIT_FAILURE (1)
 	#define READ_BINARY	"re"
+	#define sighandler	__sighandler_t
 
 	#define APP_NAME	"batteryServer (Linux)"
 #endif
