@@ -1,3 +1,4 @@
 obj/
 *.cbp
+*.depend
 battery-http-server.exe
