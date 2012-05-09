@@ -1,11 +1,11 @@
 ==================
 battery-http-server
-- simple, fast and portable HTTP server.
+- fast and portable HTTP server.
 
 Marcin Kelar (marcin.kelar@gmail.com)
 ==================
 
-Source is written in ANSI C, so you can simply compile and run it on Windows/Linux/Mac OS X.
+Source is written in ANSI C, so you can simply compile and run it under Windows/Linux/Mac OS X.
 I'm sure it's not perfect, not even finish, but it works pretty well right now.
 
 • CGI 1.0/1.1 and PHP support
