@@ -1,5 +1,5 @@
 ==================
-battery-server 0.7
+battery-http-server
 - simple, fast and portable HTTP server.
 
 Marcin Kelar (marcin.kelar@gmail.com)
