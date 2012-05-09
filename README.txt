@@ -33,7 +33,7 @@ Featured HTTP response codes:
 • 414 Request Uri Too Long
 • 416 Request Range Not Satisfiable
 • 500 Server Error
-• 501 Not Supported
+• 501 Not Implemented
 • 503 Service Unavailable
 • 504 Not Supported
 
