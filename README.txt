@@ -8,6 +8,8 @@ Marcin Kelar (marcin.kelar@gmail.com)
 Source is written in ANSI C, so you can simply compile and run it on Windows/Linux/Mac OS X.
 I'm sure it's not perfect, not even finish, but it works pretty well right now.
 
+• CGI 1.0/1.1 and PHP support
+
 Featured HTTP versions:
 • HTTP/1.0
 • HTTP/1.1
@@ -40,7 +42,6 @@ Featured HTTP response codes:
 Additional informations:
 • Single thread application
 • Multiplatform
-• CGI and PHP support
 • Event log
 • Simple configuration based on text files
 • High performance (tested with Apache Benchmark)
