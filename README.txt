@@ -46,6 +46,9 @@ Additional informations:
 • High performance (tested with Apache Benchmark)
 
 TODO:
+• HTTP Proxy
+• Method PUT
+• Method DELETE
 • IPv6 support
 • HTTPS support
 
