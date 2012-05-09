@@ -52,6 +52,7 @@ TODO:
 • Method DELETE
 • IPv6 support
 • HTTPS support
+• Higher performance!
 
 
 What you have to do to run this program:
