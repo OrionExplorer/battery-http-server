@@ -40,18 +40,19 @@ Featured HTTP response codes:
 • 504 Not Supported
 
 Additional informations:
-• Single thread application
 • Multiplatform
 • Event log
 • Simple configuration based on text files
 • High performance (tested with Apache Benchmark)
 
 TODO:
+• Multithreading
 • HTTP Proxy
 • Method PUT
 • Method DELETE
 • IPv6 support
 • HTTPS support
+• Higher performance!
 
 
 What you have to do to run this program:
