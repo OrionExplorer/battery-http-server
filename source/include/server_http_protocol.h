@@ -4,7 +4,7 @@ Projekt battery_Server
 
 Plik: server_http_protocol.h
 
-Autor: Marcin Kelar (marcin.kelar@holicon.pl)
+Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #ifndef SERVER_HTTP_PROTOCOL_H
 #define SERVER_HTTP_PROTOCOL_H
@@ -73,21 +73,20 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 #define HTTP_ERR_503_MSG					"<HTML><HEAD><TITLE>"HTTP_503_SERVICE_UNAVAILABLE"</TITLE></HEAD><BODY><H1>"HTTP_503_SERVICE_UNAVAILABLE"</H1>"HTTP_503_SERVICE_UNAVAILABLE"<HR><ADDRES><I>"APP_NAME"/"APP_VER"</I></ADDRES></BODY></HTML>"
 #define HTTP_ERR_505_MSG					"<HTML><HEAD><TITLE>"HTTP_505_HTTP_VERSION_NOT_SUPPORTED"</TITLE></HEAD><BODY><H1>"HTTP_505_HTTP_VERSION_NOT_SUPPORTED"</H1>"HTTP_505_HTTP_VERSION_NOT_SUPPORTED"<HR><ADDRES><I>"APP_NAME"/"APP_VER"</I></ADDRES></BODY></HTML>"
 
-void			http_process_session(HTTP_SESSION *http_session);
+void			REQUEST_process( HTTP_SESSION *http_session );
 
-long			http_get_range(HTTP_SESSION *http_session, int type);
-char*			http_get_mime_type(const char *filename);
-char*			http_get_message_body(HTTP_SESSION *http_session);
-char*			http_get_message_header(const char *content_data, long content_length);
-char*			http_get_cgi_name(HTTP_SESSION *http_session);
-char*			http_get_query_string(HTTP_SESSION *http_session);
-char*			http_get_header_value(const char *header, const char *requested_value_name);
+long			REQUEST_get_range( HTTP_SESSION *http_session, int type );
+char*			REQUEST_get_mime_type( const char *filename );
+char*			REQUEST_get_message_body( HTTP_SESSION *http_session );
+char*			REQUEST_get_message_header( const char *content_data, long content_length );
+char*			REQUEST_get_cgi_name( HTTP_SESSION *http_session );
+char*			REQUEST_get_query( HTTP_SESSION *http_session );
+char*			REQUEST_get_header_value( const char *header, const char *requested_value_name );
 
-void			http_send_header(HTTP_SESSION *http_session, const char *http_status_code, const char *http_mime_type, size_t http_content_length, const char *content_data, const char* add_headers);
-void			http_send_file(HTTP_SESSION *http_session, const char *filename);
-void			http_send_error(HTTP_SESSION *http_session, const char *http_status_code, const char *http_error_message, const char* add_headers);
+void			RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, const char *http_mime_type, size_t http_content_length, const char *content_data, const char* add_headers );
+void			RESPONSE_file( HTTP_SESSION *http_session, const char *filename );
+void			RESPONSE_error( HTTP_SESSION *http_session, const char *http_status_code, const char *http_error_message, const char* add_headers );
 
-void			http_valid_cgi_file(const char *filename, int *valid_res, char *exec_name, char *param);
-char*			http_get_index(const char *path);
+char*			REQUEST_get_index( const char *path );
 
 #endif

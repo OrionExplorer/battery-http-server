@@ -8,7 +8,7 @@ Przeznaczenie:
 Dzi�ki definicjom w tym pliku mo�liwe jest ujednolicenie kodu dla r�nych platform.
 Definicje, kt�re nie s� uniwersalne swoje miejsce znalaz�y w adekwatnych plikach �r�d�owychh.
 
-Autor: Marcin Kelar (marcin.kelar@holicon.pl)
+Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #ifndef SERVER_PORTABLE_H
 #define SERVER_PORTABLE_H
@@ -29,7 +29,7 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 	#define putenv		_putenv
 /* Operacje na plikach i folderach */
 	#define chdir		_chdir
-	#define mkdir(a,b)	mkdir(a)
+	#define mkdir( a,b )	mkdir( a )
 	#define S_IREAD		_S_IREAD
 /* W�a�ciwo�ci socket�w */
 	#define fcntl		ioctlsocket
@@ -39,19 +39,19 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 	#define S_IXOTH		S_IEXEC
 	#define sighandler	__p_sig_fn_t
 
-	#define APP_NAME	"batteryServer (Win32)"
+	#define APP_NAME	"batteryServer ( Win32 )"
 #else
 	#define WSAGetLastError() -1
 /* �cie�ki do plik�w/folder�w na systemach LINUX s� oddzielone "/" */
 	#define SLASH		"/"
 	#define C_SLASH		'/'
-/* Dla zachowania kompatybilno�ci z WinSock (!)*/
-	#define SOCKET_ERROR (-1)
-	#define EXIT_FAILURE (1)
+/* Dla zachowania kompatybilno�ci z WinSock ( ! )*/
+	#define SOCKET_ERROR ( -1 )
+	#define EXIT_FAILURE ( 1 )
 	#define READ_BINARY	"re"
 	#define sighandler	__sighandler_t
 
-	#define APP_NAME	"batteryServer (Linux)"
+	#define APP_NAME	"batteryServer ( Linux )"
 #endif
 
 #endif

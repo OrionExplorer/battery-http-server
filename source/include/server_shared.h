@@ -4,7 +4,7 @@ Projekt battery_Server
 
 Plik: server_shared.h
 
-Autor: Marcin Kelar (marcin.kelar@holicon.pl)
+Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #ifndef SERVER_SHARED_H
 #define SERVER_SHARED_H
@@ -28,20 +28,22 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 #endif
 
 #ifdef _MSC_VER
-#pragma comment(lib, "WS2_32.lib")
+#pragma comment( lib, "WS2_32.lib" )
+#endif
+
+#ifndef _MSC_VER
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
 #endif
 
 #ifndef _WIN32
-/* Obs�uga socket�w na systemach LINUX */
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #endif
 
 #define APP_VER								"0.7"
@@ -58,32 +60,32 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 #define DEFAULT_PORT						80
 
 #define MAX_BUFFER							65535
-#define MAX_BUFFER_CHAR						65535*sizeof(char)
+#define MAX_BUFFER_CHAR						65535*sizeof( char )
 #define UPLOAD_BUFFER						16384
-#define UPLOAD_BUFFER_CHAR					16384*sizeof(char)
+#define UPLOAD_BUFFER_CHAR					16384*sizeof( char )
 #define LOG_BUFFER							10240
-#define LOG_BUFFER_CHAR						10240*sizeof(char)
+#define LOG_BUFFER_CHAR						10240*sizeof( char )
 #define BIG_BUFF_SIZE						2048
-#define BIG_BUFF_SIZE_CHAR					2048*sizeof(char)
+#define BIG_BUFF_SIZE_CHAR					2048*sizeof( char )
 #define MEDIUM_BUFF_SIZE					1024
-#define MEDIUM_BUFF_SIZE_CHAR				1024*sizeof(char)
+#define MEDIUM_BUFF_SIZE_CHAR				1024*sizeof( char )
 #define STD_BUFF_SIZE						256
-#define STD_BUFF_SIZE_CHAR					256*sizeof(char)
+#define STD_BUFF_SIZE_CHAR					256*sizeof( char )
 #define TIME_BUFF_SIZE						30
-#define TIME_BUFF_SIZE_CHAR					30*sizeof(char)
+#define TIME_BUFF_SIZE_CHAR					30*sizeof( char )
 #define SMALL_BUFF_SIZE						32
-#define SMALL_BUFF_SIZE_CHAR				32*sizeof(char)
+#define SMALL_BUFF_SIZE_CHAR				32*sizeof( char )
 #define TINY_BUFF_SIZE						16
-#define TINY_BUFF_SIZE_CHAR					16*sizeof(char)
+#define TINY_BUFF_SIZE_CHAR					16*sizeof( char )
 #define PROTO_BUFF_SIZE						10
-#define PROTO_BUFF_SIZE_CHAR				10*sizeof(char)
+#define PROTO_BUFF_SIZE_CHAR				10*sizeof( char )
 #define MICRO_BUFF_SIZE						8
-#define MICRO_BUFF_SIZE_CHAR				8*sizeof(char)
+#define MICRO_BUFF_SIZE_CHAR				8*sizeof( char )
 #define EXT_LEN								8
-#define EXT_LEN_CHAR						8*sizeof(char)
+#define EXT_LEN_CHAR						8*sizeof( char )
 
 #define MAX_PATH_LENGTH						1024
-#define MAX_PATH_LENGTH_CHAR				1024*sizeof(char)
+#define MAX_PATH_LENGTH_CHAR				1024*sizeof( char )
 #define MAX_CLIENTS							FD_SETSIZE
 
 #define RFC1123FMT							"%a, %d %b %Y %H:%M:%S GMT"
@@ -124,7 +126,7 @@ typedef struct
 	long				range_st;					/* Dla nag��wka "Range" */
 	long				range_en;					/* Dla nag��wka "Range" */
 	long				content_length;				/* Dla nag��wka "Content-Length" */
-	http_m				method_name;				/* Typ ��danej metody (GET/HEAD/POST) */
+	http_m				method_name;				/* Typ ��danej metody ( GET/HEAD/POST ) */
 	char*				content_data;				/* Ca�kowita zawarto�� ��dania */
 	char*				header;						/* Nag��wki z ��dania */
 	char*				request_line;				/* Pierwsza linia z ��dania */
@@ -139,7 +141,7 @@ typedef struct
 	char*				authorization;				/* Login i has�o do ��danego zasobu */
 	char*				user_login;					/* Odszyfrowany login u�ytkownika */
 	char*				user_pwd;					/* Odszyfrowane has�o u�ytkownika */
-	short				keep_alive;					/* Przechowuje informacj� o typie po��czenia (Close/Keep-Alive) */
+	short				keep_alive;					/* Przechowuje informacj� o typie po��czenia ( Close/Keep-Alive ) */
 	short				is_cgi;						/* 1 = ��danie jest operacj� na skrypcie, 0 = przes�anie zawarto�ci zasobu */
 	short				received_all;				/* Dla ��da� typu POST - informuje, czy odebrano ca�� wiadomo�� */
 } HTTP_INFO;
@@ -162,7 +164,7 @@ typedef struct
 #ifdef _WIN32
 	int						address_length;
 #else
-	socklen_t               	address_length;
+	socklen_t				address_length;
 #endif
 	int						socket_descriptor;
 	HTTP_INFO				http_info;
@@ -171,7 +173,7 @@ typedef struct
 
 /* Struktura przechowuj�ca informacje o innych mo�liwych rozszerzeniach plik�w,
 kt�re maj� uprawnienia do wykonania jako skrypt CGI */
-typedef struct									
+typedef struct
 {
 	char ext[EXT_LEN];					/* Rozszerzenie*/
 	char external_app[STD_BUFF_SIZE];	/* Zewn�trzna aplikacja do uruchamiania skryptu */
@@ -191,7 +193,7 @@ extern int					ip_proto_ver;
 extern HTTP_SESSION			http_session_;
 extern fd_set				master;
 extern int					http_conn_count;
-char*						server_get_remote_hostname(HTTP_SESSION *http_session);
+char*						server_get_remote_hostname( HTTP_SESSION *http_session );
 
 /* Przechowuje wczytane rozszerzenia plik�w uprawnionych do wykonania jako skrypt CGI */
 OTHER_SCRIPTS				other_script_type[8];

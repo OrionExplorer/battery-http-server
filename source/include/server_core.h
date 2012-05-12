@@ -4,16 +4,16 @@ Projekt battery_Server
 
 Plik: server_core.h
 
-Autor: Marcin Kelar (marcin.kelar@holicon.pl)
+Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #ifndef SERVER_CORE_H
 #define SERVER_CORE_H
 
-void			server_initialize(void);
-void			server_run(void);
+void			CORE_initialize( void );
+void			CORE_start( void );
 
-int				server_load_configuration(void);
-int				server_load_index_configuration(const char* filename);
+int				CORE_load_configuration( void );
 
-int				server_load_access_configuration(const char *cfg_file);
+int				CORE_load_index_names( const char* filename );
+
 #endif

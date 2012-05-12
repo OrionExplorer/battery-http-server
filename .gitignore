@@ -1,4 +1,7 @@
 obj/
 *.cbp
 *.depend
-battery-http-server.exe
+*.layout
+Release/battery-http-server.exe
+Release/logs
+Release/www

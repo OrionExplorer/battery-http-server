@@ -7,7 +7,7 @@ Plik: server_time_util.c
 Przeznaczenie:
 Zbiór funkcji przeznaczonych do zarz¹dzania dat¹ i czasem
 
-Autor: Marcin Kelar (marcin.kelar@holicon.pl)
+Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #include "include/server_shared.h"
 #include <stdio.h>
@@ -17,15 +17,14 @@ Autor: Marcin Kelar (marcin.kelar@holicon.pl)
 get_actual_time_gmt()
 - pobiera aktualny czas
 - zwraca char *z aktualnym czasem w formacie GMT */
-char* get_actual_time_gmt(void)
-{
+char* get_actual_time_gmt( void ) {
 	static char s[TIME_BUFF_SIZE];
 	struct tm tim;
 	time_t now;
 
-	now = time(NULL);
-	tim = *(localtime(&now));
-	strftime(s, TIME_BUFF_SIZE, RFC1123FMT, &tim);
+	now = time( NULL );
+	tim = *( localtime( &now ) );
+	strftime( s, TIME_BUFF_SIZE, RFC1123FMT, &tim );
 
-	return ((char*)&s);
+	return ( ( char* )&s );
 }
