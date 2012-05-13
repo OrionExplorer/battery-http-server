@@ -118,7 +118,7 @@ static void server_validate_paths( void ) {
 	tmp_path = NULL;
 }
 
-int CORE_load_index_names( const char* filename ) {
+short CORE_load_index_names( const char* filename ) {
 	FILE *cfg_file;
 	char *buf;
 	char *index_filename;
@@ -180,7 +180,7 @@ CORE_load_configuration()
 - je�li istnieje, wczytuje plik "server.cfg" i z niego pobiera konfiguracj� dla zmiennych:
 + ip_proto_ver
 + active_port */
-int CORE_load_configuration( void ) {
+short CORE_load_configuration( void ) {
 	FILE *cfg_file;
 	char *network_configuration_filename;		/* Nazwa pliku konfiguracji sieci */
 	char *script_configuration_filename;		/* Nazwa pliku konfiguracji skrypt�w CGI */

@@ -11,6 +11,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #include <stdio.h>
 
-int MIME_load_configuration( const char *cfg_file );
+short		MIME_load_configuration( const char *cfg_file );
 
 #endif

@@ -34,7 +34,7 @@ directory_exists( const char *path )
 @path - �cie�ka, kt�ra ma zosta� sprawdzona
 - funkcja pr�buje ustawi� katalog roboczy na �cie�k� podan� w zmiennej path
 - zwraca int, gdzie 0 = �cie�ka nie istnieje, 1 = �cie�ka istnieje */
-int directory_exists( const char *path ) {
+short directory_exists( const char *path ) {
 	if( chdir( path ) == 0 ) {
 		return 1;
 	} else {
@@ -88,7 +88,7 @@ file_params( const char *filename )
 + 1 = istnieje, jest do odczytu, nie wymaga autentykacji
 + 2 = istnieje, brak uprawnie� do odczytu
 + 3 = istnieje, wymagana autentykacja */
-int file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd ) {
+short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd ) {
 	FILE *resource;
 	struct stat file_stat;
 	int i = 0;
@@ -148,7 +148,7 @@ int file_params( HTTP_SESSION *http_session, const char *filename, char *ht_acce
 file_exists( const char *filename )
 @filename - nazwa szukanego pliku
 - zwraca int, gdzie 1 = znaleziono plik. */
-int file_exists( const char *filename ) {
+short file_exists( const char *filename ) {
 	FILE *resource;	/* Uchwyt do pliku */
 
 	if( ( resource = fopen( filename, "r" ) ) ) {

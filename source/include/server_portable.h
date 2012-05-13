@@ -39,7 +39,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define S_IXOTH		S_IEXEC
 	#define sighandler	__p_sig_fn_t
 
-	#define APP_NAME	"batteryServer ( Win32 )"
+	#define APP_NAME	"battery-http-server (Win32)"
 #else
 	#define WSAGetLastError() -1
 /* �cie�ki do plik�w/folder�w na systemach LINUX s� oddzielone "/" */
@@ -51,7 +51,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define READ_BINARY	"re"
 	#define sighandler	__sighandler_t
 
-	#define APP_NAME	"batteryServer ( Linux )"
+	#define APP_NAME	"battery-http-server (Linux)"
 #endif
 
 #endif

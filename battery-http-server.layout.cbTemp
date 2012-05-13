@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Release" />
+	<File name="source\batteryServer.c" open="0" top="0" tabpos="1">
+		<Cursor position="169" topLine="0" />
+	</File>
+	<File name="source\include\server_base64.h" open="0" top="0" tabpos="0">
+		<Cursor position="455" topLine="0" />
+	</File>
+	<File name="source\include\server_cgi_manager.h" open="0" top="0" tabpos="0">
+		<Cursor position="529" topLine="0" />
+	</File>
+	<File name="source\include\server_core.h" open="0" top="0" tabpos="0">
+		<Cursor position="433" topLine="0" />
+	</File>
+	<File name="source\include\server_create_session.h" open="1" top="0" tabpos="5">
+		<Cursor position="443" topLine="0" />
+	</File>
+	<File name="source\include\server_files_io.h" open="0" top="0" tabpos="0">
+		<Cursor position="331" topLine="0" />
+	</File>
+	<File name="source\include\server_htaccess_manager.h" open="0" top="0" tabpos="0">
+		<Cursor position="346" topLine="0" />
+	</File>
+	<File name="source\include\server_http_protocol.h" open="0" top="0" tabpos="0">
+		<Cursor position="6640" topLine="51" />
+	</File>
+	<File name="source\include\server_log.h" open="1" top="0" tabpos="7">
+		<Cursor position="274" topLine="0" />
+	</File>
+	<File name="source\include\server_mem_manager.h" open="0" top="0" tabpos="0">
+		<Cursor position="303" topLine="0" />
+	</File>
+	<File name="source\include\server_mime_types.h" open="0" top="0" tabpos="0">
+		<Cursor position="342" topLine="0" />
+	</File>
+	<File name="source\include\server_portable.h" open="0" top="0" tabpos="3">
+		<Cursor position="1220" topLine="0" />
+	</File>
+	<File name="source\include\server_shared.h" open="1" top="0" tabpos="3">
+		<Cursor position="6492" topLine="176" />
+	</File>
+	<File name="source\include\server_socket_io.h" open="1" top="0" tabpos="4">
+		<Cursor position="365" topLine="0" />
+	</File>
+	<File name="source\include\server_strings_util.h" open="0" top="0" tabpos="0">
+		<Cursor position="296" topLine="0" />
+	</File>
+	<File name="source\include\server_time_util.h" open="0" top="0" tabpos="0">
+		<Cursor position="327" topLine="0" />
+	</File>
+	<File name="source\server_base64.c" open="0" top="0" tabpos="0">
+		<Cursor position="5335" topLine="179" />
+	</File>
+	<File name="source\server_cgi_manager.c" open="0" top="0" tabpos="4">
+		<Cursor position="6419" topLine="167" />
+	</File>
+	<File name="source\server_core.c" open="0" top="0" tabpos="3">
+		<Cursor position="11236" topLine="330" />
+	</File>
+	<File name="source\server_create_session.c" open="1" top="0" tabpos="1">
+		<Cursor position="20013" topLine="398" />
+	</File>
+	<File name="source\server_files_io.c" open="0" top="0" tabpos="0">
+		<Cursor position="4828" topLine="139" />
+	</File>
+	<File name="source\server_htaccess_manager.c" open="0" top="0" tabpos="0">
+		<Cursor position="3228" topLine="69" />
+	</File>
+	<File name="source\server_http_protocol.c" open="1" top="1" tabpos="6">
+		<Cursor position="15510" topLine="380" />
+	</File>
+	<File name="source\server_log.c" open="0" top="0" tabpos="0">
+		<Cursor position="1763" topLine="36" />
+	</File>
+	<File name="source\server_mem_manager.c" open="0" top="0" tabpos="0">
+		<Cursor position="988" topLine="0" />
+	</File>
+	<File name="source\server_mime_types.c" open="0" top="0" tabpos="0">
+		<Cursor position="2327" topLine="43" />
+	</File>
+	<File name="source\server_socket_io.c" open="1" top="0" tabpos="2">
+		<Cursor position="7667" topLine="213" />
+	</File>
+	<File name="source\server_strings_util.c" open="0" top="0" tabpos="0">
+		<Cursor position="3524" topLine="95" />
+	</File>
+	<File name="source\server_time_util.c" open="0" top="0" tabpos="0">
+		<Cursor position="367" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

@@ -14,7 +14,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #define CGI_VER				"CGI/1.1"		/* Wersja protoko³u CGI */
 
 void			CGI_execute( HTTP_SESSION *http_session, const char *filename );
-int				CGI_load_configuration( const char *cfg_file );
+short			CGI_load_configuration( const char *cfg_file );
 void			CGI_valid( const char *filename, int *valid_res, char *exec_name, char *param );
 
 #endif

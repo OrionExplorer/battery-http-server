@@ -1,0 +1,12 @@
+Starting server_validate_paths()...
+Creating path: D:\Marcin\Programowanie\battery-http-server\battery-http-server\logs\...
+	- verified: D:\Marcin\Programowanie\battery-http-server\battery-http-server\logs\
+	- verified: D:\Marcin\Programowanie\battery-http-server\battery-http-server\logs\.
+NEW SERVER SESSION.
+LOG_filename: D:\Marcin\Programowanie\battery-http-server\battery-http-server\logs\log.txt.
+server_validate_paths() done.
+Application start path:
+D:\Marcin\Programowanie\battery-http-server\battery-http-server\
+Loading configuration file ( D:\Marcin\Programowanie\battery-http-server\battery-http-server\configuration\network.conf )...error or file not found.
+Loading configuration file ( D:\Marcin\Programowanie\battery-http-server\battery-http-server\configuration\network.conf )...error or file not found.
+Error: unable to load configuration.

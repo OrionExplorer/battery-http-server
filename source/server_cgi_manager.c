@@ -23,8 +23,8 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <stdarg.h>
 #include <string.h>
 
-static void		cgi_set_env_variables( HTTP_SESSION *http_session, const char *filename );
-static void		cgi_set_env( const char *var, const char *val );
+static void		CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename );
+static void		CGI_set_env( const char *var, const char *val );
 
 /*
 CGI_execute( HTTP_SESSION *http_session, const char *filename )
@@ -99,7 +99,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	}
 
 	/* Ustawienie zmiennych systemowych */
-	cgi_set_env_variables( http_session, filename );
+	CGI_set_env_variables( http_session, filename );
 
 	/* Stworzenie potoku ze skryptem CGI. Weryfikacja poprawno�ci nazwy nast�pi�a w funkcji
 	CGI_valid. Odczyt danych w trybie binarnym. */
@@ -181,7 +181,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	cgi_script_exec = NULL;
 }
 
-static void cgi_set_env( const char *var, const char *val ) {
+static void CGI_set_env( const char *var, const char *val ) {
 #ifdef _WIN32
 	char env_var[MAX_BUFFER];
 	sprintf( env_var, "%s=%s", var, val );
@@ -192,63 +192,63 @@ static void cgi_set_env( const char *var, const char *val ) {
 }
 
 /*
-cgi_set_env_variables( HTTP_SESSION *http_session, const char *filename )
+CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename )
 @http_session - wska�nik do pod��czonego klienta
 @filename - pe�na nazwa pliku skryptu
 - funkcja ustawia zmienne �rodowiskowe, zgodnie ze specyfikacj� CGI/1.1 ( RFC3875 )*/
-static void cgi_set_env_variables( HTTP_SESSION *http_session, const char *filename ) {
+static void CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename ) {
 	char str_res[SMALL_BUFF_SIZE];
 
 	/* "Content-Length" i "Content-Type" s� nieobecne w przypadku metody GET i HEAD */
 	if( http_session->http_info.method_name == POST ) {
 		sprintf( str_res, "%ld", http_session->http_info.content_length );
-		cgi_set_env( "CONTENT_LENGTH", str_res );
-		cgi_set_env( "CONTENT_TYPE", http_session->http_info.content_type );
+		CGI_set_env( "CONTENT_LENGTH", str_res );
+		CGI_set_env( "CONTENT_TYPE", http_session->http_info.content_type );
 	} else {
 		/* Zerowanie zmiennych systemowych */
-		cgi_set_env( "CONTENT_LENGTH", NULL );
-		cgi_set_env( "CONTENT_TYPE", NULL );
+		CGI_set_env( "CONTENT_LENGTH", NULL );
+		CGI_set_env( "CONTENT_TYPE", NULL );
 	}
 
-	cgi_set_env( "GATEWAY_INTERFACE", CGI_VER );
+	CGI_set_env( "GATEWAY_INTERFACE", CGI_VER );
 
 	/*sprintf( env_var,"PATH_INFO=%s", path_in );
 	putenv( env_var );*/
 
-	cgi_set_env( "SCRIPT_FILENAME", filename );
+	CGI_set_env( "SCRIPT_FILENAME", filename );
 
-	cgi_set_env( "QUERY_STRING", http_session->http_info.query_string );
+	CGI_set_env( "QUERY_STRING", http_session->http_info.query_string );
 
-	cgi_set_env( "REMOTE_ADDR", http_session->http_info.remote_addr );
+	CGI_set_env( "REMOTE_ADDR", http_session->http_info.remote_addr );
 
-	cgi_set_env( "AUTH_TYPE", http_session->http_info.authorization == NULL ? NULL:"Basic" );
+	CGI_set_env( "AUTH_TYPE", http_session->http_info.authorization == NULL ? NULL:"Basic" );
 
-	cgi_set_env( "REMOTE_USER", http_session->http_info.user_login == NULL ? NULL:http_session->http_info.user_login );
+	CGI_set_env( "REMOTE_USER", http_session->http_info.user_login == NULL ? NULL:http_session->http_info.user_login );
 
-	cgi_set_env( "REMOTE_IDENT", http_session->http_info.user_pwd == NULL ? NULL:http_session->http_info.user_pwd );
+	CGI_set_env( "REMOTE_IDENT", http_session->http_info.user_pwd == NULL ? NULL:http_session->http_info.user_pwd );
 
-	cgi_set_env( "REMOTE_HOST", server_get_remote_hostname( http_session ) );
+	CGI_set_env( "REMOTE_HOST", server_get_remote_hostname( http_session ) );
 
-	cgi_set_env( "REQUEST_METHOD", http_method_list[http_session->http_info.method_name] );
+	CGI_set_env( "REQUEST_METHOD", http_method_list[http_session->http_info.method_name] );
 
-	cgi_set_env( "SCRIPT_NAME", http_session->http_info.http_local_path );
+	CGI_set_env( "SCRIPT_NAME", http_session->http_info.http_local_path );
 
-	cgi_set_env( "SERVER_NAME", APP_NAME );
+	CGI_set_env( "SERVER_NAME", APP_NAME );
 
 	sprintf( str_res, "%d", active_port );
-	cgi_set_env( "SERVER_PORT", str_res );
+	CGI_set_env( "SERVER_PORT", str_res );
 
-	cgi_set_env( "SERVER_PROTOCOL", http_session->http_info.protocol_ver );
+	CGI_set_env( "SERVER_PROTOCOL", http_session->http_info.protocol_ver );
 
-	cgi_set_env( "SERVER_SOFTWARE", SERVER_NAME );
+	CGI_set_env( "SERVER_SOFTWARE", SERVER_NAME );
 
-	cgi_set_env( "REDIRECT_STATUS", "200" );
+	CGI_set_env( "REDIRECT_STATUS", "200" );
 
 }
 
 /*
 CGI_load_configuration( void )*/
-int CGI_load_configuration( const char *filename ) {
+short CGI_load_configuration( const char *filename ) {
 	FILE *cfg_file;
 	char *buf;				/* Wczytana linia z pliku konfiguracyjnego */
 	char *ext;				/* Wczytane rozszerzenie pliku z buf */

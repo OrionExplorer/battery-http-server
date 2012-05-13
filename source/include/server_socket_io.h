@@ -11,16 +11,18 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #include "server_shared.h"
 
-void serverStart( void );
-
 void			SOCKET_main( void );
 void			SOCKET_run( void );
 void			SOCKET_stop( void );
 
-int				SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size );
+void			SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size, int *res );
 void			SOCKET_disconnect_client( HTTP_SESSION *http_session );
 void			SOCKET_release( HTTP_SESSION *http_session );
 char*			SOCKET_get_remote_ip( HTTP_SESSION *http_session );
 void			SOCKET_process( void *socket_fd );
+void			SOCKET_process_thread( void *socket_fd );
+
+SEND_INFO* SOCKET_find_response_struct_by_id( int socket );
+HTTP_SESSION* SOCKET_find_session_by_id( int socket );
 
 #endif

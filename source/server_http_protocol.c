@@ -14,12 +14,14 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include "include/server_files_io.h"
 #include "include/server_cgi_manager.h"
 #include "include/server_log.h"
+#include "include/server_socket_io.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-const char *http_method_list[] = { "", "GET", "HEAD", "POST" };
+const char			*http_method_list[] = { "", "GET", "HEAD", "POST" };
+SEND_INFO			send_d[ MAX_CLIENTS ];
 
 /*
 REQUEST_get_message_body( const char *content_data )
@@ -354,6 +356,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 	long total = 0;		/* Ca�kowity rozmiar wysy�anych danych */
 	char *buf;
 	char *add_hdr;		/* Opcjonalne nag��wki */
+	SEND_INFO *send_struct;
 
 	/* Otwarcie pliku. Weryfikacja poprawno�ci jego nazwy nast�pi�a poprzez funkcj�
 	file_params w nadrz�dnej funkcji REQUEST_process */
@@ -398,16 +401,28 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 				/* Wysy�ka z kodem 200 - wszystko ok */
 				RESPONSE_header( http_session, HTTP_200_OK, REQUEST_get_mime_type( filename ), filesize, NULL, NULL );
 
-				/* Je�eli rozmiar pliku jest wi�kszy od rozmiaru UPLOAD_BUFFER to wysy�a w cz�ciach */
-				buf = ( char* )malloc( UPLOAD_BUFFER_CHAR );
-				while( ( len = fread( buf, sizeof( char ), UPLOAD_BUFFER, file ) ) > 0 ) {
-					if( SESSION_send_response( http_session, buf, len ) == 0 ) {
-						break; /*Roz��czy�o si�... CONNECTION RESET BY PEER */
-					}
+				send_struct = SOCKET_find_response_struct_by_id( http_session->socket_descriptor );
+
+				if( send_struct ) {
+					send_struct->file = file;
+					send_struct->http_content_size = filesize;
+					send_struct->m_buf_len = 0;
+					send_struct->m_buf_used = 0;
+					printf("Added content size: %ld\n", send_struct->http_content_size);
+					send_struct->sent_size = 0;
 				}
 
-				free( buf );
-				buf = NULL;
+				//TODO!!!!!!!
+				/* Je�eli rozmiar pliku jest wi�kszy od rozmiaru UPLOAD_BUFFER to wysy�a w cz�ciach */
+//				buf = ( char* )malloc( UPLOAD_BUFFER_CHAR );
+//				while( ( len = fread( buf, sizeof( char ), UPLOAD_BUFFER, file ) ) > 0 ) {
+//					if( SESSION_send_response( http_session, buf, len ) == 0 ) {
+//						break; /*Roz��czy�o si�... CONNECTION RESET BY PEER */
+//					}
+//				}
+//
+//				free( buf );
+//				buf = NULL;
 			} else {
 				/* Wysy�ka wybranego fragmentu pliku */
 				/* Je�eli zakres ko�cowy jest mniejszy od 0 ( np. -1 ) to ustawiamy go jako rozmiar pliku */
@@ -449,7 +464,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 			}
 		}
 		/* Zamkni�cie pliku */
-		fclose( file );
+		//fclose( file );
 	}
 }
 
@@ -462,10 +477,11 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 	char *file_ext;				/* Rozszerzenie ��danego pliku */
 	char *add_hdr;				/* Opcjonalne nag��wki */
 	char *ht_access_pwd;		/* Has�o do ��danego zasobu z funkcji file_params*/
-	int len_loc = strlen( http_session->http_info.http_local_path ); /* D�ugo�� ��danej �cie�ki */
+	int len_loc; /* D�ugo�� ��danej �cie�ki */
 	int file_params_val = 0;	/* Przechowuje wynik dzia�ania funkcji file_params */
 	int cgi_valid_res = -1;		/* Informuje, czy ��dany zas�b jest skryptem CGI */
 
+	len_loc = strlen( http_session->http_info.http_local_path );
 	/* Przygotowanie pami�ci na nazw� ��danego pliku */
 	local_file_path = ( char* )malloc( MAX_PATH_LENGTH_CHAR+1 );
 	mem_allocated( local_file_path, 12 );
@@ -602,6 +618,13 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 	/* Zwolnienie pami�ci dla nazwy ��danego pliku */
 	free( local_file_path );
 	local_file_path = NULL;
+
+	/* Jeďż˝eli typ poďż˝ďż˝czenia jest zamkniďż˝ty lub niezdefiniowany - rozďż˝ďż˝czamy siďż˝ */
+	if( http_session->http_info.keep_alive != 1 ) {
+		SOCKET_disconnect_client( http_session );
+	}
+	 /* Zwalniamy pamiďż˝ďż˝ */
+	SESSION_release( http_session );
 }
 
 /*

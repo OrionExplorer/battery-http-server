@@ -23,7 +23,7 @@ int			mime_types_count;
 MIME_load_configuration( const char *filename )
 @filename - nazwa pliku konfiguracyjnego
 - zwraca int, gdzie 1 = uda�o si� wczyta� konfiguracj�, a 0 = nie uda�o si�. */
-int MIME_load_configuration( const char *filename ) {
+short MIME_load_configuration( const char *filename ) {
 	FILE *cfg_file;
 	char *buf;				/* Wczytana linia z pliku */
 	char *ext;				/* Wczytane rozszerzenie pliku z buf */

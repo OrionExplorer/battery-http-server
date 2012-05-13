@@ -23,7 +23,7 @@ int	ht_access_count = 0;
 HTACCESS_load_configuration( const char *filename )
 @filename - nazwa pliku konfiguracyjnego
 - zwraca int, gdzie 1 = konfiguracja wczytana poprawnie. */
-int HTACCESS_load_configuration( const char *filename ) {
+short HTACCESS_load_configuration( const char *filename ) {
 	FILE *cfg_file;
 	char *buf;			/* Zmienna pomocnicza */
 	char *res;			/* Przechowuje nazw� zasobu */

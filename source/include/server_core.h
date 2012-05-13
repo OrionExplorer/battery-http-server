@@ -11,9 +11,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 void			CORE_initialize( void );
 void			CORE_start( void );
-
-int				CORE_load_configuration( void );
-
-int				CORE_load_index_names( const char* filename );
+short			CORE_load_configuration( void );
+short			CORE_load_index_names( const char* filename );
 
 #endif

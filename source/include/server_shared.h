@@ -13,6 +13,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include "server_strings_util.h"
 #include "server_time_util.h"
 #include "server_mem_manager.h"
+#include <stdio.h>
 #include <time.h>
 
 #define FD_SETSIZE	1024
@@ -84,6 +85,8 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #define EXT_LEN								8
 #define EXT_LEN_CHAR						8*sizeof( char )
 
+#define MAX_THREADS							64
+
 #define MAX_PATH_LENGTH						1024
 #define MAX_PATH_LENGTH_CHAR				1024*sizeof( char )
 #define MAX_CLIENTS							FD_SETSIZE
@@ -151,9 +154,24 @@ typedef struct LOCAL_INFO
 	char*				date_res_last_modified;		/* Przechowuje informacj� kiedy zas�b zosta� ostatnio zmodyfikowany */
 } LOCAL_INFO;
 
+typedef struct HTTP_SESSION		HTTP_SESSION;
+typedef struct SEND_INFO		SEND_INFO;
+
+struct SEND_INFO {
+	FILE				*file;
+	long				http_content_size;
+	long				sent_size;
+	int					m_buf_len;          /* bytes in buffer */
+    int					m_buf_used;         /* bytes used so far; <= m_buf_len */
+#ifdef _WIN32
+	SOCKET					socket_descriptor;
+#else
+	int						socket_descriptor;
+#endif
+};
+
 /* G��wna struktura, kt�ra b�dzie przechowywa�a wszystkie informacje o po��czonym kliencie */
-typedef struct
-{
+struct HTTP_SESSION {
 	struct sockaddr_in		address;
 #ifdef _WIN32
 	SOCKET					socket;
@@ -169,7 +187,9 @@ typedef struct
 	int						socket_descriptor;
 	HTTP_INFO				http_info;
 	LOCAL_INFO				local_info;
-} HTTP_SESSION;
+	SEND_INFO				response_data;
+
+};
 
 /* Struktura przechowuj�ca informacje o innych mo�liwych rozszerzeniach plik�w,
 kt�re maj� uprawnienia do wykonania jako skrypt CGI */
@@ -191,6 +211,7 @@ extern int					active_port;
 extern struct sockaddr_in	server_address;
 extern int					ip_proto_ver;
 extern HTTP_SESSION			http_session_;
+extern SEND_INFO			send_d[ MAX_CLIENTS ];
 extern fd_set				master;
 extern int					http_conn_count;
 char*						server_get_remote_hostname( HTTP_SESSION *http_session );
