@@ -40,13 +40,13 @@ Featured HTTP response codes:
 • 504 Not Supported
 
 Additional informations:
+• Multithreaded
 • Multiplatform
 • Event log
 • Simple configuration based on text files
 • High performance (tested with Apache Benchmark)
 
 TODO:
-• Multithreading
 • HTTP Proxy
 • Method PUT
 • Method DELETE
