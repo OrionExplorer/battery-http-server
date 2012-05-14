@@ -351,7 +351,6 @@ RESPONSE_file( HTTP_SESSION *http_session, const char *filename )
 - funkcja wysy�a do przegl�darki ��dany zas�b lub jego fragment */
 void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 	FILE *file;
-	long len = 0;
 	long filesize = 0;	/* Ca�kowity rozmiar ��danego pliku */
 	long total = 0;		/* Ca�kowity rozmiar wysy�anych danych */
 	char *buf;
@@ -401,28 +400,15 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 				/* Wysy�ka z kodem 200 - wszystko ok */
 				RESPONSE_header( http_session, HTTP_200_OK, REQUEST_get_mime_type( filename ), filesize, NULL, NULL );
 
-				send_struct = SOCKET_find_response_struct_by_id( http_session->socket_descriptor );
+				send_struct = SESSION_find_response_struct_by_id( http_session->socket_descriptor );
 
 				if( send_struct ) {
 					send_struct->file = file;
 					send_struct->http_content_size = filesize;
 					send_struct->m_buf_len = 0;
 					send_struct->m_buf_used = 0;
-					printf("Added content size: %ld\n", send_struct->http_content_size);
 					send_struct->sent_size = 0;
 				}
-
-				//TODO!!!!!!!
-				/* Je�eli rozmiar pliku jest wi�kszy od rozmiaru UPLOAD_BUFFER to wysy�a w cz�ciach */
-//				buf = ( char* )malloc( UPLOAD_BUFFER_CHAR );
-//				while( ( len = fread( buf, sizeof( char ), UPLOAD_BUFFER, file ) ) > 0 ) {
-//					if( SESSION_send_response( http_session, buf, len ) == 0 ) {
-//						break; /*Roz��czy�o si�... CONNECTION RESET BY PEER */
-//					}
-//				}
-//
-//				free( buf );
-//				buf = NULL;
 			} else {
 				/* Wysy�ka wybranego fragmentu pliku */
 				/* Je�eli zakres ko�cowy jest mniejszy od 0 ( np. -1 ) to ustawiamy go jako rozmiar pliku */

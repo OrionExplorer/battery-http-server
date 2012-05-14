@@ -33,6 +33,8 @@ short			SESSION_local_path_is_valid( HTTP_SESSION *http_session );
 short			SESSION_http_protocol_is_valid( HTTP_SESSION *http_session );
 short			SESSION_check_connections_limit( HTTP_SESSION *http_session );
 
+HTTP_SESSION			*sessions[ MAX_CLIENTS ];
+
 /*
 SESSION_http_protocol_is_valid( HTTP_SESSION *http_session )
 @http_session - wskaŸnik do pod³¹czonego klienta
@@ -439,6 +441,7 @@ SESSION_release( HTTP_SESSION *http_session, int release_content )
 - sprawdza, czy elementy struktury HTTP_SESSION zajmujï¿½ pamiï¿½ï¿½ i w razie potrzeby zwalnia jï¿½ */
 void SESSION_release( HTTP_SESSION *http_session )
 {
+	//SESSION_delete_ptr( http_session );
 	/* Zwalnianie ciï¿½gï¿½w znakï¿½w */
 	if( http_session->http_info.content_data != NULL ) {
 		free( http_session->http_info.content_data );
@@ -541,4 +544,53 @@ short SESSION_send_response( HTTP_SESSION *http_session, const char *content_dat
 	SOCKET_send( http_session, content_data, http_content_size, &result );
 
 	return result;
+}
+
+void SESSION_add_new_ptr( HTTP_SESSION *http_session ) {
+	int i;
+
+	for( i = 0; i < http_conn_count; i++ ) {
+		if( sessions[ i ] == NULL ) {
+			sessions[ i ] = http_session;
+			break;
+		}
+	}
+}
+
+void SESSION_delete_ptr( HTTP_SESSION *http_session ) {
+	int i;
+
+	for( i = 0; i < http_conn_count; i++ ) {
+		if( sessions[ i ]) {
+			if( sessions[ i ]->socket_descriptor == http_session->socket_descriptor ) {
+				sessions[ i ] = NULL;
+				break;
+			}
+		}
+	}
+
+}
+
+HTTP_SESSION* SESSION_find_by_id( int socket ) {
+	int i;
+
+	for( i = 0; i <= http_conn_count; i++ ) {
+		if( sessions[i]->socket_descriptor == socket ) {
+			return sessions[i];
+		}
+	}
+
+	return NULL;
+}
+
+SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
+	int i;
+
+	for( i = 0; i <= http_conn_count; i++ ) {
+		if( send_d[i].socket_descriptor == socket ) {
+			return &send_d[ i ];
+		}
+	}
+
+	return NULL;
 }

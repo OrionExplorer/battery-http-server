@@ -22,7 +22,4 @@ char*			SOCKET_get_remote_ip( HTTP_SESSION *http_session );
 void			SOCKET_process( void *socket_fd );
 void			SOCKET_process_thread( void *socket_fd );
 
-SEND_INFO* SOCKET_find_response_struct_by_id( int socket );
-HTTP_SESSION* SOCKET_find_session_by_id( int socket );
-
 #endif

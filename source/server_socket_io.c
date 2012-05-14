@@ -36,7 +36,7 @@ int					addr_size;
 int					active_port;
 struct sockaddr_in	server_address;
 HTTP_SESSION		http_session_;
-HTTP_SESSION		*sessions[ MAX_CLIENTS ];
+//HTTP_SESSION		*sessions[ MAX_CLIENTS ];
 int					i_sac;
 fd_set				master;
 fd_set				read_fds;
@@ -50,6 +50,7 @@ SEND_INFO			send_d[ MAX_CLIENTS ];
 
 static void		socket_initialization( void );
 static void		socket_prepare( void );
+static void		SOCKET_send_all_data( void );
 void			SOCKET_stop( void );
 
 /*
@@ -150,16 +151,53 @@ static void socket_prepare( void ) {
 	/* Teraz czekamy na po��czenia i dane */
 }
 
+void SOCKET_add_new_send_struct( int socket_descriptor ) {
+	int i;
+
+	for( i = 0; i < http_conn_count; i++ ){
+		if( send_d[ i ].socket_descriptor == 0 ) {
+			send_d[ i ].socket_descriptor = socket_descriptor;
+			break;
+		}
+	}
+}
+
+static void SOCKET_send_all_data( void ) {
+	register int j;
+	char m_buf[ UPLOAD_BUFFER ];
+	int nwrite;
+
+	for(j = 0; j <= http_conn_count; j++) {
+		if( send_d[ j ].http_content_size > 0 ) {
+			/* Pobranie rozmiaru pliku */
+			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
+			send_d[ j ].m_buf_len = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
+			if( send_d[ j ].m_buf_len == 0) {
+				fclose( send_d[ j ].file );
+				continue;
+			}
+
+			send_d[ j ].sent_size += send_d[ j ].m_buf_len;
+			nwrite = send( send_d[ j ].socket_descriptor, m_buf, send_d[ j ].m_buf_len, 0 );
+
+			if( nwrite <= 0 ){
+				fclose( send_d[ j ].file );
+				send_d[ j ].http_content_size = 0;
+				send_d[ j ].m_buf_len = 0;
+				send_d[ j ].m_buf_used = 0;
+				send_d[ j ].sent_size = 0;
+				send_d[ j ].socket_descriptor = 0;
+			}
+			send_d[ j ].http_content_size -= nwrite;
+		}
+	}
+}
 /*
 SOCKET_run( void )
 - funkcja zarz�dza po��czeniami przychodz�cymi do gniazda. */
 void SOCKET_run( void ) {
 	register int i = 0;
-	register int j = 0;
 	struct timeval tv;
-	char m_buf[ UPLOAD_BUFFER_CHAR ];
-	int nwrite;
-	long filesize;
 
 	/* Reset zmiennej informuj�cej o cz�ciowym odbiorze przychodz�cej tre�ci */
 	http_session_.http_info.received_all = -1;
@@ -178,34 +216,9 @@ void SOCKET_run( void ) {
 			exit( EXIT_FAILURE );
 		}
 
-		for(j = 0; j <= http_conn_count; j++) {
-			if( send_d[ j ].http_content_size > 0 ) {
-			    /* Pobranie rozmiaru pliku */
-                fseek( send_d[ j ].file, 0, SEEK_END );
-                filesize = ftell( send_d[ j ].file );
-                printf("Filesize: %ld\n", filesize);
-                printf("Sending part from %ld\n", send_d[ j ].sent_size );
-
-				    fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-					send_d[ j ].m_buf_len = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-					if( send_d[ j ].m_buf_len == 0) {
-						printf("Closing file!\n");
-						fclose( send_d[ j ].file );
-						continue;
-					}
-					printf("Readed buf len: %d\n", send_d[ j ].m_buf_len);
-					send_d[ j ].m_buf_used = 0;
-
-
-				//assert( send_d[ j ].m_buf_len > send_d[ j ].m_buf_used );
-				send_d[ j ].sent_size += send_d[ j ].m_buf_len;
-				nwrite = send( send_d[ j ].socket_descriptor, m_buf, send_d[ j ].m_buf_len, 0 );
-				printf("Sent: %ld (%ld)\n", send_d[ j ].sent_size, filesize );
-				send_d[ j ].http_content_size -= nwrite;
-			}
-		}
 		i = fdmax+1;
 		while( --i ) {
+			//printf("Loop all...\n");
 			if( FD_ISSET( i, &read_fds ) ) { /* Co� si� dzieje na sockecie... */
 				if( i == socket_server ) {
 					/* Pod��czy� si� nowy klient */
@@ -216,9 +229,8 @@ void SOCKET_run( void ) {
 					if( newfd == -1 ) {
 						LOG_print( "Socket error: accept().\n" );
 					} else {
-						send_d[ http_conn_count ].socket_descriptor = newfd;
-						send_d[ http_conn_count ].http_content_size = 0;
-						printf("Client with desc=%d\n", newfd);
+						SOCKET_add_new_send_struct( newfd );
+						//printf("Client with desc=%d\n", newfd);
 						FD_SET( newfd, &master );
 						if( newfd > fdmax ) {
 							fdmax = newfd;
@@ -229,36 +241,9 @@ void SOCKET_run( void ) {
 					SOCKET_process( ( void * )i );
 				}
 			} /*nowe po��czenie */
+			SOCKET_send_all_data();
 		} /*p�tla deskryptor�w while( --i )*/
 	} /*for( ;; ) */
-}
-
-HTTP_SESSION* SOCKET_find_session_by_id( int socket ) {
-	int i;
-
-	printf("Looking for socket %d...", socket );
-	for( i = 0; i <= http_conn_count; i++ ) {
-		if( sessions[i]->socket_descriptor == socket ) {
-			printf("ok.\n");
-			return sessions[i];
-		}
-	}
-	printf("not found.\n");
-	return NULL;
-}
-
-SEND_INFO* SOCKET_find_response_struct_by_id( int socket ) {
-	int i;
-
-	printf("Looking for socket %d...", socket );
-	for( i = 0; i <= http_conn_count; i++ ) {
-		if( send_d[i].socket_descriptor == socket ) {
-			printf("ok.\n");
-			return &send_d[ i ];
-		}
-	}
-	printf("not found.\n");
-	return NULL;
 }
 
 /*
@@ -281,7 +266,7 @@ void SOCKET_process( void *socket_fd ) {
 	session->address = http_session_.address;
 	session->socket_descriptor = ( int )socket_fd;
 
-	sessions[ http_conn_count ] = session;
+	SESSION_add_new_ptr( session );
 
 	if ( ( session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 ) ) <= 0 ) {
 		/* ...ale to jednak by�o roz��czenie */
