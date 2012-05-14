@@ -159,6 +159,7 @@ void SOCKET_run( void ) {
 	struct timeval tv;
 	char m_buf[ UPLOAD_BUFFER_CHAR ];
 	int nwrite;
+	long filesize;
 
 	/* Reset zmiennej informuj�cej o cz�ciowym odbiorze przychodz�cej tre�ci */
 	http_session_.http_info.received_all = -1;
@@ -179,7 +180,13 @@ void SOCKET_run( void ) {
 
 		for(j = 0; j <= http_conn_count; j++) {
 			if( send_d[ j ].http_content_size > 0 ) {
-				if( send_d[ j ].m_buf_used == send_d[ j ].m_buf_len) {
+			    /* Pobranie rozmiaru pliku */
+                fseek( send_d[ j ].file, 0, SEEK_END );
+                filesize = ftell( send_d[ j ].file );
+                printf("Filesize: %ld\n", filesize);
+                printf("Sending part from %ld\n", send_d[ j ].sent_size );
+
+				    fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 					send_d[ j ].m_buf_len = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 					if( send_d[ j ].m_buf_len == 0) {
 						printf("Closing file!\n");
@@ -188,13 +195,12 @@ void SOCKET_run( void ) {
 					}
 					printf("Readed buf len: %d\n", send_d[ j ].m_buf_len);
 					send_d[ j ].m_buf_used = 0;
-				}
 
-				assert( send_d[ j ].m_buf_len > send_d[ j ].m_buf_used );
-				printf("m_buf_used: %d\n", send_d[ j ].m_buf_used);
-				printf("m_buf_len: %d\n", send_d[ j ].m_buf_len);
-				nwrite = send( send_d[ j ].socket_descriptor, m_buf + send_d[ j ].m_buf_used, send_d[ j ].m_buf_len - send_d[ j ].m_buf_used, 0 );
-				printf("Sent: %d (%ld)\n", nwrite, send_d[ j ].http_content_size);
+
+				//assert( send_d[ j ].m_buf_len > send_d[ j ].m_buf_used );
+				send_d[ j ].sent_size += send_d[ j ].m_buf_len;
+				nwrite = send( send_d[ j ].socket_descriptor, m_buf, send_d[ j ].m_buf_len, 0 );
+				printf("Sent: %ld (%ld)\n", send_d[ j ].sent_size, filesize );
 				send_d[ j ].http_content_size -= nwrite;
 			}
 		}
