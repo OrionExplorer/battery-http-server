@@ -40,7 +40,7 @@ Featured HTTP response codes:
 • 504 Not Supported
 
 Additional informations:
-• Multithreaded
+• Single-threaded
 • Multiplatform
 • Event log
 • Simple configuration based on text files
