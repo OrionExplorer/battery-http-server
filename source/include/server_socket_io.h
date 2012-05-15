@@ -19,7 +19,5 @@ void			SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_conten
 void			SOCKET_disconnect_client( HTTP_SESSION *http_session );
 void			SOCKET_release( HTTP_SESSION *http_session );
 char*			SOCKET_get_remote_ip( HTTP_SESSION *http_session );
-void			SOCKET_process( void *socket_fd );
-void			SOCKET_process_thread( void *socket_fd );
 
 #endif

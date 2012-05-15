@@ -441,7 +441,6 @@ SESSION_release( HTTP_SESSION *http_session, int release_content )
 - sprawdza, czy elementy struktury HTTP_SESSION zajmujï¿½ pamiï¿½ï¿½ i w razie potrzeby zwalnia jï¿½ */
 void SESSION_release( HTTP_SESSION *http_session )
 {
-	//SESSION_delete_ptr( http_session );
 	/* Zwalnianie ciï¿½gï¿½w znakï¿½w */
 	if( http_session->http_info.content_data != NULL ) {
 		free( http_session->http_info.content_data );
@@ -546,8 +545,12 @@ short SESSION_send_response( HTTP_SESSION *http_session, const char *content_dat
 	return result;
 }
 
+/*
+SESSION_add_new_ptr( HTTP_SESSION *http_session )
+@http_session - wskaŸnik do pod³¹czonego klienta
+- funkcja przypisuje pustemu elementowi tablicy sessions wskaŸnik do http_session */
 void SESSION_add_new_ptr( HTTP_SESSION *http_session ) {
-	int i;
+	int i = http_conn_count;
 
 	for( i = 0; i < http_conn_count; i++ ) {
 		if( sessions[ i ] == NULL ) {
@@ -557,6 +560,10 @@ void SESSION_add_new_ptr( HTTP_SESSION *http_session ) {
 	}
 }
 
+/*
+SESSION_delete_ptr( HTTP_SESSION *http_session )
+@http_session - wskaŸnik do pod³¹czonego klienta
+- funkcja usuwa z tablicy sessions wskaŸnik do http_session */
 void SESSION_delete_ptr( HTTP_SESSION *http_session ) {
 	int i;
 
@@ -571,18 +578,10 @@ void SESSION_delete_ptr( HTTP_SESSION *http_session ) {
 
 }
 
-HTTP_SESSION* SESSION_find_by_id( int socket ) {
-	int i;
-
-	for( i = 0; i <= http_conn_count; i++ ) {
-		if( sessions[i]->socket_descriptor == socket ) {
-			return sessions[i];
-		}
-	}
-
-	return NULL;
-}
-
+/*
+SESSION_find_response_struct_by_id( int socket )
+@socket - identyfikator gniazda
+- funkcja na podstawie identyfikatora gniazda odnajduje strukturê z danymi do wysy³ki */
 SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 	int i;
 
@@ -593,4 +592,20 @@ SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 	}
 
 	return NULL;
+}
+
+/*
+SESSION_add_new_send_struct( int socket_descriptor )
+@socket_descriptor - identyfikator gniazda
+- funkcja znajduje pust¹ strukturê w tablicy SEND_INFO i przydziela jej identyfikator gniazda w celu umo¿liwienia póŸniejszej wysy³ki danych */
+void SESSION_add_new_send_struct( int socket_descriptor ) {
+	int i;
+
+	for( i = 0; i < http_conn_count; i++ ){
+		if( send_d[ i ].socket_descriptor == 0 ) {
+			send_d[ i ].socket_descriptor = socket_descriptor;
+			send_d[ i ].sent_size = 0;
+			break;
+		}
+	}
 }

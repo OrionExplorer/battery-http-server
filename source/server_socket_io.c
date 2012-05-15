@@ -16,6 +16,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include "include/server_http_protocol.h"
 #include "include/server_shared.h"
 #include "include/server_log.h"
+#include "include/server_files_io.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +37,6 @@ int					addr_size;
 int					active_port;
 struct sockaddr_in	server_address;
 HTTP_SESSION		http_session_;
-//HTTP_SESSION		*sessions[ MAX_CLIENTS ];
 int					i_sac;
 fd_set				master;
 fd_set				read_fds;
@@ -48,17 +48,18 @@ struct in_addr		addr;
 int					http_conn_count = 0;
 SEND_INFO			send_d[ MAX_CLIENTS ];
 
-static void		socket_initialization( void );
-static void		socket_prepare( void );
+static void		SOCKET_initialization( void );
+static void		SOCKET_prepare( void );
+static void		SOCKET_process( int socket_fd );
 static void		SOCKET_send_all_data( void );
 void			SOCKET_stop( void );
 
 /*
-socket_initialization( void )
+SOCKET_initialization( void )
 - wersja dla systemu Windows
 - inicjalizacja WinSock
 - inicjalizacja socketa */
-static void socket_initialization( void ) {
+static void SOCKET_initialization( void ) {
 	LOG_print( "Waiting for Socket server initialization..." );
 
 #ifdef _WIN32
@@ -90,10 +91,9 @@ static void socket_initialization( void ) {
 }
 
 /*
-socket_prepare( void )
-- wersja dla systemu Windows
+SOCKET_prepare( void )
 - nasï¿½uchiwanie w celu odbioru danych od klienta */
-static void socket_prepare( void ) {
+static void SOCKET_prepare( void ) {
 	unsigned long b = 0;
 	int i = 1;
 	int wsa_result = 0;
@@ -151,44 +151,39 @@ static void socket_prepare( void ) {
 	/* Teraz czekamy na poï¿½ï¿½czenia i dane */
 }
 
-void SOCKET_add_new_send_struct( int socket_descriptor ) {
-	int i;
-
-	for( i = 0; i < http_conn_count; i++ ){
-		if( send_d[ i ].socket_descriptor == 0 ) {
-			send_d[ i ].socket_descriptor = socket_descriptor;
-			break;
-		}
-	}
-}
-
+/*
+SOCKET_send_all_data( void )
+- funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
 	register int j;
 	char m_buf[ UPLOAD_BUFFER ];
 	int nwrite;
+	size_t nread;
 
 	for(j = 0; j <= http_conn_count; j++) {
 		if( send_d[ j ].http_content_size > 0 ) {
 			/* Pobranie rozmiaru pliku */
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-			send_d[ j ].m_buf_len = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-			if( send_d[ j ].m_buf_len == 0) {
-				fclose( send_d[ j ].file );
-				continue;
-			}
+			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
-			send_d[ j ].sent_size += send_d[ j ].m_buf_len;
-			nwrite = send( send_d[ j ].socket_descriptor, m_buf, send_d[ j ].m_buf_len, 0 );
-
-			if( nwrite <= 0 ){
-				fclose( send_d[ j ].file );
+			if( nread == 0) {
+				battery_fclose( send_d[ j ].file );
 				send_d[ j ].http_content_size = 0;
-				send_d[ j ].m_buf_len = 0;
-				send_d[ j ].m_buf_used = 0;
-				send_d[ j ].sent_size = 0;
 				send_d[ j ].socket_descriptor = 0;
+				send_d[ j ].sent_size = 0;
+			} else {
+
+				send_d[ j ].sent_size += nread;
+				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
+
+				if( nwrite <= 0 ){
+					battery_fclose( send_d[ j ].file );
+					send_d[ j ].http_content_size = 0;
+					send_d[ j ].sent_size = 0;
+					send_d[ j ].socket_descriptor = 0;
+				}
+				send_d[ j ].http_content_size -= nwrite;
 			}
-			send_d[ j ].http_content_size -= nwrite;
 		}
 	}
 }
@@ -218,7 +213,6 @@ void SOCKET_run( void ) {
 
 		i = fdmax+1;
 		while( --i ) {
-			//printf("Loop all...\n");
 			if( FD_ISSET( i, &read_fds ) ) { /* Coï¿½ siï¿½ dzieje na sockecie... */
 				if( i == socket_server ) {
 					/* Podï¿½ï¿½czyï¿½ siï¿½ nowy klient */
@@ -229,8 +223,7 @@ void SOCKET_run( void ) {
 					if( newfd == -1 ) {
 						LOG_print( "Socket error: accept().\n" );
 					} else {
-						SOCKET_add_new_send_struct( newfd );
-						//printf("Client with desc=%d\n", newfd);
+						SESSION_add_new_send_struct( newfd );
 						FD_SET( newfd, &master );
 						if( newfd > fdmax ) {
 							fdmax = newfd;
@@ -238,7 +231,7 @@ void SOCKET_run( void ) {
 					}
 				} else {
 					/* Podï¿½ï¿½czony klient przesï¿½aï¿½ dane... */
-					SOCKET_process( ( void * )i );
+					SOCKET_process( i );
 				}
 			} /*nowe poï¿½ï¿½czenie */
 			SOCKET_send_all_data();
@@ -247,24 +240,17 @@ void SOCKET_run( void ) {
 }
 
 /*
-SOCKET_process_thread( void *socket_fd )
-- funkcja uruchamia jest w w¹tku w celu wywo³ania SOCKET_process */
-void SOCKET_process_thread( void *socket_fd ) {
-
-	SOCKET_process( socket_fd );
-}
-
-/*
 SOCKET_process( int socket_fd )
-- funkcja odczytuje dane z socketu */
-void SOCKET_process( void *socket_fd ) {
+@socket_fd - identyfikator gniazda
+- funkcja odczytuje dane z gniazda */
+static void SOCKET_process( int socket_fd ) {
 	HTTP_SESSION *session = ( HTTP_SESSION* )malloc( sizeof( HTTP_SESSION ) );
 	char* tmp_buf = ( char* )malloc( MAX_BUFFER_CHAR );
 
 	session->http_info.received_all = http_session_.http_info.received_all;
 	session->address_length = http_session_.address_length;
 	session->address = http_session_.address;
-	session->socket_descriptor = ( int )socket_fd;
+	session->socket_descriptor = socket_fd;
 
 	SESSION_add_new_ptr( session );
 
@@ -293,19 +279,13 @@ void SOCKET_process( void *socket_fd ) {
 		SESSION_prepare( session );
 	}
 
-	if( tmp_buf ) {
-		free( tmp_buf );
-		tmp_buf = NULL;
-	}
+	free( tmp_buf );
+	tmp_buf = NULL;
 
 	if( session ) {
 		free( session );
 		session = NULL;
 	}
-
-//	pthread_mutex_lock( &mutexsum );
-//	threads_count--;
-//	pthread_mutex_unlock( &mutexsum );
 }
 
 /*
@@ -363,17 +343,10 @@ void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
 SOCKET_send( HTTP_SESSION *http_session, char *buf, int http_content_size )
 - wysyï¿½a pakiet danych ( buf ) do danego klienta ( http_session ) */
 void SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size, int *res ) {
-	//write(http_session->socket_descriptor, buf, http_content_size );
 	if( ( http_session->address_length = send( http_session->socket_descriptor, buf, http_content_size, 0 ) ) <= 0 ) {
 		SOCKET_disconnect_client( http_session );
-		if( res ) {
-			*res = http_session->address_length;
-		}
-	} else {
-		if( res ) {
-			*res = http_session->address_length;
-		}
 	}
+	*res = http_session->address_length;
 }
 
 /*
@@ -402,8 +375,8 @@ char* SOCKET_get_remote_ip( HTTP_SESSION *http_session ) {
 SOCKET_main( void )
 - obsï¿½uga funkcji socketï¿½w */
 void SOCKET_main( void ) {
-	( void )socket_initialization();
-	( void )socket_prepare();
+	( void )SOCKET_initialization();
+	( void )SOCKET_prepare();
 	( void )SOCKET_run();
 	( void )SOCKET_stop();
 }

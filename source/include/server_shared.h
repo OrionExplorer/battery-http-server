@@ -156,14 +156,19 @@ typedef struct LOCAL_INFO
 
 typedef struct HTTP_SESSION		HTTP_SESSION;
 typedef struct SEND_INFO		SEND_INFO;
+typedef struct OPENED_FILE		OPENED_FILE;
 
 struct SEND_INFO {
 	FILE				*file;
 	long				http_content_size;
 	long				sent_size;
-	int					m_buf_len;          /* bytes in buffer */
-    int					m_buf_used;         /* bytes used so far; <= m_buf_len */
 	int						socket_descriptor;
+};
+
+struct OPENED_FILE {
+	char				filename[ FILENAME_MAX ];
+	FILE*				file;
+	long				size;
 };
 
 /* G��wna struktura, kt�ra b�dzie przechowywa�a wszystkie informacje o po��czonym kliencie */
@@ -209,6 +214,7 @@ extern int					ip_proto_ver;
 extern HTTP_SESSION			http_session_;
 extern SEND_INFO			send_d[ MAX_CLIENTS ];
 extern HTTP_SESSION			*sessions[ MAX_CLIENTS ];
+extern OPENED_FILE			opened_files[ FOPEN_MAX ];
 extern fd_set				master;
 extern int					http_conn_count;
 char*						server_get_remote_hostname( HTTP_SESSION *http_session );

@@ -17,6 +17,8 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <unistd.h>
 #endif
 
+OPENED_FILE opened_files[ FOPEN_MAX ];
+
 /*
 get_app_path( void )
 - zwraca ci�g znak�w - folder startowy aplikacji */
@@ -101,10 +103,13 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 
 	/*Sprawdza, czy uda�o si� otworzy� plik */
 	resource = fopen( filename, READ_BINARY );
+
 	if( !resource ) {
 		return 0;
 	} else {
+		//printf("!!Otwarty plik\n");
 		if( http_session == NULL ) {
+			//printf("!!Zamkniety plik 1\n");
 			fclose( resource );
 			return 1;
 		}
@@ -124,6 +129,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 					if( strncmp( ht_access[i].res, filename, MAX_PATH_LENGTH ) == 0 ) {
 						/* Zas�b wymaga autoryzacji */
 						strncpy( ht_access_pwd, ht_access[i].res_auth, STD_BUFF_SIZE );
+						//printf("!!Zamkniety plik 2\n");
 						fclose( resource );
 						return 3;
 					}
@@ -131,6 +137,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 			}
 		} else {
 			/* Nie ma */
+			//printf("!!Zamkniety plik 3\n");
 			fclose( resource );
 			return 2;
 		}
@@ -138,6 +145,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 
 	/* Zamkni�cie pliku */
 	if( resource ) {
+		//printf("!!Zamkniety plik 4\n");
 		fclose( resource );
 	}
 
@@ -151,9 +159,11 @@ file_exists( const char *filename )
 short file_exists( const char *filename ) {
 	FILE *resource;	/* Uchwyt do pliku */
 
-	if( ( resource = fopen( filename, "r" ) ) ) {
+	if( ( resource = battery_fopen( filename, "r", 0 ) ) ) {
+		//printf("!!Otwarty plik\n");
 		/* Uda�o si� otworzy� plik = istnieje */
 		fclose( resource );
+		//printf("!!Zamkniety plik 5\n");
 		return 1;
 	} else {
 		/* Nie istnieje */
@@ -178,5 +188,64 @@ void file_extract_path(char *full_filename, char delim)
 			}
 		}
 	}
+}
 
+FILE *battery_fopen( const char *filename, const char *mode, short add_to_list ) {
+	int i = FOPEN_MAX;
+	FILE *tmp;
+
+	while( --i && i >= 0 ) {
+		if( strcmp( opened_files[ i ].filename, filename ) == 0 ) {
+			return opened_files[ i ].file;
+		}
+	}
+
+	tmp = fopen( filename, mode );
+
+	if( tmp ) {
+		if( add_to_list == 0) {
+			return tmp;
+		} else {
+			fseek( tmp, 0, SEEK_END );
+			i = FOPEN_MAX;
+
+			while( --i && i >= 0 ) {
+				if( opened_files[ i ].file == NULL ) {
+					opened_files[ i ].file = tmp;
+					strcpy( opened_files[ i ].filename, filename );
+					opened_files[ i ].size = ftell( tmp );
+					break;
+				}
+			}
+
+			return tmp;
+		}
+	}
+
+	return NULL;
+}
+
+long battery_ftell( FILE *file ) {
+	int i = FOPEN_MAX;
+
+	while( --i && i >= 0 ) {
+		if( opened_files[ i ].file == file ) {
+			return opened_files[ i ].size;
+		}
+	}
+
+	return 0;
+}
+
+void battery_fclose( FILE *file ) {
+	int i = FOPEN_MAX;
+
+	while( --i && i >= 0 ) {
+		if( opened_files[ i ].file == file ) {
+			fclose( file );
+			opened_files[ i ].file = NULL;
+			memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
+
+		}
+	}
 }

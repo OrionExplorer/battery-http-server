@@ -19,4 +19,8 @@ short	directory_exists( const char *path );
 short	file_exists( const char *filename );
 short	file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd );
 
+FILE	*battery_fopen( const char *filename, const char *mode, short add_to_list );
+void	battery_fclose( FILE *file );
+long	battery_ftell( FILE *file );
+
 #endif

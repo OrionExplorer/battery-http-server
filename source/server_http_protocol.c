@@ -359,7 +359,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 
 	/* Otwarcie pliku. Weryfikacja poprawno�ci jego nazwy nast�pi�a poprzez funkcj�
 	file_params w nadrz�dnej funkcji REQUEST_process */
-	file = fopen( filename, READ_BINARY );
+	file = battery_fopen( filename, READ_BINARY, 1 );
 
 	/* Nie uda�o si� otworzy� pliku, cho� istnieje - problem z serwerem? */
 	if( !file ) {
@@ -369,7 +369,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 		if( http_session->http_info.date_if_modified_since ) {
 			/* Por�wnanie nag��wka "If-Modified-Since" z dat� modyfikacji pliku */
 			if( strcmp( http_session->local_info.date_res_last_modified, http_session->http_info.date_if_modified_since ) == 0 ) {
-				fclose( file );
+				battery_fclose( file );
 				RESPONSE_header( http_session, HTTP_304_NOT_MODIFIED, HEADER_STD_CONTENT_TYPE, 0, NULL, NULL );
 				return;
 			}
@@ -379,15 +379,14 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 		if( http_session->http_info.date_if_unmodified_since ) {
 			/* Por�wnanie nag��wka "If-Unmodified-Since" z dat� modyfikacji pliku */
 			if( strcmp( http_session->local_info.date_res_last_modified, http_session->http_info.date_if_unmodified_since ) != 0 ) {
-				fclose( file );
+				battery_fclose( file );
 				RESPONSE_header( http_session, HTTP_412_PRECONDITION_FAILED, HEADER_STD_CONTENT_TYPE, 0, NULL, NULL );
 				return;
 			}
 		}
 
 		/* Pobranie rozmiaru pliku */
-		fseek( file, 0, SEEK_END );
-		filesize = ftell( file );
+		filesize = battery_ftell( file );
 
 		/* Plik jest pusty = b��d 204 */
 		if( filesize <= 0 ) {
@@ -395,8 +394,6 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 		} else {
 			/* Nie wybrano �adnego fragmentu pliku - brak nag��wka "Range" */
 			if( ( http_session->http_info.range_st < 0 )&&( http_session->http_info.range_en < 0 ) ) {
-				/* Powr�t do pocz�tku pliku */
-				fseek( file, 0L, SEEK_SET );
 				/* Wysy�ka z kodem 200 - wszystko ok */
 				RESPONSE_header( http_session, HTTP_200_OK, REQUEST_get_mime_type( filename ), filesize, NULL, NULL );
 
@@ -405,8 +402,6 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 				if( send_struct ) {
 					send_struct->file = file;
 					send_struct->http_content_size = filesize;
-					send_struct->m_buf_len = 0;
-					send_struct->m_buf_used = 0;
 					send_struct->sent_size = 0;
 				}
 			} else {
@@ -449,8 +444,6 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 				}
 			}
 		}
-		/* Zamkni�cie pliku */
-		//fclose( file );
 	}
 }
 
