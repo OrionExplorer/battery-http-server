@@ -217,6 +217,7 @@ extern HTTP_SESSION			*sessions[ MAX_CLIENTS ];
 extern OPENED_FILE			opened_files[ FOPEN_MAX ];
 extern fd_set				master;
 extern int					http_conn_count;
+extern int					send_d_count;
 char*						server_get_remote_hostname( HTTP_SESSION *http_session );
 
 /* Przechowuje wczytane rozszerzenia plik�w uprawnionych do wykonania jako skrypt CGI */

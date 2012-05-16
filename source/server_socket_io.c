@@ -46,6 +46,7 @@ struct hostent		*host;
 struct in_addr		addr;
 
 int					http_conn_count = 0;
+int					send_d_count;
 SEND_INFO			send_d[ MAX_CLIENTS ];
 
 static void		SOCKET_initialization( void );
@@ -256,6 +257,8 @@ static void SOCKET_process( int socket_fd ) {
 
 	if ( ( session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 ) ) <= 0 ) {
 		/* ...ale to jednak by�o roz��czenie */
+		SESSION_delete_ptr( session );
+		SESSION_delete_send_struct( socket_fd );
 		FD_CLR( ( int )socket_fd, &master );
 		shutdown( ( int )socket_fd, SHUT_RDWR );
 		close( ( int ) socket_fd );
