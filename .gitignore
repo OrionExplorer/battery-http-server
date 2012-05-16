@@ -2,6 +2,7 @@ obj/
 *.cbp
 *.depend
 *.layout
+*.cbTemp
 Release/battery-http-server.exe
 Release/logs
 Release/www
