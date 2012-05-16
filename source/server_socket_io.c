@@ -253,11 +253,8 @@ static void SOCKET_process( int socket_fd ) {
 	session->address = http_session_.address;
 	session->socket_descriptor = socket_fd;
 
-	SESSION_add_new_ptr( session );
-
 	if ( ( session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 ) ) <= 0 ) {
 		/* ...ale to jednak by�o roz��czenie */
-		SESSION_delete_ptr( session );
 		SESSION_delete_send_struct( socket_fd );
 		FD_CLR( ( int )socket_fd, &master );
 		shutdown( ( int )socket_fd, SHUT_RDWR );

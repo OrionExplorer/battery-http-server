@@ -213,7 +213,6 @@ extern struct sockaddr_in	server_address;
 extern int					ip_proto_ver;
 extern HTTP_SESSION			http_session_;
 extern SEND_INFO			send_d[ MAX_CLIENTS ];
-extern HTTP_SESSION			*sessions[ MAX_CLIENTS ];
 extern OPENED_FILE			opened_files[ FOPEN_MAX ];
 extern fd_set				master;
 extern int					http_conn_count;

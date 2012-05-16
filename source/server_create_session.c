@@ -33,8 +33,7 @@ short			SESSION_local_path_is_valid( HTTP_SESSION *http_session );
 short			SESSION_http_protocol_is_valid( HTTP_SESSION *http_session );
 short			SESSION_check_connections_limit( HTTP_SESSION *http_session );
 
-HTTP_SESSION			*sessions[ MAX_CLIENTS ];
-int						send_d_count;
+int				send_d_count;
 
 /*
 SESSION_http_protocol_is_valid( HTTP_SESSION *http_session )
@@ -547,59 +546,17 @@ short SESSION_send_response( HTTP_SESSION *http_session, const char *content_dat
 }
 
 /*
-SESSION_add_new_ptr( HTTP_SESSION *http_session )
-@http_session - wskaünik do pod≥πczonego klienta
-- funkcja przypisuje pustemu elementowi tablicy sessions wskaünik do http_session */
-void SESSION_add_new_ptr( HTTP_SESSION *http_session ) {
-	int i = http_conn_count;
-
-	printf("Szukam4 (%d)...\n", http_conn_count );
-	for( i = 0; i <= http_conn_count; i++ ) {
-		if( sessions[ i ] == NULL ) {
-			sessions[ i ] = http_session;
-			printf("znalazlem.\n");
-			return;
-		}
-	}
-	printf("Nie znalazlem.\n");
-}
-
-/*
-SESSION_delete_ptr( HTTP_SESSION *http_session )
-@http_session - wskaünik do pod≥πczonego klienta
-- funkcja usuwa z tablicy sessions wskaünik do http_session */
-void SESSION_delete_ptr( HTTP_SESSION *http_session ) {
-	int i;
-
-	printf("Szukam3...\n");
-	for( i = 0; i <= http_conn_count; i++ ) {
-		if( sessions[ i ]) {
-			if( sessions[ i ]->socket_descriptor == http_session->socket_descriptor ) {
-				sessions[ i ] = NULL;
-				printf("znalazlem.\n");
-				return;
-			}
-		}
-	}
-	printf("Nie znalazlem.\n");
-}
-
-/*
 SESSION_find_response_struct_by_id( int socket )
 @socket - identyfikator gniazda
 - funkcja na podstawie identyfikatora gniazda odnajduje strukturÍ z danymi do wysy≥ki */
 SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 	int i;
 
-	printf("Szukam1...\n");
 	for( i = 0; i <= send_d_count; i++ ) {
 		if( send_d[i].socket_descriptor == socket ) {
-			printf("znalazlem.\n");
 			return &send_d[ i ];
 		}
 	}
-
-	printf("Nie znalazlem.\n");
 
 	return NULL;
 }
@@ -611,31 +568,25 @@ SESSION_add_new_send_struct( int socket_descriptor )
 void SESSION_add_new_send_struct( int socket_descriptor ) {
 	int i;
 
-	printf("Szukam2...\n");
 	for( i = 0; i <= send_d_count; i++ ){
 		if( send_d[ i ].socket_descriptor == 0 ) {
 			send_d[ i ].socket_descriptor = socket_descriptor;
 			send_d[ i ].sent_size = 0;
-			printf("znalazlem.\n");
 			send_d_count++;
 			return;
 		}
 	}
-	printf("Nie znalazlem.\n");
 }
 
 void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
-	printf("Szukam5...\n");
 	for( i = 0; i <= send_d_count; i++ ){
 		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
 			send_d[ i ].socket_descriptor = 0;
 			send_d[ i ].sent_size = 0;
-			printf("znalazlem.\n");
 			send_d_count--;
 			return;
 		}
 	}
-	printf("Nie znalazlem.\n");
 }
