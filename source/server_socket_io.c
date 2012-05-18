@@ -162,26 +162,20 @@ static void SOCKET_send_all_data( void ) {
 	size_t nread;
 
 	for(j = 0; j <= http_conn_count; j++) {
-		if( send_d[ j ].http_content_size > 0 ) {
+		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
 			/* Pobranie rozmiaru pliku */
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
 			if( nread == 0) {
-				battery_fclose( send_d[ j ].file );
-				send_d[ j ].http_content_size = 0;
-				send_d[ j ].socket_descriptor = 0;
-				send_d[ j ].sent_size = 0;
+				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			} else {
 
 				send_d[ j ].sent_size += nread;
 				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
 
 				if( nwrite <= 0 ){
-					battery_fclose( send_d[ j ].file );
-					send_d[ j ].http_content_size = 0;
-					send_d[ j ].sent_size = 0;
-					send_d[ j ].socket_descriptor = 0;
+					SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 				}
 				send_d[ j ].http_content_size -= nwrite;
 			}
@@ -246,7 +240,8 @@ SOCKET_process( int socket_fd )
 - funkcja odczytuje dane z gniazda */
 static void SOCKET_process( int socket_fd ) {
 	HTTP_SESSION *session = ( HTTP_SESSION* )malloc( sizeof( HTTP_SESSION ) );
-	char* tmp_buf = ( char* )malloc( MAX_BUFFER_CHAR );
+	//char* tmp_buf = ( char* )malloc( MAX_BUFFER_CHAR );
+	char tmp_buf[ MAX_BUFFER ];
 
 	session->http_info.received_all = http_session_.http_info.received_all;
 	session->address_length = http_session_.address_length;
@@ -278,9 +273,6 @@ static void SOCKET_process( int socket_fd ) {
 		/* "Przerobienie" zapytania */
 		SESSION_prepare( session );
 	}
-
-	free( tmp_buf );
-	tmp_buf = NULL;
 
 	if( session ) {
 		free( session );

@@ -578,13 +578,19 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
 	}
 }
 
+/*
+SESSION_add_new_send_struct( int socket_descriptor )
+@socket_descriptor - identyfikator gniazda
+- funkcja usuwa strukturê SEND_INFO, poniewa¿ wysy³anie contentu zakoñczy³o siê lub klient siê roz³¹czy³ */
 void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
 	for( i = 0; i <= send_d_count; i++ ){
 		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
+			battery_fclose( send_d[ i ].file );
 			send_d[ i ].socket_descriptor = 0;
 			send_d[ i ].sent_size = 0;
+			send_d[ i ].http_content_size = 0;
 			send_d_count--;
 			return;
 		}

@@ -13,10 +13,10 @@
 	<File name="source\include\server_core.h" open="0" top="0" tabpos="0">
 		<Cursor position="433" topLine="0" />
 	</File>
-	<File name="source\include\server_create_session.h" open="1" top="0" tabpos="5">
-		<Cursor position="573" topLine="0" />
+	<File name="source\include\server_create_session.h" open="1" top="0" tabpos="8">
+		<Cursor position="870" topLine="0" />
 	</File>
-	<File name="source\include\server_files_io.h" open="1" top="0" tabpos="9">
+	<File name="source\include\server_files_io.h" open="0" top="0" tabpos="9">
 		<Cursor position="680" topLine="0" />
 	</File>
 	<File name="source\include\server_htaccess_manager.h" open="0" top="0" tabpos="0">
@@ -37,8 +37,8 @@
 	<File name="source\include\server_portable.h" open="0" top="0" tabpos="3">
 		<Cursor position="1220" topLine="0" />
 	</File>
-	<File name="source\include\server_shared.h" open="0" top="0" tabpos="6">
-		<Cursor position="5519" topLine="151" />
+	<File name="source\include\server_shared.h" open="1" top="0" tabpos="7">
+		<Cursor position="6843" topLine="200" />
 	</File>
 	<File name="source\include\server_socket_io.h" open="1" top="0" tabpos="3">
 		<Cursor position="679" topLine="0" />
@@ -52,23 +52,23 @@
 	<File name="source\server_base64.c" open="0" top="0" tabpos="0">
 		<Cursor position="5335" topLine="179" />
 	</File>
-	<File name="source\server_cgi_manager.c" open="1" top="0" tabpos="7">
+	<File name="source\server_cgi_manager.c" open="1" top="0" tabpos="6">
 		<Cursor position="5206" topLine="120" />
 	</File>
 	<File name="source\server_core.c" open="0" top="0" tabpos="3">
 		<Cursor position="11236" topLine="330" />
 	</File>
-	<File name="source\server_create_session.c" open="1" top="0" tabpos="4">
-		<Cursor position="20423" topLine="425" />
+	<File name="source\server_create_session.c" open="1" top="1" tabpos="4">
+		<Cursor position="25714" topLine="594" />
 	</File>
-	<File name="source\server_files_io.c" open="1" top="0" tabpos="8">
-		<Cursor position="5148" topLine="174" />
+	<File name="source\server_files_io.c" open="0" top="0" tabpos="8">
+		<Cursor position="2717" topLine="66" />
 	</File>
 	<File name="source\server_htaccess_manager.c" open="0" top="0" tabpos="0">
 		<Cursor position="3228" topLine="69" />
 	</File>
-	<File name="source\server_http_protocol.c" open="1" top="0" tabpos="6">
-		<Cursor position="17255" topLine="429" />
+	<File name="source\server_http_protocol.c" open="1" top="0" tabpos="5">
+		<Cursor position="20587" topLine="501" />
 	</File>
 	<File name="source\server_log.c" open="0" top="0" tabpos="0">
 		<Cursor position="2076" topLine="51" />
@@ -79,8 +79,8 @@
 	<File name="source\server_mime_types.c" open="0" top="0" tabpos="0">
 		<Cursor position="2170" topLine="49" />
 	</File>
-	<File name="source\server_socket_io.c" open="1" top="1" tabpos="2">
-		<Cursor position="10842" topLine="327" />
+	<File name="source\server_socket_io.c" open="1" top="0" tabpos="2">
+		<Cursor position="7792" topLine="243" />
 	</File>
 	<File name="source\server_strings_util.c" open="0" top="0" tabpos="0">
 		<Cursor position="3524" topLine="95" />
