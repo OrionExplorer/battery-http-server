@@ -230,11 +230,24 @@ long battery_ftell( FILE *file ) {
 
 	while( --i && i >= 0 ) {
 		if( opened_files[ i ].file == file ) {
+			opened_files[ i ].size = ftell( file );
 			return opened_files[ i ].size;
 		}
 	}
 
 	return 0;
+}
+
+char*	battery_get_filename( FILE *file ) {
+	int i = FOPEN_MAX;
+
+	while( --i && i >= 0 ) {
+		if( opened_files[ i ].file == file ) {
+			return opened_files[ i ].filename;
+		}
+	}
+
+	return NULL;
 }
 
 void battery_fclose( FILE *file ) {
@@ -245,7 +258,6 @@ void battery_fclose( FILE *file ) {
 			fclose( file );
 			opened_files[ i ].file = NULL;
 			memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
-
 		}
 	}
 }

@@ -22,5 +22,6 @@ short	file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 FILE	*battery_fopen( const char *filename, const char *mode, short add_to_list );
 void	battery_fclose( FILE *file );
 long	battery_ftell( FILE *file );
+char*	battery_get_filename( FILE *file );
 
 #endif

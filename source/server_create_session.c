@@ -33,8 +33,6 @@ short			SESSION_local_path_is_valid( HTTP_SESSION *http_session );
 short			SESSION_http_protocol_is_valid( HTTP_SESSION *http_session );
 short			SESSION_check_connections_limit( HTTP_SESSION *http_session );
 
-int				send_d_count;
-
 /*
 SESSION_http_protocol_is_valid( HTTP_SESSION *http_session )
 @http_session - wskaünik do pod≥πczonego klienta
@@ -552,7 +550,7 @@ SESSION_find_response_struct_by_id( int socket )
 SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 	int i;
 
-	for( i = 0; i <= send_d_count; i++ ) {
+	for( i = 0; i <= MAX_CLIENTS; i++ ) {
 		if( send_d[i].socket_descriptor == socket ) {
 			return &send_d[ i ];
 		}
@@ -568,11 +566,11 @@ SESSION_add_new_send_struct( int socket_descriptor )
 void SESSION_add_new_send_struct( int socket_descriptor ) {
 	int i;
 
-	for( i = 0; i <= send_d_count; i++ ){
+	for( i = 0; i <= MAX_CLIENTS; i++ ){
 		if( send_d[ i ].socket_descriptor == 0 ) {
 			send_d[ i ].socket_descriptor = socket_descriptor;
 			send_d[ i ].sent_size = 0;
-			send_d_count++;
+			send_d[ i ].http_content_size = 0;
 			return;
 		}
 	}
@@ -585,13 +583,12 @@ SESSION_add_new_send_struct( int socket_descriptor )
 void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
-	for( i = 0; i <= send_d_count; i++ ){
+	for( i = 0; i <= MAX_CLIENTS; i++ ){
 		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
 			battery_fclose( send_d[ i ].file );
 			send_d[ i ].socket_descriptor = 0;
 			send_d[ i ].sent_size = 0;
 			send_d[ i ].http_content_size = 0;
-			send_d_count--;
 			return;
 		}
 	}

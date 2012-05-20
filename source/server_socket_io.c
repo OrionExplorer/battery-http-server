@@ -46,7 +46,6 @@ struct hostent		*host;
 struct in_addr		addr;
 
 int					http_conn_count = 0;
-int					send_d_count;
 SEND_INFO			send_d[ MAX_CLIENTS ];
 
 static void		SOCKET_initialization( void );
@@ -161,16 +160,19 @@ static void SOCKET_send_all_data( void ) {
 	int nwrite;
 	size_t nread;
 
-	for(j = 0; j <= http_conn_count; j++) {
+	for(j = 0; j < MAX_CLIENTS; j++) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
 			/* Pobranie rozmiaru pliku */
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
-			if( nread == 0) {
+			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
+				printf("Something wrong...\n");
+				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
+				//SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
+			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ){
 				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			} else {
-
 				send_d[ j ].sent_size += nread;
 				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
 

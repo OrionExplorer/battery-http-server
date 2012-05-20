@@ -162,7 +162,7 @@ struct SEND_INFO {
 	FILE				*file;
 	long				http_content_size;
 	long				sent_size;
-	int						socket_descriptor;
+	int					socket_descriptor;
 };
 
 struct OPENED_FILE {
@@ -216,7 +216,6 @@ extern SEND_INFO			send_d[ MAX_CLIENTS ];
 extern OPENED_FILE			opened_files[ FOPEN_MAX ];
 extern fd_set				master;
 extern int					http_conn_count;
-extern int					send_d_count;
 char*						server_get_remote_hostname( HTTP_SESSION *http_session );
 
 /* Przechowuje wczytane rozszerzenia plik�w uprawnionych do wykonania jako skrypt CGI */
