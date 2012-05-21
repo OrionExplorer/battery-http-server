@@ -107,9 +107,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 	if( !resource ) {
 		return 0;
 	} else {
-		//printf("!!Otwarty plik\n");
 		if( http_session == NULL ) {
-			//printf("!!Zamkniety plik 1\n");
 			fclose( resource );
 			return 1;
 		}
@@ -129,7 +127,6 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 					if( strncmp( ht_access[i].res, filename, MAX_PATH_LENGTH ) == 0 ) {
 						/* Zas�b wymaga autoryzacji */
 						strncpy( ht_access_pwd, ht_access[i].res_auth, STD_BUFF_SIZE );
-						//printf("!!Zamkniety plik 2\n");
 						fclose( resource );
 						return 3;
 					}
@@ -137,7 +134,6 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 			}
 		} else {
 			/* Nie ma */
-			//printf("!!Zamkniety plik 3\n");
 			fclose( resource );
 			return 2;
 		}
@@ -145,7 +141,6 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 
 	/* Zamkni�cie pliku */
 	if( resource ) {
-		//printf("!!Zamkniety plik 4\n");
 		fclose( resource );
 	}
 
@@ -159,11 +154,9 @@ file_exists( const char *filename )
 short file_exists( const char *filename ) {
 	FILE *resource;	/* Uchwyt do pliku */
 
-	if( ( resource = battery_fopen( filename, "r", 0 ) ) ) {
-		//printf("!!Otwarty plik\n");
+	if( ( resource = battery_fopen( filename, "r", 0, 0) ) ) {
 		/* Uda�o si� otworzy� plik = istnieje */
 		fclose( resource );
-		//printf("!!Zamkniety plik 5\n");
 		return 1;
 	} else {
 		/* Nie istnieje */
@@ -190,17 +183,29 @@ void file_extract_path(char *full_filename, char delim)
 	}
 }
 
-FILE *battery_fopen( const char *filename, const char *mode, short add_to_list ) {
+/*
+battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor )
+@filename - nazwa pliku do otwarcia
+@mode - tryb czytania pliku
+@add_to_list - definiuje, czy plik ma zostać dodany do listy otwartych przez serwer plików
+@socket_descriptor - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
+- funkcja weryfikuje, czy żądany plik jest już otwarty przez serwer */
+FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor ) {
 	int i = FOPEN_MAX;
-	FILE *tmp;
+	FILE *tmp = NULL;
 
+	/* Weryfikacja, czy plik jest już otwarty przez serwer */
 	while( --i && i >= 0 ) {
 		if( strcmp( opened_files[ i ].filename, filename ) == 0 ) {
-			return opened_files[ i ].file;
+			tmp = opened_files[ i ].file;
+			break;
 		}
 	}
 
-	tmp = fopen( filename, mode );
+	/* Jeżeli nie jest - otwórz */
+	if( tmp == NULL ) {
+		tmp = fopen( filename, mode );
+	}
 
 	if( tmp ) {
 		if( add_to_list == 0) {
@@ -210,8 +215,10 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list )
 			i = FOPEN_MAX;
 
 			while( --i && i >= 0 ) {
+				/* Dodanie informacji o otwartym pliku w pierwszym wolnym elemencie */
 				if( opened_files[ i ].file == NULL ) {
 					opened_files[ i ].file = tmp;
+					opened_files[ i ].socket_descriptor = socket_descriptor;
 					strcpy( opened_files[ i ].filename, filename );
 					opened_files[ i ].size = ftell( tmp );
 					break;
@@ -225,12 +232,15 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list )
 	return NULL;
 }
 
+/*
+battery_ftell( FILE *file )
+@file - wskaźnik do otwartego pliku
+- funkcja zwraca rozmiar żądanego pliku */
 long battery_ftell( FILE *file ) {
 	int i = FOPEN_MAX;
 
 	while( --i && i >= 0 ) {
 		if( opened_files[ i ].file == file ) {
-			opened_files[ i ].size = ftell( file );
 			return opened_files[ i ].size;
 		}
 	}
@@ -238,7 +248,11 @@ long battery_ftell( FILE *file ) {
 	return 0;
 }
 
-char*	battery_get_filename( FILE *file ) {
+/*
+battery_get_filename( FILE *file )
+@file - wskaźnik do otwartego pliku
+- funkcja zwraca nazwę pliku na podstawie jego deskryptora */
+char* battery_get_filename( FILE *file ) {
 	int i = FOPEN_MAX;
 
 	while( --i && i >= 0 ) {
@@ -250,14 +264,46 @@ char*	battery_get_filename( FILE *file ) {
 	return NULL;
 }
 
-void battery_fclose( FILE *file ) {
+/*
+battery_fclose( FILE *file, int socket_descriptor )
+@file - wskaźnik do otwartego pliku
+@socket_descriptor - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
+- funkcja weryfikuje, czy żądany plik może zostać zamknięty na podstawie ilości korzystających z niego klientów */
+void battery_fclose( FILE *file, int socket_descriptor ) {
 	int i = FOPEN_MAX;
+	short clients_count = 0;
+	int client_index = -1;
+
+	if(file == 0) {
+		return;
+	}
 
 	while( --i && i >= 0 ) {
+		/* Znaleziony element przechowujący informację o otwartym pliku */
 		if( opened_files[ i ].file == file ) {
-			fclose( file );
-			opened_files[ i ].file = NULL;
-			memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
+			/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
+			if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
+				opened_files[ i ].socket_descriptor = 0;
+				opened_files[ i ].file = NULL;
+				opened_files[ i ].size = 0;
+				memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
+			}
+			/* Zliczenie ilości klientów korzystających z pliku */
+			clients_count++;
+			/* Ustawienie indeksu ostatniego znalezionego klienta powiązanego z żądanym plikiem */
+			client_index = i;
+		}
+	}
+
+	/* Z pliku korzystał jeden lub mniej klientów */
+	if( clients_count <= 1 ) {
+		fclose( file );
+		/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
+		if( client_index > -1) {
+			opened_files[ client_index ].socket_descriptor = 0;
+			opened_files[ client_index ].file = NULL;
+			opened_files[ client_index ].size = 0;
+			memset( opened_files[ client_index ].filename, '\0', FILENAME_MAX );
 		}
 	}
 }

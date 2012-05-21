@@ -169,6 +169,7 @@ struct OPENED_FILE {
 	char				filename[ FILENAME_MAX ];
 	FILE*				file;
 	long				size;
+	int					socket_descriptor;
 };
 
 /* G��wna struktura, kt�ra b�dzie przechowywa�a wszystkie informacje o po��czonym kliencie */

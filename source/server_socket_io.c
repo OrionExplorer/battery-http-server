@@ -155,20 +155,26 @@ static void SOCKET_prepare( void ) {
 SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
-	register int j;
+	int j;
 	char m_buf[ UPLOAD_BUFFER ];
 	int nwrite;
 	size_t nread;
 
 	for(j = 0; j < MAX_CLIENTS; j++) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
-			/* Pobranie rozmiaru pliku */
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
 			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
 				printf("Something wrong...\n");
+				printf("Trying to open %s...", battery_get_filename( send_d[ j ].file ));
 				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
+				if(send_d[ j ].file != NULL ){
+					printf("ok.\n");
+				} else {
+					printf("ERROR!");
+				}
+				system("pause");
 				//SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ){
 				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );

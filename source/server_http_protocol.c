@@ -359,7 +359,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 
 	/* Otwarcie pliku. Weryfikacja poprawno�ci jego nazwy nast�pi�a poprzez funkcj�
 	file_params w nadrz�dnej funkcji REQUEST_process */
-	file = battery_fopen( filename, READ_BINARY, 1 );
+	file = battery_fopen( filename, READ_BINARY, 1, http_session->socket_descriptor );
 
 	/* Nie uda�o si� otworzy� pliku, cho� istnieje - problem z serwerem? */
 	if( !file ) {
@@ -369,7 +369,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 		if( http_session->http_info.date_if_modified_since ) {
 			/* Por�wnanie nag��wka "If-Modified-Since" z dat� modyfikacji pliku */
 			if( strcmp( http_session->local_info.date_res_last_modified, http_session->http_info.date_if_modified_since ) == 0 ) {
-				battery_fclose( file );
+				battery_fclose( file, http_session->socket_descriptor );
 				RESPONSE_header( http_session, HTTP_304_NOT_MODIFIED, HEADER_STD_CONTENT_TYPE, 0, NULL, NULL );
 				return;
 			}
@@ -379,7 +379,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 		if( http_session->http_info.date_if_unmodified_since ) {
 			/* Por�wnanie nag��wka "If-Unmodified-Since" z dat� modyfikacji pliku */
 			if( strcmp( http_session->local_info.date_res_last_modified, http_session->http_info.date_if_unmodified_since ) != 0 ) {
-				battery_fclose( file );
+				battery_fclose( file, http_session->socket_descriptor );
 				RESPONSE_header( http_session, HTTP_412_PRECONDITION_FAILED, HEADER_STD_CONTENT_TYPE, 0, NULL, NULL );
 				return;
 			}
