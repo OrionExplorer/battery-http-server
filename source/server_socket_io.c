@@ -166,16 +166,7 @@ static void SOCKET_send_all_data( void ) {
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
 			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
-				printf("Something wrong...\n");
-				printf("Trying to open %s...", battery_get_filename( send_d[ j ].file ));
 				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
-				if(send_d[ j ].file != NULL ){
-					printf("ok.\n");
-				} else {
-					printf("ERROR!");
-				}
-				system("pause");
-				//SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ){
 				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			} else {

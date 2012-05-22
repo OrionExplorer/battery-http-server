@@ -21,8 +21,6 @@ static char	log_object[LOG_BUFFER+STD_BUFF_SIZE];
 /*Pe�na nazwa pliku ( +�cie�ka dost�pu ) "log.txt" */
 char		LOG_filename[MAX_PATH_LENGTH];
 
-extern int errno;
-
 /*
 LOG_print( char *fmt, ... )
 @fmt - tekst do parsowania
@@ -100,8 +98,6 @@ void LOG_save( void ) {
 		}
 	} else {
 		LOG_print( "Error: unable to open log file.\n" );
-		printf( "Error: unable to open log file (%d).\n", errno );
-		printf("%d\n", errno);
 		exit( EXIT_FAILURE );
 	}
 
