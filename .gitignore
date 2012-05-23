@@ -4,6 +4,7 @@ obj/
 *.layout
 *.cbTemp
 *.exe
+*.o
 Release/logs
 Release/www
 Release/configuration
