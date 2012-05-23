@@ -153,7 +153,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	}
 
 	/* Usuni�cie ostatniego znaku */
-	//cgi_body[result_size-hdr_len-1] = '\0';
+	cgi_body[result_size-hdr_len-1] = '\0';
 	//printf("---CGI HEAD---\n%s\n", add_hdr );
 	//printf("---CGI BODY---\n%s\n", cgi_body );
 

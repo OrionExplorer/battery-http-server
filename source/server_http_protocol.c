@@ -255,8 +255,9 @@ void RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, 
 		strncat( http_header_to_send, add_headers, MAX_BUFFER );
 	} else {
         /* Pusta linia - po niej zaczyna si� content */
-        strncat( http_header_to_send, "\r\n", MAX_BUFFER );
+        //strncat( http_header_to_send, "\r\n", MAX_BUFFER );
 	}
+	strncat( http_header_to_send, "\r\n", MAX_BUFFER );
 	/* Wysy�ka nag��wka HTTP */
 	if( SESSION_send_response( http_session, http_header_to_send, strlen( http_header_to_send ) ) > 0 ) {
 		/* Wysy�ka contentu */
