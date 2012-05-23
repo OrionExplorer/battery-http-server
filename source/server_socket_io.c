@@ -156,9 +156,12 @@ SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
 	int j;
-	char m_buf[ UPLOAD_BUFFER ];
+	//char m_buf[ UPLOAD_BUFFER ];
+	char *m_buf;
 	int nwrite;
 	size_t nread;
+
+	m_buf = ( char * )malloc( UPLOAD_BUFFER_CHAR );
 
 	for(j = 0; j < MAX_CLIENTS; j++) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
@@ -180,6 +183,9 @@ static void SOCKET_send_all_data( void ) {
 			}
 		}
 	}
+
+	free(m_buf);
+	m_buf = NULL;
 }
 /*
 SOCKET_run( void )

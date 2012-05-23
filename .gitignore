@@ -6,3 +6,5 @@ obj/
 Release/battery-http-server.exe
 Release/logs
 Release/www
+Release/configuration
+Release/tests
