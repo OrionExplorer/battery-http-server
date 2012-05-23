@@ -33,11 +33,10 @@ CGI_execute( HTTP_SESSION *http_session, const char *filename )
 - funkcja wykonuje ��dany skrypt i wysy�a odpowied� do pod��czonego klienta. */
 void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	FILE *cgi_script_file;
-	size_t result_size = 0;		/* Ilo�� wczytanych bajt�w z wyniku dzia�ania CGI */
+	long result_size = 0;		/* Ilo�� wczytanych bajt�w z wyniku dzia�ania CGI */
 	unsigned char *cgi_result;	/* Wynik dzia�ania CGI */
 	unsigned char *cgi_body;	/* Wynik dzia�ania CGI bez nag��wk�w */
-	//char buf[MAX_BUFFER];		/* Wczytany wynik dzia�ania CGI */
-	char *buf;
+	char buf[MAX_BUFFER];		/* Wczytany wynik dzia�ania CGI */
 	char *cgi_script_exec;		/* Nazwa pliku wykonywalnego CGI ( g��wny ) */
 	char *exec_filename;		/* Nazwa pliku wykonywalnego CGI */
 	char *cgi_param;			/* Parametr, z kt�rym ma zosta� uruchomiony plik wykonywalny CGI */
@@ -129,11 +128,10 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	cgi_body = ( unsigned char* )calloc( MAX_BUFFER, sizeof( char ) );
 	mem_allocated( ( char* )cgi_body, 220 );
 
-    buf = ( char* )malloc( MAX_BUFFER_CHAR );
 	/* Wczytanie wyniku dzia�ania skryptu CGI i pobranie rozmiaru danych */
 	result_size = fread( buf, sizeof( char ), MAX_BUFFER, cgi_script_file );
 
-    /* Zamkni�cie potoku */
+	/* Zamkni�cie potoku */
 	pclose( cgi_script_file );
 	cgi_script_file = NULL;
 
@@ -148,14 +146,12 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 
 	/* Wczytanie contentu */
 	/* U�yty modyfikator 2 ( poni�ej i w RESPONSE_header ) = "\r\n" = pusta linia mi�dzy nag��wkami a contentem */
-	for( i = hdr_len+2, j = 0; i <= result_size; i++, j++ ) {
+	for( i = hdr_len+2, j = 0; i < result_size-1; i++, j++ ) {
 		cgi_body[j] = cgi_result[i];
 	}
 
 	/* Usuni�cie ostatniego znaku */
 	cgi_body[result_size-hdr_len-1] = '\0';
-	//printf("---CGI HEAD---\n%s\n", add_hdr );
-	//printf("---CGI BODY---\n%s\n", cgi_body );
 
 	/* Pusta tre�� dzia�ania skryptu */
 	if( strlen( ( char* )cgi_result ) == 0 ) {
@@ -183,9 +179,6 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 
 	free( cgi_script_exec );
 	cgi_script_exec = NULL;
-
-	free( buf );
-	buf = NULL;
 }
 
 static void CGI_set_env( const char *var, const char *val ) {
