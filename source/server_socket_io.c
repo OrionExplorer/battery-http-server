@@ -106,7 +106,7 @@ static void SOCKET_prepare( void ) {
 	setgid( 0 );
 #endif
 
-	if ( bind( socket_server, ( struct sockaddr* )&server_address, sizeof( server_address ) ) == SOCKET_ERROR ) {
+    if ( bind( socket_server, ( struct sockaddr* )&server_address, sizeof( server_address ) ) == SOCKET_ERROR ) {
 		wsa_result = WSAGetLastError();
 		LOG_print( "bind() error: %d.\n", wsa_result );
 		printf( "bind() error: %d.\n", wsa_result );

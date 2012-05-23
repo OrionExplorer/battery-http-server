@@ -62,7 +62,7 @@ char* REQUEST_get_message_header( const char *content_data, long content_length 
 	hdr_line = ( char* )calloc( STD_BUFF_SIZE, sizeof( char ) );
 	temp_hdr_result = ( char* )calloc( BIG_BUFF_SIZE+1, sizeof( char ) );
 
-	for( i = 0; i < content_length; ++i ) {
+	for( i = 0; i < content_length; i++ ) {
 		/* Skopiowanie znak�w z wyniku do zmiennej przechowuj�cej nag��wki */
 		if( content_data[i] != '\n' ) {
 			hdr_line[j] = content_data[i];
@@ -253,12 +253,12 @@ void RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, 
 	/* Dodatkowe nag��wki? */
 	if( add_headers ) {
 		strncat( http_header_to_send, add_headers, MAX_BUFFER );
+	} else {
+        /* Pusta linia - po niej zaczyna si� content */
+        strncat( http_header_to_send, "\r\n", MAX_BUFFER );
 	}
-
-	/* Pusta linia - po niej zaczyna si� content */
-	strncat( http_header_to_send, "\r\n", MAX_BUFFER );
 	/* Wysy�ka nag��wka HTTP */
-	if( SESSION_send_response( http_session, http_header_to_send, strlen( http_header_to_send ) ) == 1 ) {
+	if( SESSION_send_response( http_session, http_header_to_send, strlen( http_header_to_send ) ) > 0 ) {
 		/* Wysy�ka contentu */
 		if( content_data ) {
 			SESSION_send_response( http_session, content_data, http_content_length );

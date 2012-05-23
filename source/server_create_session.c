@@ -530,7 +530,7 @@ SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int
 @content_data - dane, kt�re maj� zosta� wys�ane
 @http_content_size - rozmiar danych do wys�ania
 - wysy�a pakiet danych content_data do aktualnie pod��czonego klienta */
-short SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int http_content_size ) {
+int SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int http_content_size ) {
 	int result = 0;
 
 	if( ( http_content_size <= 0 ) || ( http_session->socket_descriptor == SOCKET_ERROR ) ) {
