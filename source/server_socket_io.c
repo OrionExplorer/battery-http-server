@@ -161,10 +161,9 @@ static void SOCKET_send_all_data( void ) {
 	int nwrite;
 	size_t nread;
 
-	m_buf = ( char * )malloc( UPLOAD_BUFFER_CHAR );
-
 	for(j = 0; j < MAX_CLIENTS; j++) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
+			m_buf = ( char * )malloc( UPLOAD_BUFFER_CHAR );
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
@@ -181,11 +180,11 @@ static void SOCKET_send_all_data( void ) {
 				}
 				send_d[ j ].http_content_size -= nwrite;
 			}
+
+			free(m_buf);
+			m_buf = NULL;
 		}
 	}
-
-	free(m_buf);
-	m_buf = NULL;
 }
 /*
 SOCKET_run( void )
