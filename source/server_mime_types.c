@@ -41,13 +41,13 @@ short MIME_load_configuration( const char *filename ) {
 	}
 
 	/* Alokacja pami�ci */
-	buf = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	buf = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( buf, 250 );
 
-	ext = ( char* )malloc( EXT_LEN_CHAR );
+	ext = malloc( EXT_LEN_CHAR );
 	mem_allocated( ext, 251 );
 
-	mime_type = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+	mime_type = malloc( SMALL_BUFF_SIZE_CHAR );
 	mem_allocated( mime_type, 252 );
 
 	/* Ilo�� wczytanych typ�w MIME */

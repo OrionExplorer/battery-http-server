@@ -78,7 +78,7 @@ short SESSION_local_path_is_valid( HTTP_SESSION *http_session ) {
 
 	/* Jeï¿½eli podano samï¿½ nazwï¿½ katalogu to automatycznie dodajemy plik indeksu */
 	if( strncmp( file_get_name( http_session->http_info.http_local_path ), "", 1 ) == 0 ) {
-		tmp_local_file_path = ( char* )malloc( MAX_PATH_LENGTH_CHAR+1 );
+		tmp_local_file_path = malloc( MAX_PATH_LENGTH_CHAR+1 );
 		mem_allocated( tmp_local_file_path, 9003 );
 
 		strncpy( tmp_local_file_path, app_path, MAX_PATH_LENGTH );
@@ -107,7 +107,7 @@ SESSION_get_http_header( HTTP_SESSION *http_session )
 @http_session - wskaŸnik do pod³¹czonego klienta
 - pobiera nag³ówek wiadomosci HTTP. */
 static void SESSION_get_http_header( HTTP_SESSION *http_session ) {
-	http_session->http_info.header = ( char* )malloc( BIG_BUFF_SIZE_CHAR );
+	http_session->http_info.header = malloc( BIG_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.header, 0 );
 	strncpy( http_session->http_info.header, REQUEST_get_message_header( http_session->http_info.content_data, http_session->address_length ), BIG_BUFF_SIZE );
 }
@@ -132,7 +132,7 @@ static void SESSION_check_auth( HTTP_SESSION *http_session ) {
 	char *user_auth_enc;			/* Przechowuje odszyfrowane login i hasï¿½o */
 
 	if( strstr( http_session->http_info.header, HEADER_AUTHORIZATION ) ) {
-		http_session->http_info.authorization = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+		http_session->http_info.authorization = malloc( STD_BUFF_SIZE_CHAR );
 		strncpy( http_session->http_info.authorization, REQUEST_get_header_value( http_session->http_info.header, HEADER_AUTHORIZATION ), STD_BUFF_SIZE );
 		/* Kodowanie metodï¿½ Digest jest nieobsï¿½ugiwane */
 		if( strstr( " Digest ", http_session->http_info.authorization ) ) {
@@ -145,10 +145,10 @@ static void SESSION_check_auth( HTTP_SESSION *http_session ) {
 			user_auth_enc = ( char* )calloc( STD_BUFF_SIZE, sizeof( char ) );
 			base64_decode( http_session->http_info.authorization, ( unsigned char* )user_auth_enc, STD_BUFF_SIZE );
 			/* Pobranie nazwy uï¿½ytkownika */
-			http_session->http_info.user_login = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+			http_session->http_info.user_login = malloc( SMALL_BUFF_SIZE_CHAR );
 			strncpy( http_session->http_info.user_login, strtok( user_auth_enc, ":" ), SMALL_BUFF_SIZE );
 			/* Pobranie hasï¿½a */
-			http_session->http_info.user_pwd = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+			http_session->http_info.user_pwd = malloc( SMALL_BUFF_SIZE_CHAR );
 			strncpy( http_session->http_info.user_pwd, strtok( NULL, ":" ), SMALL_BUFF_SIZE );
 
 			free( user_auth_enc );
@@ -163,7 +163,7 @@ SESSION_get_content_type( HTTP_SESSION *http_session )
 - pobiera informacjê o nag³ówku "Content-Type". */
 static void SESSION_get_content_type( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_CONTENT_TYPE ) ) {
-		http_session->http_info.content_type = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+		http_session->http_info.content_type = malloc( STD_BUFF_SIZE_CHAR );
 		strncpy( http_session->http_info.content_type, REQUEST_get_header_value( http_session->http_info.header, HEADER_CONTENT_TYPE ), STD_BUFF_SIZE );
 	}
 }
@@ -185,7 +185,7 @@ SESSION_get_if_unmodified_since( HTTP_SESSION *http_session )
 - pobiera informacje o nag³ówku "If-Unmodified-Since". */
 static void SESSION_get_if_unmodified_since( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_IF_UNMODIFIED_SINCE ) ) {
-		http_session->http_info.date_if_unmodified_since = ( char* )malloc( TIME_BUFF_SIZE_CHAR );
+		http_session->http_info.date_if_unmodified_since = malloc( TIME_BUFF_SIZE_CHAR );
 		strncpy( http_session->http_info.date_if_unmodified_since, REQUEST_get_header_value( http_session->http_info.header, HEADER_IF_UNMODIFIED_SINCE ), TIME_BUFF_SIZE );
 	}
 }
@@ -196,7 +196,7 @@ SESSION_get_if_modified_since( HTTP_SESSION *http_session )
 - pobiera informacje o nag³ówku "If-Modified-Since". */
 static void SESSION_get_if_modified_since( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_IF_MODIFIED_SINCE ) ) {
-		http_session->http_info.date_if_modified_since = ( char* )malloc( TIME_BUFF_SIZE_CHAR );
+		http_session->http_info.date_if_modified_since = malloc( TIME_BUFF_SIZE_CHAR );
 		strncpy( http_session->http_info.date_if_modified_since, REQUEST_get_header_value( http_session->http_info.header, HEADER_IF_MODIFIED_SINCE ), TIME_BUFF_SIZE );
 	}
 }
@@ -210,7 +210,7 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
 
 	if( strstr( http_session->http_info.header, HEADER_CONNECTION ) ) {
 		/* Pobranie informacji o poï¿½ï¿½czeniu ( "Connection: Keep-Alive/Close" ) - przypisanie do zmiennej tymczasowej */
-		temp_conn_type_handle = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+		temp_conn_type_handle = malloc( SMALL_BUFF_SIZE_CHAR );
 		mem_allocated( temp_conn_type_handle, 9002 );
 		strncpy( temp_conn_type_handle, REQUEST_get_header_value( http_session->http_info.header, HEADER_CONNECTION ), SMALL_BUFF_SIZE );
 		/* Ustawienie zmiennej keep-alive w zaleï¿½noï¿½ci od wartoï¿½ci zmiennej temp_conn_type_handle */
@@ -250,7 +250,7 @@ SESSION_get_ip_addr( HTTP_SESSION *http_session )
 @http_session - wskaŸnik do pod³¹czonego klienta
 - pobiera adres IP pod³¹czonego klienta. */
 static void SESSION_get_ip_addr( HTTP_SESSION *http_session ) {
-	http_session->http_info.remote_addr = ( char* )malloc( TINY_BUFF_SIZE_CHAR );
+	http_session->http_info.remote_addr = malloc( TINY_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.remote_addr, 6 );
 	strncpy( http_session->http_info.remote_addr, SOCKET_get_remote_ip( http_session ), TINY_BUFF_SIZE );
 }
@@ -299,15 +299,15 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	SESSION_get_http_header( http_session );
 
 	/* Pobranie pierwszej linijki ï¿½ï¿½dania */
-	http_session->http_info.request_line = ( char* )malloc( BIG_BUFF_SIZE_CHAR );
+	http_session->http_info.request_line = malloc( BIG_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.request_line, 1 );
 	/* Zmienna temp_entire_msg bï¿½dzie przechowywaï¿½ zawartoï¿½ï¿½ http_info.content_data na potrzeby funkcji strtok */
-	temp_entire_msg = ( char* )malloc( MAX_PATH_LENGTH+TINY_BUFF_SIZE );
+	temp_entire_msg = malloc( MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( temp_entire_msg, http_session->http_info.content_data, MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( http_session->http_info.request_line, strtok( temp_entire_msg, "\015\012" ), MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 
 	/* Pobranie ï¿½ï¿½danej metody z request_line */
-	temp_http_method_name = ( char* )malloc( MICRO_BUFF_SIZE_CHAR );
+	temp_http_method_name = malloc( MICRO_BUFF_SIZE_CHAR );
 	mem_allocated( temp_http_method_name, 9001 );
 	strncpy( temp_entire_msg, http_session->http_info.request_line, MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( temp_http_method_name, strtok( temp_entire_msg, " " ), MICRO_BUFF_SIZE );
@@ -332,7 +332,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	temp_http_method_name = NULL;
 
 	/* Pamiï¿½ï¿½ na ï¿½cieï¿½kï¿½ lokalnï¿½ */
-	http_session->http_info.http_local_path = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	http_session->http_info.http_local_path = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( http_session->http_info.http_local_path, 2 );
 	/* Pobranie ï¿½cieï¿½ki do pliku */
 	strncpy( http_session->http_info.http_local_path, strtok( NULL, " " ), MAX_PATH_LENGTH );
@@ -343,7 +343,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	}
 
 	/* Pamiï¿½ï¿½ na wersjï¿½ protokoï¿½u HTTP */
-	http_session->http_info.protocol_ver = ( char* )malloc( PROTO_BUFF_SIZE_CHAR );
+	http_session->http_info.protocol_ver = malloc( PROTO_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.protocol_ver, 3 );
 	/* Pobranie wersji protokoï¿½u HTTP */
 	strncpy( http_session->http_info.protocol_ver, strtok( NULL, "\015" ), PROTO_BUFF_SIZE );
@@ -384,7 +384,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		/* Przypisanie zmiennej http_info.content_length zawartoï¿½ci nagï¿½ï¿½wka "Content-Length" */
 		http_session->http_info.content_length = atoi( REQUEST_get_header_value( http_session->http_info.header, HEADER_CONTENT_LENGTH ) );
 		/* Prï¿½ba pobrania zawartoï¿½ci ï¿½ï¿½dania do zmiennej tymczasowej */
-		tmp_post_data = ( char* )malloc( MAX_BUFFER_CHAR );
+		tmp_post_data = malloc( MAX_BUFFER_CHAR );
 		mem_allocated( tmp_post_data, 9002 );
 		strncpy( tmp_post_data, REQUEST_get_message_body( http_session ), MAX_BUFFER );
 		/* Sprawdzenie, czy rozmiar pobranej zawartoï¿½ci jest zgodny z danymi z nagï¿½ï¿½wka "Content-Length" */
@@ -403,7 +403,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		/* Odebrano wszystko za jednym razem;
 		przypisanie do zmiennej http_info.query_string zawartoï¿½ci komunikatu */
 		if( !http_session->http_info.query_string ) {
-			http_session->http_info.query_string = ( char* )malloc( MAX_BUFFER_CHAR );
+			http_session->http_info.query_string = malloc( MAX_BUFFER_CHAR );
 			mem_allocated( http_session->http_info.query_string, 15 );
 		}
 		strncpy( http_session->http_info.query_string, tmp_post_data, MAX_BUFFER );

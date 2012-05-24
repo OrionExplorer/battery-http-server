@@ -51,7 +51,7 @@ server_log_prepare()
 - sprawdza, czy istnieje folder, w kt�rym przechowywany b�dzie log z dzia�ania aplikacji
 - tworzy plik "log.txt" w katalogu, kt�rego nazwa jest aktualn� dat� */
 static void server_log_prepare( void ) {
-	char *tmp_path = ( char* )malloc( MAX_PATH_LENGTH_CHAR+1 );
+	char *tmp_path = malloc( MAX_PATH_LENGTH_CHAR+1 );
 
 	/*Utworzenie �cie�ki do pliku "log.txt" */
 	strncpy( tmp_path, app_path, MAX_PATH_LENGTH );
@@ -87,7 +87,7 @@ static void server_log_prepare( void ) {
 server_validate_paths()
 - sprawdza, czy istniej� wszystie foldery niezb�dne do poprawnego dzia�ania aplikacji */
 static void server_validate_paths( void ) {
-	char *tmp_path = ( char* )malloc( MAX_PATH_LENGTH_CHAR+1 );
+	char *tmp_path = malloc( MAX_PATH_LENGTH_CHAR+1 );
 	int res = -1;
 
 	LOG_print( "Starting server_validate_paths()...\n" );
@@ -125,10 +125,10 @@ short CORE_load_index_names( const char* filename ) {
 	int len = 0;
 
 	/* Alokacja pami�ci */
-	buf = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	buf = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( buf, 1060 );
 
-	index_filename = ( char* )malloc( STD_BUFF_SIZE );
+	index_filename = malloc( STD_BUFF_SIZE );
 	mem_allocated( buf, 1061 );
 
 	LOG_print( "Loading index list..." );
@@ -193,25 +193,25 @@ short CORE_load_configuration( void ) {
 	int lines_count = 1;
 
 	/* Alokacja pami�ci */
-	buf = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	buf = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( buf, 350 );
 
-	network_configuration_filename = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	network_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( network_configuration_filename, 351 );
 
-	script_configuration_filename = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	script_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( script_configuration_filename, 352 );
 
-	mime_types_configuration_filename = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	mime_types_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( mime_types_configuration_filename, 353 );
 
-	ht_access_configuration_filename = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	ht_access_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( ht_access_configuration_filename, 354 );
 
-	index_list_configuration_filename = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	index_list_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( index_list_configuration_filename, 355 );
 
-	value = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	value = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( value, 356 );
 
 	/* Reset zmiennych */
@@ -260,7 +260,7 @@ short CORE_load_configuration( void ) {
 
 					case 2: {	/* Wczytanie informacji o udost�pnionym zasobie */
 						/* Alokacja pami�ci */
-						working_dir = ( char* )malloc( MAX_PATH_LENGTH );
+						working_dir = malloc( MAX_PATH_LENGTH );
 						mem_allocated( working_dir, 999 );
 
 						strncpy( working_dir, value, MAX_PATH_LENGTH );

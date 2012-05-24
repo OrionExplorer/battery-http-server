@@ -44,22 +44,22 @@ short HTACCESS_load_configuration( const char *filename ) {
 	}
 
 	/* Alokacja pami�ci */
-	buf = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	buf = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( buf, 1050 );
 
-	res = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	res = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( res, 1051 );
 
-	res_login = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+	res_login = malloc( SMALL_BUFF_SIZE_CHAR );
 	mem_allocated( res_login, 1052 );
 
-	res_pwd = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+	res_pwd = malloc( SMALL_BUFF_SIZE_CHAR );
 	mem_allocated( res_pwd, 1053 );
 
-	res_auth_u = ( char* )malloc( STD_BUFF_SIZE_CHAR+1 );
+	res_auth_u = malloc( STD_BUFF_SIZE_CHAR+1 );
 	mem_allocated( res_auth_u, 1054 );
 
-	res_auth_f = ( char* )malloc( STD_BUFF_SIZE_CHAR+1 );
+	res_auth_f = malloc( STD_BUFF_SIZE_CHAR+1 );
 	mem_allocated( res_auth_f, 1055 );
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {

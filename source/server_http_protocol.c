@@ -28,7 +28,7 @@ REQUEST_get_message_body( const char *content_data )
 @http_session - wska�nik do pod��czonego klienta
 - zwraca ci�g znak�w b�d�cy message body. */
 char* REQUEST_get_message_body( HTTP_SESSION *http_session ) {
-	char *p1 = ( char* )malloc( MAX_BUFFER_CHAR );
+	char *p1 = malloc( MAX_BUFFER_CHAR );
 	static char body_result[MAX_BUFFER];
 
 	memset( body_result, '\0', MAX_BUFFER );
@@ -162,7 +162,7 @@ char* REQUEST_get_header_value( const char *header, const char *requested_value_
 	}
 
 	/* Alokacja pami�ci */
-	result_handler = ( char* )malloc( BIG_BUFF_SIZE );
+	result_handler = malloc( BIG_BUFF_SIZE );
 	mem_allocated( result_handler, 651 );
 	dst = ( char* )calloc( STD_BUFF_SIZE, sizeof( char ) );
 	mem_allocated( dst, 652 );
@@ -206,9 +206,9 @@ void RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, 
 	char *http_single_header_line;	/* Pojedyncza linia nag��wka */
 
 	/* Alokacja pami�ci */
-	http_header_to_send = ( char* )malloc( MAX_BUFFER_CHAR+1 );
+	http_header_to_send = malloc( MAX_BUFFER_CHAR+1 );
 	mem_allocated( http_header_to_send, 9 );
-	http_single_header_line = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	http_single_header_line = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( http_single_header_line, 10 );
 
 	/* HTTP/1.1 KOD OPIS */
@@ -290,9 +290,9 @@ void RESPONSE_error( HTTP_SESSION *http_session, const char *http_status_code, c
 	int len = 0;
 
 	/* Alokacja pami�ci */
-	http_header_to_send = ( char* )malloc( MAX_BUFFER_CHAR+1 );
+	http_header_to_send = malloc( MAX_BUFFER_CHAR+1 );
 	mem_allocated( http_header_to_send, 750 );
-	http_single_header_line = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	http_single_header_line = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( http_single_header_line, 751 );
 
 	/* HTTP/1.X XXX OPIS */
@@ -420,7 +420,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 					RESPONSE_error( http_session, HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE, HTTP_ERR_416_MSG, NULL );
 				} else {
 					/* Dodanie nag��wka "Content-Range" */
-					add_hdr = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+					add_hdr = malloc( STD_BUFF_SIZE_CHAR );
 					mem_allocated( add_hdr, 34 );
 					sprintf( add_hdr, "%sbytes %ld-%ld/%ld\r\n", HEADER_CONTENT_RANGE, http_session->http_info.range_st, http_session->http_info.range_en, filesize );
 					/* Wysy�ka z kodem 206 - wybrany fragment zasobu */
@@ -429,7 +429,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 					add_hdr = NULL;
 
 					/* Wczytanie fragmentu i wysy�ka */
-					buf = ( char* )malloc( total );
+					buf = malloc( total );
 					mem_allocated( buf, 35 );
 
 					if( fread( buf, sizeof( char ), total, file ) > 0 ) {
@@ -462,7 +462,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 
 	len_loc = strlen( http_session->http_info.http_local_path );
 	/* Przygotowanie pami�ci na nazw� ��danego pliku */
-	local_file_path = ( char* )malloc( MAX_PATH_LENGTH_CHAR+1 );
+	local_file_path = malloc( MAX_PATH_LENGTH_CHAR+1 );
 	mem_allocated( local_file_path, 12 );
 
 	/* Po��czenie �cie�ki z ��dania z pe�n� �cie�k� w systemie*/
@@ -478,7 +478,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 
 			/* Pobranie query string */
 			if( !http_session->http_info.query_string ) {
-				http_session->http_info.query_string = ( char* )malloc( MAX_BUFFER_CHAR );
+				http_session->http_info.query_string = malloc( MAX_BUFFER_CHAR );
 				mem_allocated( http_session->http_info.query_string, 15 );
 			}
 			strncpy( http_session->http_info.query_string, REQUEST_get_query( http_session ), MAX_PATH_LENGTH );
@@ -516,13 +516,13 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 	}
 
 	/* Alokacja pami�ci */
-	ht_access_pwd = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	ht_access_pwd = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( ht_access_pwd, 6550 );
 
 	/*Sprawdzamy, czy ��dany plik istnieje... */
 	file_params_val = file_params( http_session, local_file_path, ht_access_pwd );
 	if( file_params_val == 0 ) { /* Plik nie istnieje */
-		file_ext = ( char* )malloc( MICRO_BUFF_SIZE_CHAR );
+		file_ext = malloc( MICRO_BUFF_SIZE_CHAR );
 		strncpy( file_ext, file_get_ext( local_file_path ), MICRO_BUFF_SIZE );
 		/*...brak rozszerzenia = nie podano konkretnego pliku w URL... */
 		if( strncmp( file_ext, "", MICRO_BUFF_SIZE ) == 0 ) {
@@ -531,7 +531,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 				/*...mimo wszystko sprawdzamy, czy �cie�ka jest prawid�owa. Tak = b��d 302. Nie = b��d 400. */
 				if( directory_exists( local_file_path ) ) {
 					/* Stworzenie dodatkowej informacji do nag��wna wysy�anego przez RESPONSE_error z prawid�ow� �cie�k� */
-					add_hdr = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+					add_hdr = malloc( MAX_PATH_LENGTH_CHAR );
 					sprintf( add_hdr, "%s%s/\r\n", HEADER_LOCATION, http_session->http_info.http_local_path );
 					RESPONSE_error( http_session, HTTP_302_FOUND, HTTP_ERR_302_MSG, add_hdr );
 					free( add_hdr );
@@ -644,7 +644,7 @@ long REQUEST_get_range( HTTP_SESSION *http_session, int type ) {
 	int len = 0;
 
 	/* Pobranie warto�ci nag��wka "Range" do zmiennej tymczasowej */
-	ptr = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	ptr = malloc( STD_BUFF_SIZE_CHAR );
 	strncpy( ptr, REQUEST_get_header_value( http_session->http_info.header, HEADER_RANGE ), STD_BUFF_SIZE );
 	if( strlen( ptr ) == 0 ) { /* Nag�owek nie istnieje */
 		free( ptr );
@@ -653,10 +653,10 @@ long REQUEST_get_range( HTTP_SESSION *http_session, int type ) {
 	}
 
 	/* Rezerwacja pami�ci */
-	range = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+	range = malloc( SMALL_BUFF_SIZE_CHAR );
 	mem_allocated( range, 7 );
 
-	temp_r = ( char* )malloc( SMALL_BUFF_SIZE_CHAR );
+	temp_r = malloc( SMALL_BUFF_SIZE_CHAR );
 	mem_allocated( temp_r, 8 );
 
 	/* Przypisanie do zmiennej range warto�ci zmiennej tymczasowej */

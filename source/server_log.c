@@ -35,7 +35,7 @@ void LOG_print( char *fmt, ... ) {
 	int len = 0;
 
 	/* Rezerwacja pami�ci */
-	output_text = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	output_text = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( output_text, 150 );
 
 	/* Przetworzenie tekstu na form� wyj�ciow� */
@@ -56,7 +56,7 @@ void LOG_print( char *fmt, ... ) {
 		if( buf_len > LOG_BUFFER ) {
 			/* Sprawdzenie, o ile wi�kszy jest rozmiar log_object */
 			len = buf_len - LOG_BUFFER;
-			tmp_buf = ( char* )malloc( len );
+			tmp_buf = malloc( len );
 			mem_allocated( tmp_buf, 160 );
 			strncpy( tmp_buf, log_object+LOG_BUFFER, len );
 			strncat( log_object, tmp_buf, len );

@@ -239,7 +239,7 @@ SOCKET_process( int socket_fd )
 - funkcja odczytuje dane z gniazda */
 static void SOCKET_process( int socket_fd ) {
 	HTTP_SESSION *session = ( HTTP_SESSION* )malloc( sizeof( HTTP_SESSION ) );
-	//char* tmp_buf = ( char* )malloc( MAX_BUFFER_CHAR );
+	//char* tmp_buf = malloc( MAX_BUFFER_CHAR );
 	char tmp_buf[ MAX_BUFFER ];
 
 	session->http_info.received_all = http_session_.http_info.received_all;
@@ -265,7 +265,7 @@ static void SOCKET_process( int socket_fd ) {
 			session->http_info.received_all = 1;
 		} else if( session->http_info.received_all == -1 ) {
 			/* Dla metod GET i HEAD */
-			session->http_info.content_data = ( char* )malloc( session->address_length+1 );
+			session->http_info.content_data = malloc( session->address_length+1 );
 			mem_allocated( session->http_info.content_data, 25 );
 			strncpy( session->http_info.content_data, tmp_buf, session->address_length );
 		}

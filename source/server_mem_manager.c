@@ -23,8 +23,8 @@ mem_allocated( char* ptr, int n )
 void mem_allocated( char *ptr, int n ) {
 	/* B��d alokacji pami�ci, ptr = NULL */
 	if( !ptr ) {
-		LOG_print( "Error: ( char* )malloc( %d ).\n", n );
-		printf( "Error: ( char* )malloc( %d ).\n", n );
+		LOG_print( "Error: malloc( %d ).\n", n );
+		printf( "Error: malloc( %d ).\n", n );
 		exit( EXIT_FAILURE );
 	}
 	/* Wszystko ok, kontynuuje dzia�anie programu */

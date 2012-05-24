@@ -3,6 +3,7 @@ obj/
 *.depend
 *.layout
 *.cbTemp
+*.conf
 Release/battery-http-server.exe
 Release/logs
 Release/www

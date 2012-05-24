@@ -46,10 +46,10 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	int i = 0, j = 0;			/* Zmienne pomocnicze dla p�tli */
 
 	/* Alokacja pami�ci na obiekty, na kt�rych b�dzie grzeba� funkcja CGI_valid */
-	exec_filename = ( char* )malloc( MAX_PATH_LENGTH_CHAR );
+	exec_filename = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( exec_filename, 39 );
 
-	cgi_param = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	cgi_param = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( cgi_param, 40 );
 
 	add_hdr = ( char* )calloc( BIG_BUFF_SIZE+1, sizeof( char ) );
@@ -76,7 +76,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 
 	/* Alokacja pami�ci na obiekt, kt�ry b�dzie zawiera� nazw� zewn�trznego pliku
 	wykonywalnego i ewentualnie parametr, z kt�rym ma zosta� uruchomiony */
-	cgi_script_exec = ( char* )malloc( MAX_PATH_LENGTH_CHAR+1 );
+	cgi_script_exec = malloc( MAX_PATH_LENGTH_CHAR+1 );
 	mem_allocated( cgi_script_exec, 41 );
 
 	/* Weryfikacja, czy ��dany plik ( filename ) jest wykonywalny sam z siebie, czy
@@ -268,16 +268,16 @@ short CGI_load_configuration( const char *filename ) {
 	}
 
 	/* Alokacja pami�ci */
-	buf = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	buf = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( buf, 450 );
 
-	ext = ( char* )malloc( EXT_LEN_CHAR );
+	ext = malloc( EXT_LEN_CHAR );
 	mem_allocated( ext, 451 );
 
-	exec_name = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	exec_name = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( exec_name, 452 );
 
-	param = ( char* )malloc( STD_BUFF_SIZE_CHAR );
+	param = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( param, 453 );
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
@@ -353,7 +353,7 @@ void CGI_valid( const char *filename, int *valid_res, char *exec_name, char *par
 
 	*valid_res = 0;
 
-	ext = ( char* )malloc( EXT_LEN_CHAR );
+	ext = malloc( EXT_LEN_CHAR );
 	mem_allocated( ext, 37 );
 
 	strncpy( ext, file_get_ext( filename ), EXT_LEN );

@@ -114,7 +114,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 
 		/* Pobranie informacji o ostatniej dacie modyfikacji zasobu */
 		if( !http_session->local_info.date_res_last_modified ) {
-			http_session->local_info.date_res_last_modified = ( char* )malloc( TIME_BUFF_SIZE_CHAR );
+			http_session->local_info.date_res_last_modified = malloc( TIME_BUFF_SIZE_CHAR );
 			mem_allocated( http_session->local_info.date_res_last_modified, 1111 );
 		}
 
@@ -271,7 +271,7 @@ battery_fclose( FILE *file, int socket_descriptor )
 - funkcja weryfikuje, czy żądany plik może zostać zamknięty na podstawie ilości korzystających z niego klientów */
 void battery_fclose( FILE *file, int socket_descriptor ) {
 	int i = FOPEN_MAX;
-	short clients_count = 0;
+	short clients_count = -1;
 	int client_index = -1;
 
 	if(file == 0) {
@@ -296,9 +296,12 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 	}
 
 	/* Z pliku korzystał jeden lub mniej klientów */
-	if( clients_count <= 1 ) {
-		fclose( file );
-		/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
+	if( clients_count == 1 ) {
+
+        if( file ) {
+            fclose( file );
+        }
+        /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
 		if( client_index > -1) {
 			opened_files[ client_index ].socket_descriptor = 0;
 			opened_files[ client_index ].file = NULL;
