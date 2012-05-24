@@ -195,16 +195,20 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 	FILE *tmp = NULL;
 
 	/* Weryfikacja, czy plik jest już otwarty przez serwer */
-	while( --i && i >= 0 ) {
+	//printf("Weryfikacja(%s)...", filename);
+	while( i-- && i >= 0 ) {
 		if( strcmp( opened_files[ i ].filename, filename ) == 0 ) {
 			tmp = opened_files[ i ].file;
+			//printf("ok.\n");
 			break;
 		}
 	}
 
 	/* Jeżeli nie jest - otwórz */
 	if( tmp == NULL ) {
+		//printf("NIE DOBRZE.\n");
 		tmp = fopen( filename, mode );
+		//printf("Otwieram plik: %d.\n", (int) tmp);
 	}
 
 	if( tmp ) {
@@ -221,6 +225,7 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 					opened_files[ i ].socket_descriptor = socket_descriptor;
 					strcpy( opened_files[ i ].filename, filename );
 					opened_files[ i ].size = ftell( tmp );
+					//printf("Dodany (%s) jako %d.\n", filename, i );
 					break;
 				}
 			}
@@ -271,8 +276,7 @@ battery_fclose( FILE *file, int socket_descriptor )
 - funkcja weryfikuje, czy żądany plik może zostać zamknięty na podstawie ilości korzystających z niego klientów */
 void battery_fclose( FILE *file, int socket_descriptor ) {
 	int i = FOPEN_MAX;
-	short clients_count = -1;
-	int client_index = -1;
+	short clients_count = 0;
 
 	if(file == 0) {
 		return;
@@ -283,6 +287,7 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 		if( opened_files[ i ].file == file ) {
 			/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
 			if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
+				//printf("Czyszcze!\n");
 				opened_files[ i ].socket_descriptor = 0;
 				opened_files[ i ].file = NULL;
 				opened_files[ i ].size = 0;
@@ -290,23 +295,14 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 			}
 			/* Zliczenie ilości klientów korzystających z pliku */
 			clients_count++;
-			/* Ustawienie indeksu ostatniego znalezionego klienta powiązanego z żądanym plikiem */
-			client_index = i;
 		}
 	}
 
 	/* Z pliku korzystał jeden lub mniej klientów */
 	if( clients_count == 1 ) {
-
         if( file ) {
             fclose( file );
+            //printf("Zamykam plik.\n");
         }
-        /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
-		if( client_index > -1) {
-			opened_files[ client_index ].socket_descriptor = 0;
-			opened_files[ client_index ].file = NULL;
-			opened_files[ client_index ].size = 0;
-			memset( opened_files[ client_index ].filename, '\0', FILENAME_MAX );
-		}
 	}
 }
