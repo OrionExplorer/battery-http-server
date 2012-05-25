@@ -20,9 +20,9 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 void app_terminate( void );
 
 int main( void ) {
+	signal( SIGINT, ( sighandler )&app_terminate );
 	signal( SIGABRT, ( sighandler )&app_terminate );
 	signal( SIGTERM, ( sighandler )&app_terminate );
-	signal( SIGINT, ( sighandler )&app_terminate );
 
 	printf( "%s\n", SERVER_NAME );
 	CORE_initialize();

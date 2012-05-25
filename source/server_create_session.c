@@ -566,7 +566,7 @@ SESSION_add_new_send_struct( int socket_descriptor )
 void SESSION_add_new_send_struct( int socket_descriptor ) {
 	int i;
 
-	for( i = 0; i <= MAX_CLIENTS; i++ ){
+	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
 		if( send_d[ i ].socket_descriptor == 0 ) {
 			send_d[ i ].socket_descriptor = socket_descriptor;
 			send_d[ i ].sent_size = 0;
@@ -583,7 +583,7 @@ SESSION_add_new_send_struct( int socket_descriptor )
 void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
-	for( i = 0; i <= MAX_CLIENTS; i++ ){
+	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
 		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
 			battery_fclose( send_d[ i ].file, socket_descriptor );
 			send_d[ i ].socket_descriptor = 0;

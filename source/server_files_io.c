@@ -195,20 +195,16 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 	FILE *tmp = NULL;
 
 	/* Weryfikacja, czy plik jest już otwarty przez serwer */
-	//printf("Weryfikacja(%s)...", filename);
-	while( i-- && i >= 0 ) {
+	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( strcmp( opened_files[ i ].filename, filename ) == 0 ) {
 			tmp = opened_files[ i ].file;
-			//printf("ok.\n");
 			break;
 		}
 	}
 
 	/* Jeżeli nie jest - otwórz */
 	if( tmp == NULL ) {
-		//printf("NIE DOBRZE.\n");
 		tmp = fopen( filename, mode );
-		//printf("Otwieram plik: %d.\n", (int) tmp);
 	}
 
 	if( tmp ) {
@@ -218,7 +214,7 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 			fseek( tmp, 0, SEEK_END );
 			i = FOPEN_MAX;
 
-			while( --i && i >= 0 ) {
+			for(i = 0; i <= FOPEN_MAX-1; i++ ) {
 				/* Dodanie informacji o otwartym pliku w pierwszym wolnym elemencie */
 				if( opened_files[ i ].file == NULL ) {
 					opened_files[ i ].file = tmp;
@@ -244,7 +240,8 @@ battery_ftell( FILE *file )
 long battery_ftell( FILE *file ) {
 	int i = FOPEN_MAX;
 
-	while( --i && i >= 0 ) {
+	//while( --i && i >= 0 ) {
+	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( opened_files[ i ].file == file ) {
 			return opened_files[ i ].size;
 		}
@@ -260,7 +257,8 @@ battery_get_filename( FILE *file )
 char* battery_get_filename( FILE *file ) {
 	int i = FOPEN_MAX;
 
-	while( --i && i >= 0 ) {
+	//while( --i && i >= 0 ) {
+	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( opened_files[ i ].file == file ) {
 			return opened_files[ i ].filename;
 		}
@@ -276,33 +274,32 @@ battery_fclose( FILE *file, int socket_descriptor )
 - funkcja weryfikuje, czy żądany plik może zostać zamknięty na podstawie ilości korzystających z niego klientów */
 void battery_fclose( FILE *file, int socket_descriptor ) {
 	int i = FOPEN_MAX;
-	short clients_count = 0;
+	int clients_count = 0;
+	short file_found = 0;
 
-	if(file == 0) {
+	if( file == NULL ) {
 		return;
 	}
 
-	while( --i && i >= 0 ) {
+	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		/* Znaleziony element przechowujący informację o otwartym pliku */
-		if( opened_files[ i ].file == file ) {
-			/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
+		if( opened_files[ i ].file == file && file ) {
+		    /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
 			if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
-				//printf("Czyszcze!\n");
 				opened_files[ i ].socket_descriptor = 0;
 				opened_files[ i ].file = NULL;
 				opened_files[ i ].size = 0;
 				memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
+				file_found++;
 			}
 			/* Zliczenie ilości klientów korzystających z pliku */
-			clients_count++;
+            clients_count++;
 		}
 	}
-
 	/* Z pliku korzystał jeden lub mniej klientów */
-	if( clients_count == 1 ) {
+	if( clients_count == 1 && file_found > 0 ) {
         if( file ) {
             fclose( file );
-            //printf("Zamykam plik.\n");
         }
 	}
 }
