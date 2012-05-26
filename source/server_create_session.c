@@ -551,7 +551,7 @@ SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 	int i;
 
 	for( i = 0; i <= MAX_CLIENTS; i++ ) {
-		if( send_d[i].socket_descriptor == socket ) {
+		if( send_d[ i ].socket_descriptor == socket ) {
 			return &send_d[ i ];
 		}
 	}
@@ -568,9 +568,9 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
 
 	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
 		if( send_d[ i ].socket_descriptor == 0 ) {
-			send_d[ i ].socket_descriptor = socket_descriptor;
-			send_d[ i ].sent_size = 0;
-			send_d[ i ].http_content_size = 0;
+			send_d[ i ] .socket_descriptor = socket_descriptor;
+			send_d[ i ] .sent_size = 0;
+			send_d[ i ] .http_content_size = 0;
 			return;
 		}
 	}
@@ -584,11 +584,11 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
 	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
-		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
-			battery_fclose( send_d[ i ].file, socket_descriptor );
-			send_d[ i ].socket_descriptor = 0;
-			send_d[ i ].sent_size = 0;
-			send_d[ i ].http_content_size = 0;
+		if( send_d[ i ] .socket_descriptor == socket_descriptor ) {
+			battery_fclose( send_d[ i ] .file, socket_descriptor );
+			send_d[ i ] .socket_descriptor = 0;
+			send_d[ i ] .sent_size = 0;
+			send_d[ i ] .http_content_size = 0;
 			return;
 		}
 	}

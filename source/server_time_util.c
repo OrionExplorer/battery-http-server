@@ -18,7 +18,7 @@ get_actual_time_gmt()
 - pobiera aktualny czas
 - zwraca char *z aktualnym czasem w formacie GMT */
 char* get_actual_time_gmt( void ) {
-	static char s[TIME_BUFF_SIZE];
+	static char s[ TIME_BUFF_SIZE ];
 	struct tm tim;
 	time_t now;
 

@@ -23,7 +23,7 @@ OPENED_FILE opened_files[ FOPEN_MAX ];
 get_app_path( void )
 - zwraca ci�g znak�w - folder startowy aplikacji */
 char* get_app_path( void ) {
-	static char buf[MAX_PATH_LENGTH];
+	static char buf[ MAX_PATH_LENGTH ];
 	if( getcwd( buf, MAX_PATH_LENGTH ) ) {
 		return strncat( buf, SLASH, MAX_PATH_LENGTH );
 	} else {
@@ -122,11 +122,11 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 
 		/* Sprawdza, czy plik ma uprawnienia do odczytu */
 		if( file_stat.st_mode & S_IREAD ) {
-			if( ht_access_pwd ) {
+			if( ht_access_pwd && ht_access_count > 0 ) {
 				for( i = 0; i < ht_access_count; i++ ) {
-					if( strncmp( ht_access[i].res, filename, MAX_PATH_LENGTH ) == 0 ) {
+					if( strncmp( ht_access[ i ].res_filename, filename, MAX_PATH_LENGTH ) == 0 ) {
 						/* Zas�b wymaga autoryzacji */
-						strncpy( ht_access_pwd, ht_access[i].res_auth, STD_BUFF_SIZE );
+						strncpy( ht_access_pwd, ht_access[ i ].res_auth, STD_BUFF_SIZE );
 						fclose( resource );
 						return 3;
 					}
@@ -154,7 +154,7 @@ file_exists( const char *filename )
 short file_exists( const char *filename ) {
 	FILE *resource;	/* Uchwyt do pliku */
 
-	if( ( resource = battery_fopen( filename, "r", 0, 0) ) ) {
+	if( ( resource = battery_fopen( filename, "r", 0, 0, STD_FILE ) ) ) {
 		/* Uda�o si� otworzy� plik = istnieje */
 		fclose( resource );
 		return 1;
@@ -176,8 +176,8 @@ void file_extract_path(char *full_filename, char delim)
 
 	if(i > 0) {
 		while(--i) {
-			if(full_filename[i] == delim) {
-				full_filename[i+1] = '\0';
+			if(full_filename[ i ] == delim) {
+				full_filename[ i+1 ] = '\0';
 			}
 		}
 	}
@@ -190,21 +190,21 @@ battery_fopen( const char *filename, const char *mode, short add_to_list, int so
 @add_to_list - definiuje, czy plik ma zostać dodany do listy otwartych przez serwer plików
 @socket_descriptor - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
 - funkcja weryfikuje, czy żądany plik jest już otwarty przez serwer */
-FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor ) {
+FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor, RESOURCE_TYPE type ) {
 	int i = FOPEN_MAX;
 	FILE *tmp = NULL;
 
 	/* Weryfikacja, czy plik jest już otwarty przez serwer */
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
-		if( strcmp( opened_files[ i ].filename, filename ) == 0 ) {
-			tmp = opened_files[ i ].file;
+		if( strcmp( opened_files[ i ].filename, filename ) == 0 && type == opened_files[ i ].type) {
+			tmp = opened_files[ i ] .file;
 			break;
 		}
 	}
 
 	/* Jeżeli nie jest - otwórz */
 	if( tmp == NULL ) {
-		tmp = fopen( filename, mode );
+		tmp = ( type == STD_FILE ? fopen( filename, mode ) : popen( filename, mode ) );
 	}
 
 	if( tmp ) {
@@ -217,11 +217,11 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 			for(i = 0; i <= FOPEN_MAX-1; i++ ) {
 				/* Dodanie informacji o otwartym pliku w pierwszym wolnym elemencie */
 				if( opened_files[ i ].file == NULL ) {
-					opened_files[ i ].file = tmp;
-					opened_files[ i ].socket_descriptor = socket_descriptor;
+					opened_files[ i ] .file = tmp;
+					opened_files[ i ] .socket_descriptor = socket_descriptor;
 					strcpy( opened_files[ i ].filename, filename );
 					opened_files[ i ].size = ftell( tmp );
-					//printf("Dodany (%s) jako %d.\n", filename, i );
+					opened_files[ i ].type = type;
 					break;
 				}
 			}
@@ -274,6 +274,7 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 	int i = FOPEN_MAX;
 	int clients_count = 0;
 	short file_found = 0;
+	RESOURCE_TYPE type = NONE;
 
 	if( file == NULL ) {
 		return;
@@ -287,17 +288,26 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 				opened_files[ i ].socket_descriptor = 0;
 				opened_files[ i ].file = NULL;
 				opened_files[ i ].size = 0;
+				type = opened_files[ i ].type;
+				opened_files[ i ].type = NONE;
 				memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
+
 				file_found++;
+
 			}
 			/* Zliczenie ilości klientów korzystających z pliku */
             clients_count++;
 		}
 	}
+
 	/* Z pliku korzystał jeden lub mniej klientów */
 	if( clients_count == 1 && file_found > 0 ) {
         if( file ) {
-            fclose( file );
+			if( type == STD_FILE ) {
+				fclose( file );
+			} else if( type == SCRIPT ) {
+				pclose( file );
+			}
         }
 	}
 }

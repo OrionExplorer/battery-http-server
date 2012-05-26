@@ -26,7 +26,7 @@ HTACCESS_load_configuration( const char *filename )
 short HTACCESS_load_configuration( const char *filename ) {
 	FILE *cfg_file;
 	char *buf;			/* Zmienna pomocnicza */
-	char *res;			/* Przechowuje nazw� zasobu */
+	char *res_filename;	/* Przechowuje nazw� zasobu */
 	char *res_login;	/* Przechowuje login do zasobu */
 	char *res_pwd;		/* Przechowuje has�o do zasobu */
 	char *res_auth_u;	/* Przechowuje niezaszyfrowane, sformatowane dane */
@@ -47,8 +47,8 @@ short HTACCESS_load_configuration( const char *filename ) {
 	buf = malloc( STD_BUFF_SIZE_CHAR );
 	mem_allocated( buf, 1050 );
 
-	res = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( res, 1051 );
+	res_filename = malloc( MAX_PATH_LENGTH_CHAR );
+	mem_allocated( res_filename, 1051 );
 
 	res_login = malloc( SMALL_BUFF_SIZE_CHAR );
 	mem_allocated( res_login, 1052 );
@@ -63,11 +63,11 @@ short HTACCESS_load_configuration( const char *filename ) {
 	mem_allocated( res_auth_f, 1055 );
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
-		if( sscanf( buf, "%s %s %s", res, res_login, res_pwd ) == 3 ) {
+		if( sscanf( buf, "%s %s %s", res_filename, res_login, res_pwd ) == 3 ) {
 			/* Wczytanie danych z pliku */
-			strncpy( ht_access[ht_access_count].res, res, MAX_PATH_LENGTH );
-			strncpy( ht_access[ht_access_count].res_login, res_login, SMALL_BUFF_SIZE );
-			strncpy( ht_access[ht_access_count].res_pwd, res_pwd, SMALL_BUFF_SIZE );
+			strncpy( ht_access[ ht_access_count ].res_filename, res_filename, MAX_PATH_LENGTH );
+			strncpy( ht_access[ ht_access_count ].res_login, res_login, SMALL_BUFF_SIZE );
+			strncpy( ht_access[ ht_access_count ].res_pwd, res_pwd, SMALL_BUFF_SIZE );
 
 			/* Format loginu i has�a: "login:has�o" */
 			strncpy( res_auth_u, res_login, STD_BUFF_SIZE );
@@ -78,9 +78,9 @@ short HTACCESS_load_configuration( const char *filename ) {
 			base64_encode( ( unsigned char* )res_auth_u, strlen( res_auth_u ), res_auth_f, STD_BUFF_SIZE );
 
 			/* Zapisanie do elementu struktury ht_access informacji o spodziewanym ha�le */
-			strncpy( ht_access[ht_access_count].res_auth, res_auth_f, STD_BUFF_SIZE );
+			strncpy( ht_access[ ht_access_count ].res_auth, res_auth_f, STD_BUFF_SIZE );
 
-			LOG_print( "\t- %d access to \"%s\" with login \"%s\", password \"%s\" ( %s ).\n", ht_access_count, res, res_login, res_pwd, res_auth_f );
+			LOG_print( "\t- %d access to \"%s\" with login \"%s\", password \"%s\" ( %s ).\n", ht_access_count, res_filename, res_login, res_pwd, res_auth_f );
 			ht_access_count++;
 		}
 	}
@@ -89,8 +89,8 @@ short HTACCESS_load_configuration( const char *filename ) {
 	free( buf );
 	buf = NULL;
 
-	free( res );
-	res = NULL;
+	free( res_filename );
+	res_filename = NULL;
 
 	free( res_login );
 	res_login = NULL;

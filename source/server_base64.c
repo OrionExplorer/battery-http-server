@@ -24,19 +24,19 @@ const char *BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 * @param triple three bytes that should be encoded
 * @param result buffer of four characters where the result is stored
 */
-void _base64_encode_triple( unsigned char triple[3], char result[4] )
+void _base64_encode_triple( unsigned char triple[ 3 ] , char result[ 4 ] )
 {
 	int tripleValue, i;
 
-	tripleValue = triple[0];
+	tripleValue = triple[ 0 ] ;
 	tripleValue *= 256;
-	tripleValue += triple[1];
+	tripleValue += triple[ 1 ];
 	tripleValue *= 256;
-	tripleValue += triple[2];
+	tripleValue += triple[ 2 ];
 
 	for ( i=0; i<4; i++ )
 	{
-		result[3-i] = BASE64_CHARS[tripleValue%64];
+		result[ 3-i ] = BASE64_CHARS[ tripleValue%64 ];
 		tripleValue /= 64;
 	}
 }
@@ -68,19 +68,19 @@ int base64_encode( unsigned char *source, size_t sourcelen, char *target, size_t
 	/* encode the last one or two characters */
 	if ( sourcelen > 0 )
 	{
-		unsigned char temp[3];
+		unsigned char temp[ 3 ] ;
 		memset( temp, 0, sizeof( temp ) );
 		memcpy( temp, source, sourcelen );
 		_base64_encode_triple( temp, target );
-		target[3] = '=';
+		target[ 3 ] = '=';
 		if ( sourcelen == 1 )
-			target[2] = '=';
+			target[ 2 ] = '=';
 
 		target += 4;
 	}
 
 	/* terminate the string */
-	target[0] = 0;
+	target[ 0 ] = 0;
 
 	return 1;
 }
@@ -113,24 +113,24 @@ int _base64_char_value( char base64char )
 * @param result the decoded data
 * @return lenth of the result ( 1, 2 or 3 ), 0 on failure
 */
-int _base64_decode_triple( char quadruple[4], unsigned char *result )
+int _base64_decode_triple( char quadruple[ 4 ], unsigned char *result )
 {
 	int i, triple_value, bytes_to_decode = 3, only_equals_yet = 1;
-	int char_value[4];
+	int char_value[ 4 ];
 
 	for ( i=0; i<4; i++ )
-		char_value[i] = _base64_char_value( quadruple[i] );
+		char_value[ i ] = _base64_char_value( quadruple[ i ] );
 
 	/* check if the characters are valid */
 	for ( i=3; i>=0; i-- )
 	{
-		if ( char_value[i]<0 )
+		if ( char_value[ i ] < 0 )
 		{
-			if ( only_equals_yet && quadruple[i]=='=' )
+			if ( only_equals_yet && quadruple[ i ] =='=' )
 			{
 				/* we will ignore this character anyway, make it something
 				* that does not break our calculations */
-				char_value[i]=0;
+				char_value[ i ]=0;
 				bytes_to_decode--;
 				continue;
 			}
@@ -145,20 +145,20 @@ int _base64_decode_triple( char quadruple[4], unsigned char *result )
 		bytes_to_decode = 0;
 
 	/* make one big value out of the partial values */
-	triple_value = char_value[0];
+	triple_value = char_value[ 0 ];
 	triple_value *= 64;
-	triple_value += char_value[1];
+	triple_value += char_value[ 1 ] ;
 	triple_value *= 64;
-	triple_value += char_value[2];
+	triple_value += char_value[ 2 ];
 	triple_value *= 64;
-	triple_value += char_value[3];
+	triple_value += char_value[ 3 ];
 
 	/* break the big value into bytes */
 	for ( i=bytes_to_decode; i<3; i++ )
 		triple_value /= 256;
 	for ( i=bytes_to_decode-1; i>=0; i-- )
 	{
-		result[i] = triple_value%256;
+		result[ i ] = triple_value%256;
 		triple_value /= 256;
 	}
 
@@ -176,7 +176,7 @@ int _base64_decode_triple( char quadruple[4], unsigned char *result )
 size_t base64_decode( char *source, unsigned char *target, size_t targetlen )
 {
 	char *src, *tmpptr;
-	char quadruple[4], tmpresult[3];
+	char quadruple[ 4 ], tmpresult[ 3 ];
 	int i;
 	int tmplen = 3;
 	size_t converted = 0;
@@ -199,7 +199,7 @@ size_t base64_decode( char *source, unsigned char *target, size_t targetlen )
 			while ( *tmpptr != '=' && _base64_char_value( *tmpptr )<0 )
 				tmpptr++;
 
-			quadruple[i] = *( tmpptr++ );
+			quadruple[ i ]= *( tmpptr++ );
 		}
 
 		/* convert the characters */

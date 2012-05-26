@@ -36,7 +36,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	size_t result_size = 0;		/* Ilo�� wczytanych bajt�w z wyniku dzia�ania CGI */
 	unsigned char *cgi_result;	/* Wynik dzia�ania CGI */
 	unsigned char *cgi_body;	/* Wynik dzia�ania CGI bez nag��wk�w */
-	char buf[MAX_BUFFER];		/* Wczytany wynik dzia�ania CGI */
+	char buf[ MAX_BUFFER ];		/* Wczytany wynik dzia�ania CGI */
 	char *cgi_script_exec;		/* Nazwa pliku wykonywalnego CGI ( g��wny ) */
 	char *exec_filename;		/* Nazwa pliku wykonywalnego CGI */
 	char *cgi_param;			/* Parametr, z kt�rym ma zosta� uruchomiony plik wykonywalny CGI */
@@ -44,6 +44,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	int valid_res = -1;			/* Przechowuje rezultat dzia�ania funkcji CGI_valid */
 	long hdr_len = 0;			/* Rozmiar wczytanych nag��wk�w */
 	int i = 0, j = 0;			/* Zmienne pomocnicze dla p�tli */
+	//SEND_INFO *send_struct;
 
 	/* Alokacja pami�ci na obiekty, na kt�rych b�dzie grzeba� funkcja CGI_valid */
 	exec_filename = malloc( MAX_PATH_LENGTH_CHAR );
@@ -104,6 +105,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	/* Stworzenie potoku ze skryptem CGI. Weryfikacja poprawno�ci nazwy nast�pi�a w funkcji
 	CGI_valid. Odczyt danych w trybie binarnym. */
 	cgi_script_file = popen( cgi_script_exec, READ_BINARY );
+	//cgi_script_file = battery_fopen( cgi_script_exec, READ_BINARY, 1, http_session->socket_descriptor, SCRIPT );
 
 	if( !cgi_script_file ) {
 		/* Zwolnienie pami�ci */
@@ -137,7 +139,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 
 	/* Skopiowanie wczytanego wyniku z buf do cgi_result */
 	for( i = 0, j = 0; i < result_size-1; i++, j++ ) {
-		cgi_result[j] = buf[i];
+		cgi_result[ j ] = buf[ i ];
 	}
 
 	strncpy( add_hdr, REQUEST_get_message_header( buf, result_size ), BIG_BUFF_SIZE );
@@ -147,11 +149,11 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	/* Wczytanie contentu */
 	/* U�yty modyfikator 2 ( poni�ej i w RESPONSE_header ) = "\r\n" = pusta linia mi�dzy nag��wkami a contentem */
 	for( i = hdr_len+2, j = 0; i < result_size-1; i++, j++ ) {
-		cgi_body[j] = cgi_result[i];
+		cgi_body[ j ] = cgi_result[ i ];
 	}
 
 	/* Usuni�cie ostatniego znaku */
-	cgi_body[result_size-hdr_len-1] = '\0';
+	cgi_body[ result_size-hdr_len-1 ] = '\0';
 
 	/* Pusta tre�� dzia�ania skryptu */
 	if( strlen( ( char* )cgi_result ) == 0 ) {
@@ -159,6 +161,16 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	} else {
 		/*Wysy�ka */
 		RESPONSE_header( http_session, HTTP_200_OK, NULL, result_size-hdr_len-2, ( char* )cgi_body, add_hdr );
+		/*RESPONSE_header( http_session, HTTP_200_OK, NULL, result_size-hdr_len-2, NULL, add_hdr );
+
+		send_struct = SESSION_find_response_struct_by_id( http_session->socket_descriptor );
+
+		if( send_struct ) {
+			send_struct->file = cgi_script_file;
+			send_struct->http_content_size = result_size-hdr_len;
+			send_struct->sent_size = 0;
+		}*/
+
 	}
 
 	/* Zwalnianie pami�ci */
@@ -183,7 +195,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 
 static void CGI_set_env( const char *var, const char *val ) {
 #ifdef _WIN32
-	char env_var[MAX_BUFFER];
+	char env_var[ MAX_BUFFER ];
 	sprintf( env_var, "%s=%s", var, val );
 	putenv( env_var );
 #else
@@ -197,7 +209,7 @@ CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename )
 @filename - pe�na nazwa pliku skryptu
 - funkcja ustawia zmienne �rodowiskowe, zgodnie ze specyfikacj� CGI/1.1 ( RFC3875 )*/
 static void CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename ) {
-	char str_res[SMALL_BUFF_SIZE];
+	char str_res[ SMALL_BUFF_SIZE ];
 
 	/* "Content-Length" i "Content-Type" s� nieobecne w przypadku metody GET i HEAD */
 	if( http_session->http_info.method_name == POST ) {
@@ -229,7 +241,7 @@ static void CGI_set_env_variables( HTTP_SESSION *http_session, const char *filen
 
 	CGI_set_env( "REMOTE_HOST", server_get_remote_hostname( http_session ) );
 
-	CGI_set_env( "REQUEST_METHOD", http_method_list[http_session->http_info.method_name] );
+	CGI_set_env( "REQUEST_METHOD", http_method_list[ http_session->http_info.method_name ] );
 
 	CGI_set_env( "SCRIPT_NAME", http_session->http_info.http_local_path );
 
@@ -283,9 +295,9 @@ short CGI_load_configuration( const char *filename ) {
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
 		if( ( sscanf( buf, "%s %s %s", ext, exec_name, param ) == 3 ) && ( cgi_other_count < 8 ) ) {
 			/* ��dana opcja jest w pliku pod numerem 2 */
-			strncpy( other_script_type[cgi_other_count].ext, ext, EXT_LEN );
-			strncpy( other_script_type[cgi_other_count].external_app, exec_name, STD_BUFF_SIZE );
-			strncpy( other_script_type[cgi_other_count].param, param, STD_BUFF_SIZE );
+			strncpy( other_script_type[ cgi_other_count ].ext, ext, EXT_LEN );
+			strncpy( other_script_type[ cgi_other_count ].external_app, exec_name, STD_BUFF_SIZE );
+			strncpy( other_script_type[ cgi_other_count ].param, param, STD_BUFF_SIZE );
 
 			/* Weryfikacja, czy plik pod zmienn� exec_name jest wykonywalny */
 			/* Je�eli exec_name = <exec> plik sam z siebie jest plikiem wykonywalnym */
@@ -361,25 +373,25 @@ void CGI_valid( const char *filename, int *valid_res, char *exec_name, char *par
 	/* Szukanie rozszerzenia w tablicy other_script_type */
 	for( i = 0; i < cgi_other_count; ++i ) {
 		/* Znaleziono pasuj�ce rozszerzenie */
-		if( strncasecmp( ext, other_script_type[i].ext, EXT_LEN ) == 0 ) {
+		if( strncasecmp( ext, other_script_type[ i ].ext, EXT_LEN ) == 0 ) {
 			free( ext );
 			ext = NULL;
 
 			/* Przypisanie warto�ci do wywo�anych argument�w:
 				- nazwa zewn�trznej aplikacji */
 			if( exec_name ) {
-				strncpy( exec_name, other_script_type[i].external_app, MAX_PATH_LENGTH );
+				strncpy( exec_name, other_script_type[ i ].external_app, MAX_PATH_LENGTH );
 			}
 
-			if( strncmp( other_script_type[i].external_app, STD_EXEC, STD_BUFF_SIZE ) == 0 ) {
+			if( strncmp( other_script_type[ i ].external_app, STD_EXEC, STD_BUFF_SIZE ) == 0 ) {
 				*valid_res = 1; /* Skrypt jest wykonywalny sam w sobie ( np. plik exe ) */
 			} else {
-				if( strncmp( other_script_type[i].param, STD_EXEC, STD_BUFF_SIZE ) == 0 ) {
+				if( strncmp( other_script_type[ i ].param, STD_EXEC, STD_BUFF_SIZE ) == 0 ) {
 					*valid_res = 2; /* Potrzeba uruchomienia zewn�trznego programu */
 				} else {
 					*valid_res = 3; /* Potrzeba uruchomienia zewn�trznego programu z parametrem */
 					/*	- parametr */
-					strncpy( param, other_script_type[i].param, STD_BUFF_SIZE );
+					strncpy( param, other_script_type[ i ].param, STD_BUFF_SIZE );
 				}
 			}
 

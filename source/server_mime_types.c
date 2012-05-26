@@ -56,10 +56,10 @@ short MIME_load_configuration( const char *filename ) {
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
 		if( ( sscanf( buf, "%s %s", ext, mime_type ) == 2 ) && ( mime_types_count < STD_BUFF_SIZE ) ) {
 			/* Wczytanie rozszerzenia pliku */
-			strncpy( mime_types[mime_types_count].ext, ext, EXT_LEN );
+			strncpy( mime_types[ mime_types_count ].ext, ext, EXT_LEN );
 			/* Wczytanie pliku MIME */
-			strncpy( mime_types[mime_types_count].mime_type, mime_type, SMALL_BUFF_SIZE );
-			LOG_print( "\t- %d \"%s\" assigned to \"%s\".\n", mime_types_count, mime_types[mime_types_count].ext, mime_types[mime_types_count].mime_type );
+			strncpy( mime_types[ mime_types_count ].mime_type, mime_type, SMALL_BUFF_SIZE );
+			LOG_print( "\t- %d \"%s\" assigned to \"%s\".\n", mime_types_count, mime_types[ mime_types_count ].ext, mime_types[ mime_types_count ].mime_type );
 			mime_types_count++;
 		} else {
 			LOG_print( "\t- unknown command at line %d.\n", lines_count );

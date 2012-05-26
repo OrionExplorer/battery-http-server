@@ -29,7 +29,7 @@ REQUEST_get_message_body( const char *content_data )
 - zwraca ci�g znak�w b�d�cy message body. */
 char* REQUEST_get_message_body( HTTP_SESSION *http_session ) {
 	char *p1 = malloc( MAX_BUFFER_CHAR );
-	static char body_result[MAX_BUFFER];
+	static char body_result[ MAX_BUFFER ];
 
 	memset( body_result, '\0', MAX_BUFFER );
 	strncpy( p1, http_session->http_info.content_data, MAX_BUFFER );
@@ -49,7 +49,7 @@ REQUEST_get_message_header( const char *content_data, long content_length )
 char* REQUEST_get_message_header( const char *content_data, long content_length ) {
 	char *hdr_line;
 	char *temp_hdr_result;
-	static char hdr_result[BIG_BUFF_SIZE];
+	static char hdr_result[ BIG_BUFF_SIZE ];
 	int i = 0;
 	int j = 0;
 
@@ -64,8 +64,8 @@ char* REQUEST_get_message_header( const char *content_data, long content_length 
 
 	for( i = 0; i < content_length; i++ ) {
 		/* Skopiowanie znak�w z wyniku do zmiennej przechowuj�cej nag��wki */
-		if( content_data[i] != '\n' ) {
-			hdr_line[j] = content_data[i];
+		if( content_data[ i ]!= '\n' ) {
+			hdr_line[ j ]= content_data[ i ];
 			j++;
 		} else {
 			/* Napotkano koniec linii */
@@ -134,8 +134,8 @@ char* REQUEST_get_mime_type( const char *filename ) {
 	char *ext = file_get_ext( filename );
 
 	for( i = 0; i < mime_types_count; ++i ) {
-		if( strncasecmp( ext, mime_types[i].ext, EXT_LEN ) == 0 ) {
-			return mime_types[i].mime_type;
+		if( strncasecmp( ext, mime_types[ i ].ext, EXT_LEN ) == 0 ) {
+			return mime_types[ i ].mime_type;
 		}
 	}
 
@@ -149,7 +149,7 @@ REQUEST_get_header_value( const char *header, const char *requested_value_name )
 - zwraca ci�g znak�w z warto�ci�, kt�ra odpowiada nag��wkowi requested_value_name. */
 char* REQUEST_get_header_value( const char *header, const char *requested_value_name ) {
 	char *result_handler;				/* Przechowuje ca�� lini� z ��danym nag��wkiem */
-	static char result[STD_BUFF_SIZE];	/* Zwracana przez funkcj� warto�� */
+	static char result[ STD_BUFF_SIZE ];	/* Zwracana przez funkcj� warto�� */
 	char *dst;
 	char *tmp_header_val;				/* Wska�nik do pocz�tku ��danego nag��wka */
 	int count = 0;
@@ -171,12 +171,12 @@ char* REQUEST_get_header_value( const char *header, const char *requested_value_
 	tmp_header_val = NULL;
 
 	/* Skopiowanie do dst pierwszej linii z result_handler */
-	while( ( dst[count] = result_handler[count] ) != '\015' ) {
-		if( result_handler[count] != '\015' ) {
+	while( ( dst[ count ] = result_handler[ count ] ) != '\015' ) {
+		if( result_handler[ count ] != '\015' ) {
 			 count++;
 		}
 	}
-	dst[count] = '\0';
+	dst[ count ]= '\0';
 
 	free( result_handler );
 	result_handler = NULL;
@@ -268,7 +268,7 @@ void RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, 
 
 
 	/* Zapis ��dania do logu */
-	LOG_print( "%s %s %s \"%s\" %s %.3s\n", get_actual_time_gmt(), http_session->http_info.remote_addr, http_method_list[http_session->http_info.method_name], http_session->http_info.http_local_path, http_session->http_info.protocol_ver, http_status_code );
+	LOG_print( "%s %s %s \"%s\" %s %.3s\n", get_actual_time_gmt(), http_session->http_info.remote_addr, http_method_list[ http_session->http_info.method_name ], http_session->http_info.http_local_path, http_session->http_info.protocol_ver, http_status_code );
 
 	/* Zwolnienie pami�ci */
 	free( http_header_to_send );
@@ -335,7 +335,7 @@ void RESPONSE_error( HTTP_SESSION *http_session, const char *http_status_code, c
 	}
 
 	/* Zapis ��dania do logu */
-	LOG_print( "%s %s %s \"%s\" %s %.3s\n", get_actual_time_gmt(), http_session->http_info.remote_addr, http_method_list[http_session->http_info.method_name], http_session->http_info.http_local_path, http_session->http_info.protocol_ver, http_status_code );
+	LOG_print( "%s %s %s \"%s\" %s %.3s\n", get_actual_time_gmt(), http_session->http_info.remote_addr, http_method_list[ http_session->http_info.method_name ], http_session->http_info.http_local_path, http_session->http_info.protocol_ver, http_status_code );
 
 	/* Zwolnienie pami�ci */
 	free( http_header_to_send );
@@ -360,7 +360,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 
 	/* Otwarcie pliku. Weryfikacja poprawno�ci jego nazwy nast�pi�a poprzez funkcj�
 	file_params w nadrz�dnej funkcji REQUEST_process */
-	file = battery_fopen( filename, READ_BINARY, 1, http_session->socket_descriptor );
+	file = battery_fopen( filename, READ_BINARY, 1, http_session->socket_descriptor, STD_FILE );
 
 	/* Nie uda�o si� otworzy� pliku, cho� istnieje - problem z serwerem? */
 	if( !file ) {
@@ -485,7 +485,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 			strncpy( http_session->http_info.query_string, REQUEST_get_query( http_session ), MAX_PATH_LENGTH );
 
 			if( http_session->http_info.method_name != POST ) {
-				http_session->http_info.http_local_path[strpos( http_session->http_info.http_local_path, "?" )] = '\0';
+				http_session->http_info.http_local_path[ strpos( http_session->http_info.http_local_path, "?" ) ] = '\0';
 			}
 		} else {
 			/* Stworzenie lokalnej �cie�ki dost�pu do zasobu */
@@ -528,7 +528,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 		/*...brak rozszerzenia = nie podano konkretnego pliku w URL... */
 		if( strncmp( file_ext, "", MICRO_BUFF_SIZE ) == 0 ) {
 			/*...sprawdzamy, czy ostatni znak to "/"... */
-			if( local_file_path[strlen( local_file_path )-1] != C_SLASH ) {
+			if( local_file_path[ strlen( local_file_path )-1 ] != C_SLASH ) {
 				/*...mimo wszystko sprawdzamy, czy �cie�ka jest prawid�owa. Tak = b��d 302. Nie = b��d 400. */
 				if( directory_exists( local_file_path ) ) {
 					/* Stworzenie dodatkowej informacji do nag��wna wysy�anego przez RESPONSE_error z prawid�ow� �cie�k� */
@@ -612,7 +612,7 @@ REQUEST_get_cgi_name( const char* http_local_path )
 @http_local_path - URI przekazane w ��daniu
 - zwraca ci�g znak�w b�d�cy nazw� skryptu. */
 char* REQUEST_get_cgi_name( HTTP_SESSION *http_session ) {
-	static char result[MAX_PATH_LENGTH];
+	static char result[ MAX_PATH_LENGTH ];
 	int len = strlen( http_session->http_info.http_local_path );
 
 	/* Metody GET i HEAD */
@@ -622,7 +622,7 @@ char* REQUEST_get_cgi_name( HTTP_SESSION *http_session ) {
 
 		/* Usuni�cie reszty znak�w po znaku "?" */
 		if( strstr( result, "?" ) ) {
-			result[strpos( result, "?" )] = '\0';
+			result[ strpos( result, "?" ) ] = '\0';
 		}
 		return ( ( char* )&result );
 	} else {
@@ -669,11 +669,11 @@ long REQUEST_get_range( HTTP_SESSION *http_session, int type ) {
 	if( type == 0 ) {
 		strncpy( temp_r, strstr( range, "=" ), SMALL_BUFF_SIZE );
 		len = strlen( temp_r );
-		temp_r[len-1] = '\0';
+		temp_r[ len-1 ] = '\0';
 
 		for( i = 0; i < len; ++i ) {
 			if( i < len ) {
-				temp_r[i] = temp_r[i+1];
+				temp_r[ i ] = temp_r[ i+1 ] ;
 			}
 		}
 	} else if( type == 1 ) {
@@ -684,7 +684,7 @@ long REQUEST_get_range( HTTP_SESSION *http_session, int type ) {
 		/* Usuni�cie znaku "-" pozosta�ego po strrchr() */
 		for( i = 0; i < len; ++i ) {
 			if( i < len ) {
-				temp_r[i] = temp_r[i+1];
+				temp_r[ i ] = temp_r[ i+1 ];
 			}
 		}
 	}
@@ -706,16 +706,16 @@ REQUEST_get_index( const char *path )
 @path - �cie�ka, w kt�rej ma zosta� odszukany index ( z listy index_file_list )
 - zwraca ci�g znak�w z plikiem index, kt�ry zosta� odnaleziony w katalogu */
 char* REQUEST_get_index( const char *path ) {
-	char filename[MAX_PATH_LENGTH+1];
+	char filename[ MAX_PATH_LENGTH+1 ];
 	int i = 0;
 
 	/* Sprawdzenie, czy w podanym katalogu znajduje si� kt�ry� z wczytanych plik�w index */
 	for( i = 0; i < index_file_count; ++i ) {
 		strncpy( filename, path, MAX_PATH_LENGTH );
-		strncat( filename, index_file_list[i], MAX_PATH_LENGTH );
+		strncat( filename, index_file_list[ i ], MAX_PATH_LENGTH );
 		/* Sprawdzenie, czy plik istnieje */
 		if( file_exists( filename ) ) {
-			return index_file_list[i]; /* Istnieje */
+			return index_file_list[ i ]; /* Istnieje */
 		}
 	}
 

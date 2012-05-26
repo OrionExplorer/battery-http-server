@@ -64,8 +64,8 @@ void strrepchar( char *s1, char c1, char c2 ) {
 	}
 
 	while( len > -1 ) {
-		if( s1[len] == c1 ) {
-			s1[len] = c2;
+		if( s1[ len ] == c1 ) {
+			s1[ len ] = c2;
 		}
 		len--;
 	}
@@ -119,9 +119,9 @@ text_md5( const char *sz_Text )
 char *text_md5( const char *sz_Text )
 {
 md5_state_t state;
-md5_byte_t digest[16];
-char hex_output[16*2 + 1];
-static char sz_md5Result[128];
+md5_byte_t digest[ 16[ ;
+char hex_output[ 16*2 + 1[ ;
+static char sz_md5Result[ 128[ ;
 int di;
 
 md5_init( &state );
@@ -129,7 +129,7 @@ md5_append( &state, ( const md5_byte_t * )sz_Text, strlen( sz_Text ) );
 md5_finish( &state, digest );
 
 for ( di = 0; di < 16; ++di )
-sprintf( hex_output + di  *2, "%02x", digest[di] );
+sprintf( hex_output + di  *2, "%02x", digest[ di[  );
 
 strncpy( sz_md5Result, hex_output, STD_BUFF_SIZE );
 

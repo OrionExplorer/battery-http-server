@@ -16,10 +16,10 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <string.h>
 
 /*Przechowuje logi */
-static char	log_object[LOG_BUFFER+STD_BUFF_SIZE];
+static char	log_object[ LOG_BUFFER+STD_BUFF_SIZE ];
 
 /*Pe�na nazwa pliku ( +�cie�ka dost�pu ) "log.txt" */
-char		LOG_filename[MAX_PATH_LENGTH];
+char		LOG_filename[ MAX_PATH_LENGTH ];
 
 /*
 LOG_print( char *fmt, ... )

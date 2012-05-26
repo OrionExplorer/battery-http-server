@@ -32,7 +32,7 @@ char	app_path[];
 char	*working_dir;
 
 /*Pe�na nazwa pliku ( +�cie�ka dost�pu ) "log.txt" */
-char	LOG_filename[MAX_PATH_LENGTH];
+char	LOG_filename[ MAX_PATH_LENGTH ];
 
 /*Przechowuje informacj� o typach adres�w IP: IPv4 lub IPv6 */
 int		ip_proto_ver = -1;
@@ -156,11 +156,11 @@ short CORE_load_index_names( const char* filename ) {
 			len = strlen( buf );
 
 			/* Stworzenie nowego obiektu */
-			index_file_list[index_file_count] = ( char* )calloc( len, sizeof( char ) );
-			mem_allocated( index_file_list[index_file_count], 1062 );
+			index_file_list[ index_file_count ] = ( char* )calloc( len, sizeof( char ) );
+			mem_allocated( index_file_list[ index_file_count ], 1062 );
 
-			strncpy( index_file_list[index_file_count], index_filename, len );
-			LOG_print( "\t- %d new index file: %s.\n", index_file_count, index_file_list[index_file_count] );
+			strncpy( index_file_list[ index_file_count ], index_filename, len );
+			LOG_print( "\t- %d new index file: %s.\n", index_file_count, index_file_list[ index_file_count ] );
 			index_file_count++;
 		}
 	}

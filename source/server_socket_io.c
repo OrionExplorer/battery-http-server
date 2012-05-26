@@ -345,7 +345,7 @@ server_get_remote_hostname( const char *remote_addr )
 @http_session - wskaŸnik do pod³¹czonego klienta
 - zwraca ciï¿½g znakï¿½w bï¿½dï¿½cy nazwï¿½ hosta. */
 char* server_get_remote_hostname( HTTP_SESSION *http_session ) {
-	static char remote_name[TINY_BUFF_SIZE];
+	static char remote_name[ TINY_BUFF_SIZE ];
 	memset( remote_name, '\0', TINY_BUFF_SIZE );
 	getnameinfo( ( struct sockaddr * )&http_session->address, sizeof( http_session->address ), remote_name, sizeof( remote_name ), NULL, 0, NI_NAMEREQD );
 	return ( ( char* )&remote_name );
@@ -356,7 +356,7 @@ SOCKET_get_remote_ip( HTTP_SESSION *http_session )
 @http_session - wskaŸnik do pod³¹czonego klienta
 - zwraca ciï¿½g znakï¿½w bï¿½dï¿½cy adresem IP. */
 char* SOCKET_get_remote_ip( HTTP_SESSION *http_session ) {
-	static char ip_addr[TINY_BUFF_SIZE];
+	static char ip_addr[ TINY_BUFF_SIZE ];
 	memset( ip_addr, '\0', TINY_BUFF_SIZE );
 	getnameinfo( ( struct sockaddr * )&http_session->address, sizeof( http_session->address ), ip_addr, sizeof( ip_addr ), NULL, 0, NI_NUMERICHOST );
 	return ( ( char* )&ip_addr );

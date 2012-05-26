@@ -93,39 +93,53 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #define RFC1123FMT							"%a, %d %b %Y %H:%M:%S GMT"
 
-char				app_path[MAX_PATH_LENGTH];
-extern char*		working_dir;
+char							app_path[ MAX_PATH_LENGTH ];
+extern char*					working_dir;
+/* Zaimplementowane metody dost�pu do zasob�w serwera */
+extern const char				*http_method_list[ ];
 
-typedef enum {
+typedef enum http_m				http_m;
+typedef enum RESOURCE_TYPE		RESOURCE_TYPE;
+typedef struct HT_ACCESS		HT_ACCESS;
+typedef struct HTTP_INFO		HTTP_INFO;
+typedef struct MIME_TYPE		MIME_TYPE;
+typedef struct LOCAL_INFO		LOCAL_INFO;
+typedef struct HTTP_SESSION		HTTP_SESSION;
+typedef struct SEND_INFO		SEND_INFO;
+typedef struct OPENED_FILE		OPENED_FILE;
+typedef struct OTHER_SCRIPTS	OTHER_SCRIPTS;
+
+/* Obsługiwane metody protokołu HTTP */
+enum http_m {
 	UNKNOWN_HTTP_METHOD,
 	GET,
 	HEAD,
 	POST
-} http_m;
+};
 
-/* Zaimplementowane metody dost�pu do zasob�w serwera */
-extern const char *http_method_list[];
-
+/* Typ żądanego zasobu */
+enum RESOURCE_TYPE {
+	NONE,
+	STD_FILE,
+	SCRIPT
+};
 
 /* Struktura przechowuj�ca informacje o prawach dost�pu do danych zasob�w */
-typedef struct
-{
-	char res[MAX_PATH_LENGTH];
-	char res_login[SMALL_BUFF_SIZE];
-	char res_pwd[SMALL_BUFF_SIZE];
-	char res_auth[STD_BUFF_SIZE];
-} HT_ACCESS;
+struct HT_ACCESS {
+	char res_filename[ MAX_PATH_LENGTH ];			/* Nazwa zasobu */
+	char res_login[ SMALL_BUFF_SIZE ];				/* Wymagany login */
+	char res_pwd[ SMALL_BUFF_SIZE ];				/* Wymagane hasło */
+	char res_auth[ STD_BUFF_SIZE ];
+};
 
 /* Struktura przechowuj�ca informacje o mime-type dla danego rozszerzenia pliku */
-typedef struct
-{
-	char ext[EXT_LEN];
-	char mime_type[SMALL_BUFF_SIZE];
-} MIME_TYPE;
+struct MIME_TYPE {
+	char ext[ EXT_LEN];								/* Rozszerzenie */
+	char mime_type[ SMALL_BUFF_SIZE];				/* MIME */
+};
 
 /* Struktura przechowuj�ca informacje o ��daniu HTTP */
-typedef struct
-{
+struct HTTP_INFO {
 	long				range_st;					/* Dla nag��wka "Range" */
 	long				range_en;					/* Dla nag��wka "Range" */
 	long				content_length;				/* Dla nag��wka "Content-Length" */
@@ -147,29 +161,36 @@ typedef struct
 	short				keep_alive;					/* Przechowuje informacj� o typie po��czenia ( Close/Keep-Alive ) */
 	short				is_cgi;						/* 1 = ��danie jest operacj� na skrypcie, 0 = przes�anie zawarto�ci zasobu */
 	short				received_all;				/* Dla ��da� typu POST - informuje, czy odebrano ca�� wiadomo�� */
-} HTTP_INFO;
-
-typedef struct LOCAL_INFO
-{
-	char*				date_res_last_modified;		/* Przechowuje informacj� kiedy zas�b zosta� ostatnio zmodyfikowany */
-} LOCAL_INFO;
-
-typedef struct HTTP_SESSION		HTTP_SESSION;
-typedef struct SEND_INFO		SEND_INFO;
-typedef struct OPENED_FILE		OPENED_FILE;
-
-struct SEND_INFO {
-	FILE				*file;
-	long				http_content_size;
-	long				sent_size;
-	int					socket_descriptor;
 };
 
+/* Struktura przechowuje informacje szczegółowe o lokalnym zasobie */
+struct LOCAL_INFO {
+	char*				date_res_last_modified;		/* Przechowuje informacj� kiedy zas�b zosta� ostatnio zmodyfikowany */
+};
+
+/* Struktura przechowuje informacje o statusie wysyłki lokalnego zasobu */
+struct SEND_INFO {
+	FILE				*file;						/* Deskryptor otwartego pliku */
+	long				http_content_size;			/* Rozmiar pliku */
+	long				sent_size;					/* Ilość danych wysłana do tej pory */
+	int					socket_descriptor;			/* Deksryptor podłączonego klienta, który wysłał żądanie */
+};
+
+/* Struktura przechowuje informacje o otwartym pliku */
 struct OPENED_FILE {
-	char				filename[ FILENAME_MAX ];
-	FILE*				file;
-	long				size;
-	int					socket_descriptor;
+	char				filename[ FILENAME_MAX ];	/* Nazwa */
+	FILE*				file;						/* Deskryptor */
+	long				size;						/* Rozmiar */
+	int					socket_descriptor;			/* Deskryptor podłączonego klienta, który wysłał żądanie */
+	RESOURCE_TYPE		type;						/* Rodzaj zasobu */
+};
+
+/* Struktura przechowuj�ca informacje o innych mo�liwych rozszerzeniach plik�w,
+kt�re maj� uprawnienia do wykonania jako skrypt CGI */
+struct OTHER_SCRIPTS {
+	char 				ext[ EXT_LEN];					/* Rozszerzenie*/
+	char 				external_app[ STD_BUFF_SIZE];	/* Zewn�trzna aplikacja do uruchamiania skryptu */
+	char 				param[ STD_BUFF_SIZE];			/* Parametr, z kt�rym ma zosta� uruchomiona aplikacja ze zmiennej external_app */
 };
 
 /* G��wna struktura, kt�ra b�dzie przechowywa�a wszystkie informacje o po��czonym kliencie */
@@ -193,20 +214,11 @@ struct HTTP_SESSION {
 
 };
 
-/* Struktura przechowuj�ca informacje o innych mo�liwych rozszerzeniach plik�w,
-kt�re maj� uprawnienia do wykonania jako skrypt CGI */
-typedef struct
-{
-	char ext[EXT_LEN];					/* Rozszerzenie*/
-	char external_app[STD_BUFF_SIZE];	/* Zewn�trzna aplikacja do uruchamiania skryptu */
-	char param[STD_BUFF_SIZE];			/* Parametr, z kt�rym ma zosta� uruchomiona aplikacja ze zmiennej external_app */
-} OTHER_SCRIPTS;
-
 #ifdef _WIN32
-extern WSADATA				wsk;
-extern SOCKET				socket_server;
+	extern WSADATA				wsk;
+	extern SOCKET				socket_server;
 #else
-extern int					socket_server;
+	extern int					socket_server;
 #endif
 extern int					addr_size;
 extern int					active_port;
@@ -220,23 +232,26 @@ extern int					http_conn_count;
 char*						server_get_remote_hostname( HTTP_SESSION *http_session );
 
 /* Przechowuje wczytane rozszerzenia plik�w uprawnionych do wykonania jako skrypt CGI */
-OTHER_SCRIPTS				other_script_type[8];
+OTHER_SCRIPTS				other_script_type[ 8 ];
 extern int					cgi_other_count;
 #define STD_EXEC			"<exec>"
 
 /* Przechowuje informacje o dost�pach do zasob�w */
-HT_ACCESS					ht_access[256];
+HT_ACCESS					ht_access[ 256 ];
 extern int					ht_access_count;
 
 /* Przechowuje wczytane rozszerzenia plik�w wraz z ich typami MIME */
-MIME_TYPE					mime_types[STD_BUFF_SIZE];
+MIME_TYPE					mime_types[ STD_BUFF_SIZE ];
 extern int					mime_types_count;
 
 /* Wersja protoko�u */
-enum IP_VER { IPv4 = 4, IPv6 = 6 };
+enum IP_VER {
+	IPv4 = 4,
+	IPv6 = 6
+};
 
 /* Lista mo�liwych plik�w typu index */
-char		*index_file_list[MICRO_BUFF_SIZE];
+char		*index_file_list[ MICRO_BUFF_SIZE ];
 extern int	index_file_count;
 
 #endif
