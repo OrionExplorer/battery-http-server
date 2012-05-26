@@ -33,7 +33,7 @@ CGI_execute( HTTP_SESSION *http_session, const char *filename )
 - funkcja wykonuje ��dany skrypt i wysy�a odpowied� do pod��czonego klienta. */
 void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	FILE *cgi_script_file;
-	long result_size = 0;		/* Ilo�� wczytanych bajt�w z wyniku dzia�ania CGI */
+	size_t result_size = 0;		/* Ilo�� wczytanych bajt�w z wyniku dzia�ania CGI */
 	unsigned char *cgi_result;	/* Wynik dzia�ania CGI */
 	unsigned char *cgi_body;	/* Wynik dzia�ania CGI bez nag��wk�w */
 	char buf[MAX_BUFFER];		/* Wczytany wynik dzia�ania CGI */
@@ -136,7 +136,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	cgi_script_file = NULL;
 
 	/* Skopiowanie wczytanego wyniku z buf do cgi_result */
-	for( i = 0, j = 0; i < result_size; ++i, ++j ) {
+	for( i = 0, j = 0; i < result_size-1; i++, j++ ) {
 		cgi_result[j] = buf[i];
 	}
 

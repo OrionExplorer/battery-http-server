@@ -60,7 +60,7 @@ SOCKET_initialization( void )
 - inicjalizacja WinSock
 - inicjalizacja socketa */
 static void SOCKET_initialization( void ) {
-	LOG_print( "Waiting for Socket server initialization..." );
+	LOG_print( "Waiting for socket server initialization..." );
 
 #ifdef _WIN32
 	/*Inicjalizacja WinSock */

@@ -240,7 +240,6 @@ battery_ftell( FILE *file )
 long battery_ftell( FILE *file ) {
 	int i = FOPEN_MAX;
 
-	//while( --i && i >= 0 ) {
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( opened_files[ i ].file == file ) {
 			return opened_files[ i ].size;
@@ -257,7 +256,6 @@ battery_get_filename( FILE *file )
 char* battery_get_filename( FILE *file ) {
 	int i = FOPEN_MAX;
 
-	//while( --i && i >= 0 ) {
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( opened_files[ i ].file == file ) {
 			return opened_files[ i ].filename;
