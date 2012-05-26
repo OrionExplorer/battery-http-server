@@ -47,11 +47,14 @@ Additional informations:
 • High performance (tested with Apache Benchmark)
 
 TODO:
-• HTTP Proxy
-• Method PUT
-• Method DELETE
-• IPv6 support
-• HTTPS support
+• Rebuild CGI/PHP algorithm
+• Rebuild range-based data send
+• Rebuild HTTP authorization mechanism
+• Add HTTP Proxy support
+• Add method PUT
+• Add method DELETE
+• Add IPv6 support
+• Add HTTPS support
 • Higher performance!
 
 
