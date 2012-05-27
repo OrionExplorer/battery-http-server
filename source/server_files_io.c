@@ -93,22 +93,24 @@ file_params( const char *filename )
 short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd ) {
 	FILE *resource;
 	struct stat file_stat;
+	int tmp_socket;
 	int i = 0;
 
 	/* Weryfikacja, czy podany parametr jest prawid�ow� nazw� pliku */
 	stat( filename, &file_stat );
 	if( file_stat.st_mode & S_IFREG );
-	else /* Nie jest... */
+	else {/* Nie jest... */
 		return 0;
+	}
 
+	tmp_socket = ( http_session ? http_session->socket_descriptor : -133 );
 	/*Sprawdza, czy uda�o si� otworzy� plik */
-	resource = fopen( filename, READ_BINARY );
+	resource = battery_fopen( filename, READ_BINARY, 1, tmp_socket, STD_FILE );
 
 	if( !resource ) {
 		return 0;
 	} else {
 		if( http_session == NULL ) {
-			fclose( resource );
 			return 1;
 		}
 
@@ -127,21 +129,15 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 					if( strncmp( ht_access[ i ].res_filename, filename, MAX_PATH_LENGTH ) == 0 ) {
 						/* Zas�b wymaga autoryzacji */
 						strncpy( ht_access_pwd, ht_access[ i ].res_auth, STD_BUFF_SIZE );
-						fclose( resource );
+
 						return 3;
 					}
 				}
 			}
 		} else {
 			/* Nie ma */
-			fclose( resource );
 			return 2;
 		}
-	}
-
-	/* Zamkni�cie pliku */
-	if( resource ) {
-		fclose( resource );
 	}
 
 	return 1;
@@ -154,9 +150,9 @@ file_exists( const char *filename )
 short file_exists( const char *filename ) {
 	FILE *resource;	/* Uchwyt do pliku */
 
-	if( ( resource = battery_fopen( filename, "r", 0, 0, STD_FILE ) ) ) {
+	if( ( resource = battery_fopen( filename, READ_BINARY, 1, -133, STD_FILE ) ) ) {
 		/* Uda�o si� otworzy� plik = istnieje */
-		fclose( resource );
+		//fclose( resource );
 		return 1;
 	} else {
 		/* Nie istnieje */
@@ -197,7 +193,7 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 	/* Weryfikacja, czy plik jest już otwarty przez serwer */
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( strcmp( opened_files[ i ].filename, filename ) == 0 && type == opened_files[ i ].type) {
-			tmp = opened_files[ i ] .file;
+			tmp = opened_files[ i ].file;
 			break;
 		}
 	}
@@ -285,6 +281,7 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 		if( opened_files[ i ].file == file && file ) {
 		    /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
 			if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
+				//printf("Znalazlem.\n");
 				opened_files[ i ].socket_descriptor = 0;
 				opened_files[ i ].file = NULL;
 				opened_files[ i ].size = 0;
@@ -300,8 +297,10 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 		}
 	}
 
+	//printf("clients: %d\nfile: %d\n", clients_count, file_found);
 	/* Z pliku korzystał jeden lub mniej klientów */
-	if( clients_count == 1 && file_found > 0 ) {
+	if( clients_count == 2 && file_found > 0 ) {
+		//printf("Zamykam plik dla socketu %d\n", socket_descriptor );
         if( file ) {
 			if( type == STD_FILE ) {
 				fclose( file );

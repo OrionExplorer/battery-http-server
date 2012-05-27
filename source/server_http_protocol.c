@@ -516,12 +516,14 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 		strncat( local_file_path, REQUEST_get_index( local_file_path ), MAX_PATH_LENGTH );
 	}
 
-	/* Alokacja pami�ci */
-	ht_access_pwd = malloc( STD_BUFF_SIZE_CHAR );
-	mem_allocated( ht_access_pwd, 6550 );
+	if( ht_access_count > 0 ) {
+		/* Alokacja pami�ci */
+		ht_access_pwd = malloc( STD_BUFF_SIZE_CHAR );
+		mem_allocated( ht_access_pwd, 6550 );
+	}
 
 	/*Sprawdzamy, czy ��dany plik istnieje... */
-	file_params_val = file_params( http_session, local_file_path, ht_access_pwd );
+	file_params_val = file_params( http_session, local_file_path, (ht_access_count > 0 ? ht_access_pwd : NULL ) );
 	if( file_params_val == 0 ) { /* Plik nie istnieje */
 		file_ext = malloc( MICRO_BUFF_SIZE_CHAR );
 		strncpy( file_ext, file_get_ext( local_file_path ), MICRO_BUFF_SIZE );
@@ -591,9 +593,13 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 		}
 	}
 
-	/* Zwolnienie pami�ci dla has�a zasobu */
-	free( ht_access_pwd );
-	ht_access_pwd = NULL;
+	if( ht_access_count > 0) {
+		/* Zwolnienie pami�ci dla has�a zasobu */
+		if( ht_access_pwd ) {
+			free( ht_access_pwd );
+			ht_access_pwd = NULL;
+		}
+	}
 
 	/* Zwolnienie pami�ci dla nazwy ��danego pliku */
 	free( local_file_path );
@@ -713,10 +719,8 @@ char* REQUEST_get_index( const char *path ) {
 	for( i = 0; i < index_file_count; ++i ) {
 		strncpy( filename, path, MAX_PATH_LENGTH );
 		strncat( filename, index_file_list[ i ], MAX_PATH_LENGTH );
-		/* Sprawdzenie, czy plik istnieje */
-		if( file_exists( filename ) ) {
-			return index_file_list[ i ]; /* Istnieje */
-		}
+		/* Sprawdzenie, czy plik istnieje nastąpi później */
+		return index_file_list[ i ];
 	}
 
 	/* Je�eli nie znaleziono �adnego z plik�w index_file_list to zwracamy SITE_INDEX */
