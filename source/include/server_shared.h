@@ -45,6 +45,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
+#include <errno.h>
 #endif
 
 #define APP_VER								"0.7"

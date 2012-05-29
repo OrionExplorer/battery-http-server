@@ -164,14 +164,13 @@ static void SOCKET_send_all_data( void ) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-
 			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
 				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
-			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ){
+			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ) {
 				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			} else {
 				send_d[ j ].sent_size += nread;
-				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
+				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
 
 				if( nwrite <= 0 ){
 					SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
@@ -181,6 +180,7 @@ static void SOCKET_send_all_data( void ) {
 		}
 	}
 }
+
 /*
 SOCKET_run( void )
 - funkcja zarz�dza po��czeniami przychodz�cymi do gniazda. */
@@ -241,36 +241,51 @@ static void SOCKET_process( int socket_fd ) {
 	HTTP_SESSION *session = ( HTTP_SESSION* )malloc( sizeof( HTTP_SESSION ) );
 	//char* tmp_buf = malloc( MAX_BUFFER_CHAR );
 	char tmp_buf[ MAX_BUFFER ];
+	extern int errno;
 
+    errno = 0;
 	session->http_info.received_all = http_session_.http_info.received_all;
-	session->address_length = http_session_.address_length;
+	//session->address_length = http_session_.address_length;
 	session->address = http_session_.address;
 	session->socket_descriptor = socket_fd;
+	session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
 
-	if ( ( session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 ) ) <= 0 ) {
-		/* ...ale to jednak by�o roz��czenie */
+	if( errno > 1) {
 		SESSION_delete_send_struct( socket_fd );
+
 		FD_CLR( ( int )socket_fd, &master );
 		shutdown( ( int )socket_fd, SHUT_RDWR );
 		close( ( int ) socket_fd );
 		/* Zmniejszensie licznika pod��czonych klient�w */
 		__sync_fetch_and_sub( &http_conn_count, 1);
 	} else {
-		/* Nie zosta�y wcze�niej odebrane wszystkie dane - metoda POST.
-		Teraz trzeba je doklei� do http_info.content_data */
-		if( session->http_info.received_all == 0 ) {
-			/* Obiekt jest ju� stworzony, nie trzeba przydziela� pami�ci */
-			session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
-			strncat( session->http_info.content_data, tmp_buf, session->address_length );
-			session->http_info.received_all = 1;
-		} else if( session->http_info.received_all == -1 ) {
-			/* Dla metod GET i HEAD */
-			session->http_info.content_data = malloc( session->address_length+1 );
-			mem_allocated( session->http_info.content_data, 25 );
-			strncpy( session->http_info.content_data, tmp_buf, session->address_length );
-		}
-		/* "Przerobienie" zapytania */
-		SESSION_prepare( session );
+
+        if ( session->address_length <= 0 ) {
+            /* ...ale to jednak by�o roz��czenie */
+            SESSION_delete_send_struct( socket_fd );
+            FD_CLR( ( int )socket_fd, &master );
+            shutdown( ( int )socket_fd, SHUT_RDWR );
+            close( ( int ) socket_fd );
+            /* Zmniejszensie licznika pod��czonych klient�w */
+            __sync_fetch_and_sub( &http_conn_count, 1);
+        } else if (session->address_length > 0 ){
+            //printf("HEHE: %s (%d)\n", (session->address_length < 0 ? "true" : "false"), session->address_length );
+            /* Nie zosta�y wcze�niej odebrane wszystkie dane - metoda POST.
+            Teraz trzeba je doklei� do http_info.content_data */
+            if( session->http_info.received_all == 0 ) {
+                /* Obiekt jest ju� stworzony, nie trzeba przydziela� pami�ci */
+                session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
+                strncat( session->http_info.content_data, tmp_buf, session->address_length );
+                session->http_info.received_all = 1;
+            } else if( session->http_info.received_all == -1 ) {
+                /* Dla metod GET i HEAD */
+                session->http_info.content_data = malloc( session->address_length+1 );
+                mem_allocated( session->http_info.content_data, 25 );
+                strncpy( session->http_info.content_data, tmp_buf, session->address_length );
+            }
+            /* "Przerobienie" zapytania */
+            SESSION_prepare( session );
+        }
 	}
 
 	if( session ) {
