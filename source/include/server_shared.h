@@ -175,6 +175,7 @@ struct SEND_INFO {
 	long				http_content_size;			/* Rozmiar pliku */
 	long				sent_size;					/* Ilość danych wysłana do tej pory */
 	int					socket_descriptor;			/* Deksryptor podłączonego klienta, który wysłał żądanie */
+	short               keep_alive;                 /* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
 };
 
 /* Struktura przechowuje informacje o otwartym pliku */

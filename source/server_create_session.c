@@ -207,6 +207,7 @@ SESSION_get_connection( HTTP_SESSION *http_session )
 - pobiera informacjê o nag³ówku "Connection". */
 static void SESSION_get_connection( HTTP_SESSION *http_session ) {
 	char *temp_conn_type_handle;	/* Do wczytania informacji o rodzaju poï¿½ï¿½czenia */
+	SEND_INFO *send_struct;
 
 	if( strstr( http_session->http_info.header, HEADER_CONNECTION ) ) {
 		/* Pobranie informacji o poï¿½ï¿½czeniu ( "Connection: Keep-Alive/Close" ) - przypisanie do zmiennej tymczasowej */
@@ -226,6 +227,11 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
 	} else {
 		/* Brak - poï¿½ï¿½czenie zamkniï¿½te */
 		http_session->http_info.keep_alive = 0;
+	}
+
+	send_struct = SESSION_find_response_struct_by_id( http_session->socket_descriptor );
+	if( send_struct ) {
+	    send_struct->keep_alive = http_session->http_info.keep_alive;
 	}
 }
 
@@ -568,9 +574,10 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
 
 	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
 		if( send_d[ i ].socket_descriptor == 0 ) {
-			send_d[ i ] .socket_descriptor = socket_descriptor;
-			send_d[ i ] .sent_size = 0;
-			send_d[ i ] .http_content_size = 0;
+			send_d[ i ].socket_descriptor = socket_descriptor;
+			send_d[ i ].sent_size = 0;
+			send_d[ i ].http_content_size = 0;
+			send_d[ i ].keep_alive = 0;
 			return;
 		}
 	}
@@ -584,11 +591,17 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
 	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
-		if( send_d[ i ] .socket_descriptor == socket_descriptor ) {
+		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
+		    if( send_d[ i ].keep_alive <= 0 ) {
+		        FD_CLR( send_d[ i ].socket_descriptor, &master );
+                shutdown( send_d[ i ].socket_descriptor, SHUT_RDWR );
+                close( send_d[ i ].socket_descriptor );
+		    }
 			battery_fclose( send_d[ i ] .file, socket_descriptor );
-			send_d[ i ] .socket_descriptor = 0;
-			send_d[ i ] .sent_size = 0;
-			send_d[ i ] .http_content_size = 0;
+			send_d[ i ].socket_descriptor = 0;
+			send_d[ i ].sent_size = 0;
+			send_d[ i ].http_content_size = 0;
+			send_d[ i ].keep_alive = 0;
 			return;
 		}
 	}
