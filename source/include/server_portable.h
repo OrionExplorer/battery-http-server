@@ -38,6 +38,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define F_SETFL		FIONBIO
 	#define S_IXOTH		S_IEXEC
 	#define sighandler	__p_sig_fn_t
+	#define MSG_NOSIGNAL	0
 
 	#define APP_NAME	"battery-http-server (Win32)"
 #else

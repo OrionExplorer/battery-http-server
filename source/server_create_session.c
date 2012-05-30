@@ -243,6 +243,7 @@ short SESSION_check_connections_limit( HTTP_SESSION *http_session ) {
 	/* Sprawdzenie ilo�ci pod��czonych klient�w. Je�eli jest max = b��d 503 */
 	if( http_conn_count == MAX_CLIENTS ) {
 		RESPONSE_error( http_session, HTTP_503_SERVICE_UNAVAILABLE, HTTP_ERR_503_MSG, NULL );
+		printf("LIMIT!!!\n");
 		SOCKET_disconnect_client( http_session );
 		SESSION_release( http_session );
 		return 0;
@@ -594,8 +595,9 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
 		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
 		    if( send_d[ i ].keep_alive <= 0 ) {
 		        FD_CLR( send_d[ i ].socket_descriptor, &master );
-                shutdown( send_d[ i ].socket_descriptor, SHUT_RDWR );
                 close( send_d[ i ].socket_descriptor );
+                http_conn_count--;
+                //shutdown( send_d[ i ].socket_descriptor, SHUT_RDWR );
 		    }
 			battery_fclose( send_d[ i ] .file, socket_descriptor );
 			send_d[ i ].socket_descriptor = 0;

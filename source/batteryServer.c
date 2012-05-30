@@ -22,7 +22,9 @@ void app_terminate( void );
 int main( void ) {
 
 	signal( SIGINT, ( sighandler )&app_terminate );
-	signal( SIGPIPE, SIG_IGN );
+	#ifndef _WIN32
+		signal( SIGPIPE, SIG_IGN );
+	#endif
 	signal( SIGABRT, ( sighandler )&app_terminate );
 	signal( SIGTERM, ( sighandler )&app_terminate );
 
