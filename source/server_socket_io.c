@@ -162,8 +162,10 @@ static void SOCKET_send_all_data( void ) {
 
 	for( j = 0; j < MAX_CLIENTS; j++ ) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
+		    printf("Wysylam do %d\n", send_d[ j ].socket_descriptor);
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
+			printf("ODCZYT: %d/%ld\n", nread, send_d[ j ].http_content_size);
 			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
 				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
 			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ) {
@@ -171,12 +173,15 @@ static void SOCKET_send_all_data( void ) {
 			} else {
 				send_d[ j ].sent_size += nread;
 				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
+				printf("ZAPISANO: %d\n", nwrite);
+
 				send_d[ j ].http_content_size -= nwrite;
 
-				if(send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0) {
+				if(nwrite == -1 || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
 				    SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 				}
 			}
+			printf("OK\n");
 		}
 	}
 }
@@ -251,23 +256,13 @@ static void SOCKET_process( int socket_fd ) {
 
 	if( errno > 1) {
 		SESSION_delete_send_struct( socket_fd );
-		FD_CLR( ( int )socket_fd, &master );
-		//shutdown( ( int )socket_fd, SHUT_RDWR );
-		close( ( int ) socket_fd );
-		http_conn_count--;
-		/* Zmniejszensie licznika pod��czonych klient�w */
-		__sync_fetch_and_sub( &http_conn_count, 1);
+		SOCKET_close( socket_fd );
 	} else {
         if ( session->address_length <= 0 ) {
             /* ...ale to jednak by�o roz��czenie */
             SESSION_delete_send_struct( socket_fd );
-            FD_CLR( socket_fd, &master );
-            //shutdown( socket_fd, SHUT_RDWR );
-            close( socket_fd );
-            /* Zmniejszensie licznika pod��czonych klient�w */
-            __sync_fetch_and_sub( &http_conn_count, 1);
+            SOCKET_close( socket_fd );
         } else if (session->address_length > 0 ){
-            //printf("HEHE: %s (%d)\n", (session->address_length < 0 ? "true" : "false"), session->address_length );
             /* Nie zosta�y wcze�niej odebrane wszystkie dane - metoda POST.
             Teraz trzeba je doklei� do http_info.content_data */
             if( session->http_info.received_all == 0 ) {
@@ -290,6 +285,14 @@ static void SOCKET_process( int socket_fd ) {
 		free( session );
 		session = NULL;
 	}
+}
+
+void SOCKET_close( int socket_descriptor ) {
+    FD_CLR( socket_descriptor, &master );
+    shutdown( socket_descriptor, SHUT_RDWR );
+    close( socket_descriptor );
+    /* Zmniejszensie licznika pod��czonych klient�w */
+    __sync_fetch_and_sub( &http_conn_count, 1);
 }
 
 /*
