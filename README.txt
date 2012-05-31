@@ -39,7 +39,7 @@ Featured HTTP response codes:
 • 503 Service Unavailable
 • 504 Not Supported
 
-Additional informations:
+Additional information:
 • Single-threaded
 • Multiplatform
 • Event log
