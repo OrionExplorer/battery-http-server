@@ -596,13 +596,13 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
 		    if( send_d[ i ].keep_alive <= 0 ) {
 		        SOCKET_close( send_d[ i ].socket_descriptor );
 		    }
-		    printf("Deleting send struct...");
+
 			battery_fclose( send_d[ i ] .file, socket_descriptor );
 			send_d[ i ].socket_descriptor = 0;
 			send_d[ i ].sent_size = 0;
 			send_d[ i ].http_content_size = 0;
 			send_d[ i ].keep_alive = 0;
-			printf("ok (%d).\n", http_conn_count );
+
 			return;
 		}
 	}

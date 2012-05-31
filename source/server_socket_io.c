@@ -162,10 +162,8 @@ static void SOCKET_send_all_data( void ) {
 
 	for( j = 0; j < MAX_CLIENTS; j++ ) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
-		    printf("Wysylam do %d\n", send_d[ j ].socket_descriptor);
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-			printf("ODCZYT: %d/%ld\n", nread, send_d[ j ].http_content_size);
 			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
 				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
 			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ) {
@@ -173,7 +171,6 @@ static void SOCKET_send_all_data( void ) {
 			} else {
 				send_d[ j ].sent_size += nread;
 				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
-				printf("ZAPISANO: %d\n", nwrite);
 
 				send_d[ j ].http_content_size -= nwrite;
 
@@ -181,7 +178,6 @@ static void SOCKET_send_all_data( void ) {
 				    SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 				}
 			}
-			printf("OK\n");
 		}
 	}
 }
@@ -215,7 +211,7 @@ void SOCKET_run( void ) {
 			if( FD_ISSET( i, &read_fds ) ) { /* Co� si� dzieje na sockecie... */
 				if( i == socket_server ) {
 					/* Pod��czy� si� nowy klient */
-					__sync_fetch_and_add( &http_conn_count, 1); /* Kolejny klient - do obs�ugi b��du 503 */
+					SOCKET_modify_clients_count( 1 ); /* Kolejny klient - do obs�ugi b��du 503 */
 					http_session_.address_length = sizeof( struct sockaddr );
 					newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &http_session_.address_length );
 
@@ -287,12 +283,22 @@ static void SOCKET_process( int socket_fd ) {
 	}
 }
 
+void SOCKET_modify_clients_count( int mod ) {
+    if( mod > 0 ) {
+        http_conn_count++;
+    } else {
+        if( (http_conn_count - mod) >= 0 ) {
+            http_conn_count--;
+        }
+    }
+}
+
 void SOCKET_close( int socket_descriptor ) {
     FD_CLR( socket_descriptor, &master );
     shutdown( socket_descriptor, SHUT_RDWR );
     close( socket_descriptor );
     /* Zmniejszensie licznika pod��czonych klient�w */
-    __sync_fetch_and_sub( &http_conn_count, 1);
+    SOCKET_modify_clients_count( -1 );
 }
 
 /*
@@ -335,16 +341,10 @@ SOCKET_disconnect_client( HTTP_SESSION *http_session )
 - roz��cza klienta podanego jako struktura http_session */
 void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
 	if( http_session->socket_descriptor != SOCKET_ERROR ) {
-		FD_CLR( http_session->socket_descriptor, &master );
-		//shutdown( http_session->socket, SHUT_RDWR );
-		close( http_session->socket_descriptor );
-		http_conn_count--;
+		SOCKET_close( http_session->socket_descriptor );
 	} else {
 		SOCKET_release( http_session );
 	}
-
-	/* Zmniejszenie licznika pod��czonych klient�w */
-	__sync_fetch_and_sub(&http_conn_count, 1);
 }
 
 /*
