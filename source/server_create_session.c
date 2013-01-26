@@ -243,7 +243,6 @@ short SESSION_check_connections_limit( HTTP_SESSION *http_session ) {
 	/* Sprawdzenie ilo�ci pod��czonych klient�w. Je�eli jest max = b��d 503 */
 	if( http_conn_count == MAX_CLIENTS ) {
 		RESPONSE_error( http_session, HTTP_503_SERVICE_UNAVAILABLE, HTTP_ERR_503_MSG, NULL );
-		printf("LIMIT!!!\n");
 		SOCKET_disconnect_client( http_session );
 		SESSION_release( http_session );
 		return 0;
@@ -415,7 +414,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		}
 		strncpy( http_session->http_info.query_string, tmp_post_data, MAX_BUFFER );
 
-		if( strlen( http_session->http_info.query_string ) == MAX_BUFFER ) {
+		if( strlen( http_session->http_info.query_string ) >= MAX_BUFFER ) {
 			RESPONSE_error( http_session, HTTP_413_REQUEST_ENTITY_TOO_LARGE, HTTP_ERR_413_MSG, NULL );
 			SOCKET_disconnect_client( http_session );
 			SESSION_release( http_session );

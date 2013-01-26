@@ -266,7 +266,6 @@ void RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, 
 		}
 	}
 
-
 	/* Zapis ��dania do logu */
 	LOG_print( "%s %s %s \"%s\" %s %.3s\n", get_actual_time_gmt(), http_session->http_info.remote_addr, http_method_list[ http_session->http_info.method_name ], http_session->http_info.http_local_path, http_session->http_info.protocol_ver, http_status_code );
 

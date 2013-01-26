@@ -249,32 +249,37 @@ static void SOCKET_process( int socket_fd ) {
 	session->address = http_session_.address;
 	session->socket_descriptor = socket_fd;
 	session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
-
-	if( errno > 1) {
-		SESSION_delete_send_struct( socket_fd );
-		SOCKET_close( socket_fd );
+	if( session->address_length < MAX_URI_LENGTH ) {
+		if( errno > 1) {
+			SESSION_delete_send_struct( socket_fd );
+			SOCKET_close( socket_fd );
+		} else {
+			if ( session->address_length <= 0 ) {
+				/* ...ale to jednak by�o roz��czenie */
+				SESSION_delete_send_struct( socket_fd );
+				SOCKET_close( socket_fd );
+			} else if (session->address_length > 0 ) {
+				/* Nie zosta�y wcze�niej odebrane wszystkie dane - metoda POST.
+				Teraz trzeba je doklei� do http_info.content_data */
+				if( session->http_info.received_all == 0 ) {
+					/* Obiekt jest ju� stworzony, nie trzeba przydziela� pami�ci */
+					session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
+					strncat( session->http_info.content_data, tmp_buf, session->address_length );
+					session->http_info.received_all = 1;
+				} else if( session->http_info.received_all == -1 ) {
+					/* Dla metod GET i HEAD */
+					session->http_info.content_data = malloc( (session->address_length+1)*sizeof( char ) );
+					mem_allocated( session->http_info.content_data, 25 );
+					strncpy( session->http_info.content_data, tmp_buf, session->address_length );
+				}
+				/* "Przerobienie" zapytania */
+				SESSION_prepare( session );
+			}
+		}
 	} else {
-        if ( session->address_length <= 0 ) {
-            /* ...ale to jednak by�o roz��czenie */
-            SESSION_delete_send_struct( socket_fd );
-            SOCKET_close( socket_fd );
-        } else if (session->address_length > 0 ){
-            /* Nie zosta�y wcze�niej odebrane wszystkie dane - metoda POST.
-            Teraz trzeba je doklei� do http_info.content_data */
-            if( session->http_info.received_all == 0 ) {
-                /* Obiekt jest ju� stworzony, nie trzeba przydziela� pami�ci */
-                session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
-                strncat( session->http_info.content_data, tmp_buf, session->address_length );
-                session->http_info.received_all = 1;
-            } else if( session->http_info.received_all == -1 ) {
-                /* Dla metod GET i HEAD */
-                session->http_info.content_data = malloc( session->address_length+1 );
-                mem_allocated( session->http_info.content_data, 25 );
-                strncpy( session->http_info.content_data, tmp_buf, session->address_length );
-            }
-            /* "Przerobienie" zapytania */
-            SESSION_prepare( session );
-        }
+		RESPONSE_error( session, HTTP_414_REQUEST_URI_TOO_LONG, HTTP_ERR_414_MSG, NULL );
+		SOCKET_disconnect_client( session );
+		SESSION_release( session );
 	}
 
 	if( session ) {
