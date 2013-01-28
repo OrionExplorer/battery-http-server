@@ -328,9 +328,12 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	} else {
 		/* Metoda nieobs�ugiwana - papa... */
 		RESPONSE_error( http_session, HTTP_501_NOT_SUPPORTED, HTTP_ERR_501_MSG, NULL );
+		SOCKET_disconnect_client( http_session );
 		SESSION_release( http_session );
-		free( temp_http_method_name );
-		temp_http_method_name = NULL;
+		if( temp_http_method_name ) {
+            free( temp_http_method_name );
+            temp_http_method_name = NULL;
+		}
 		return;
 	}
 
