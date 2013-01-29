@@ -8,6 +8,9 @@ Marcin Kelar (marcin.kelar@gmail.com)
 Source is written in ANSI C, so you can simply compile and run it under Windows/Linux/Mac OS X.
 I'm sure it's not perfect, not even finish, but it works pretty well right now.
 
+For performance test please visit http://pastebin.com/zBG7nHbL
+
+
 • CGI 1.0/1.1 and PHP support
 
 Featured HTTP versions:
@@ -44,7 +47,7 @@ Additional information:
 • Multiplatform
 • Event log
 • Simple configuration based on text files
-• High performance (tested with Apache Benchmark)
+• High performance (tested with Apache Benchmark - http://pastebin.com/zBG7nHbL)
 
 TODO:
 • Rebuild CGI/PHP algorithm
