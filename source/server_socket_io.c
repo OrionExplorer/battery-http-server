@@ -53,6 +53,7 @@ static void		SOCKET_prepare( void );
 static void		SOCKET_process( int socket_fd );
 static void		SOCKET_send_all_data( void );
 void			SOCKET_stop( void );
+pthread_t        sthread;
 
 /*
 SOCKET_initialization( void )
@@ -88,6 +89,40 @@ static void SOCKET_initialization( void ) {
 	server_address.sin_addr.s_addr = htonl( INADDR_ANY );
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons( ( u_short )active_port );
+}
+
+void *THREAD_SOCKET_send_all_data( void ) {
+    SOCKET_send_all_data();
+}
+/*
+SOCKET_send_all_data( void )
+- funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
+static void SOCKET_send_all_data( void ) {
+	int j;
+	char m_buf[ UPLOAD_BUFFER ];
+	int nwrite;
+	size_t nread;
+
+	for( j = 0; j < MAX_CLIENTS; j++ ) {
+		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
+			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
+			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
+			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
+				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
+			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ) {
+				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
+			} else {
+				send_d[ j ].sent_size += nread;
+				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
+
+				send_d[ j ].http_content_size -= nwrite;
+
+				if(nwrite == -1 || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
+					SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
+				}
+			}
+		}
+	}
 }
 
 /*
@@ -148,38 +183,8 @@ static void SOCKET_prepare( void ) {
 	LOG_print( "- Port: %d.\n", active_port );
 	LOG_print( "Lock and load...\n" );
 	printf( "Lock and load...\n" );
+	pthread_create(&sthread, NULL, THREAD_SOCKET_send_all_data, NULL );
 	/* Teraz czekamy na poï¿½ï¿½czenia i dane */
-}
-
-/*
-SOCKET_send_all_data( void )
-- funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
-static void SOCKET_send_all_data( void ) {
-	int j;
-	char m_buf[ UPLOAD_BUFFER ];
-	int nwrite;
-	size_t nread;
-
-	for( j = 0; j < MAX_CLIENTS; j++ ) {
-		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
-			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
-				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
-			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ) {
-				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
-			} else {
-				send_d[ j ].sent_size += nread;
-				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
-
-				send_d[ j ].http_content_size -= nwrite;
-
-				if(nwrite == -1 || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
-					SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
-				}
-			}
-		}
-	}
 }
 
 /*
