@@ -10,15 +10,11 @@ I'm sure it's not perfect, not even finish, but it works pretty well right now.
 
 For performance test please visit http://pastebin.com/zBG7nHbL
 
-
-• CGI 1.0/1.1 and PHP support
-
 Featured HTTP versions:
 • HTTP/1.0
 • HTTP/1.1
 
 Featured HTTP methods:
-• POST
 • GET
 • HEAD
 
