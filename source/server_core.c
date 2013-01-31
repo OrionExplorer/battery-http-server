@@ -17,7 +17,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include "include/server_base64.h"
 #include "include/server_log.h"
 #include "include/server_mime_types.h"
-#include "include/server_cgi_manager.h"
 #include "include/server_htaccess_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -282,11 +281,6 @@ short CORE_load_configuration( void ) {
 		/* Zamkni�cie pliku konfiguracji */
 		fclose( cfg_file );
 
-		/* Wczytanie konfiguracji skrypt�w CGI */
-		if( !CGI_load_configuration( script_configuration_filename ) ) {
-			LOG_save();
-			return 0;
-		}
 		/* Wczytanie typ�w MIME */
 		if( !MIME_load_configuration( mime_types_configuration_filename ) ) {
 			LOG_save();

@@ -12,7 +12,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include "include/server_http_protocol.h"
 #include "include/server_create_session.h"
 #include "include/server_files_io.h"
-#include "include/server_cgi_manager.h"
 #include "include/server_log.h"
 #include "include/server_socket_io.h"
 #include <stdio.h>
@@ -458,7 +457,6 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 	char *ht_access_pwd;		/* Has�o do ��danego zasobu z funkcji file_params*/
 	int len_loc; /* D�ugo�� ��danej �cie�ki */
 	int file_params_val = 0;	/* Przechowuje wynik dzia�ania funkcji file_params */
-	int cgi_valid_res = -1;		/* Informuje, czy ��dany zas�b jest skryptem CGI */
 
 	len_loc = strlen( http_session->http_info.http_local_path );
 	/* Przygotowanie pami�ci na nazw� ��danego pliku */
@@ -467,38 +465,9 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 
 	/* Po��czenie �cie�ki z ��dania z pe�n� �cie�k� w systemie*/
 	if( len_loc > 1 ) {
-		/* Sprawdzenie, czy to jest ��danie CGI */
-		if( ( strstr( http_session->http_info.http_local_path, "?" ) != NULL ) || ( http_session->http_info.method_name == POST ) ) {
-			/* Pobieramy nazw� skryptu CGI z URI do zmiennej local_file_path */
-			strncpy( local_file_path, app_path, MAX_PATH_LENGTH );
-			strncat( local_file_path, REQUEST_get_cgi_name( http_session ), MAX_PATH_LENGTH );
-
-			/* Oznaczenie zapytania jako wykonanie skryptu CGI */
-			http_session->http_info.is_cgi = 1;
-
-			/* Pobranie query string */
-			if( !http_session->http_info.query_string ) {
-				http_session->http_info.query_string = malloc( MAX_BUFFER_CHAR );
-				mem_allocated( http_session->http_info.query_string, 15 );
-			}
-			strncpy( http_session->http_info.query_string, REQUEST_get_query( http_session ), MAX_PATH_LENGTH );
-
-			if( http_session->http_info.method_name != POST ) {
-				http_session->http_info.http_local_path[ strpos( http_session->http_info.http_local_path, "?" ) ] = '\0';
-			}
-		} else {
-			/* Stworzenie lokalnej �cie�ki dost�pu do zasobu */
-			strncpy( local_file_path, app_path, MAX_PATH_LENGTH );
-			strncat( local_file_path, http_session->http_info.http_local_path, MAX_PATH_LENGTH );
-
-			/* Czy ��dany zas�b w metodzie GET jest skryptem CGI? */
-			CGI_valid( local_file_path, &cgi_valid_res, NULL, NULL );
-			if( cgi_valid_res > 0 ) {
-				http_session->http_info.is_cgi = 1;
-			} else {
-				http_session->http_info.is_cgi = 0;
-			}
-		}
+		/* Stworzenie lokalnej �cie�ki dost�pu do zasobu */
+		strncpy( local_file_path, app_path, MAX_PATH_LENGTH );
+		strncat( local_file_path, http_session->http_info.http_local_path, MAX_PATH_LENGTH );
 	} else {
 		/* Jeste�my w g��wnym katalogu */
 		strncpy( local_file_path, app_path, MAX_PATH_LENGTH );
@@ -557,31 +526,22 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 		if( file_params_val == 1 ) {
 			/* Plik istnieje i jest do odczytu */
 			/* Je�eli jest to skrypt CGI, to zostaje wykonany */
-			if( http_session->http_info.is_cgi == 1 ) {
-				/* Wcze�niej oznaczony jako CGI */
-				CGI_execute( http_session, local_file_path );
-			} else {
-				/* Zwyk�e ��danie zasobu */
-				/*Zapytanie zweryfikowane - wysy�ka zawarto�ci zasobu */
-				if( http_session->http_info.method_name != POST ) {
-					RESPONSE_file( http_session, local_file_path ); /* Zapytanie HEAD jest weryfikowane w funkcji RESPONSE_header */
-				}
+			/* Zwyk�e ��danie zasobu */
+			/*Zapytanie zweryfikowane - wysy�ka zawarto�ci zasobu */
+			if( http_session->http_info.method_name != POST ) {
+				RESPONSE_file( http_session, local_file_path ); /* Zapytanie HEAD jest weryfikowane w funkcji RESPONSE_header */
 			}
 		} else if( file_params_val == 2 ) {/* Plik istnieje, ale dost�p jest zabroniony */
 			RESPONSE_error( http_session, HTTP_403_FORBIDDEN, HTTP_ERR_403_MSG, NULL );
 		} else if( file_params_val == 3 ) {/* Plik istnieje, ale wymaga autoryzacji */
 			if( http_session->http_info.authorization ) {
 				if( strncmp( ht_access_pwd, http_session->http_info.authorization, STD_BUFF_SIZE ) == 0 ) {
-					if( http_session->http_info.is_cgi == 1 ) {/* Wcze�niej oznaczony jako CGI */
-						CGI_execute( http_session, local_file_path );
+					/* Zwyk�e ��danie zasobu */
+					/*Zapytanie zweryfikowane - wysy�ka zawarto�ci zasobu */
+					if( http_session->http_info.method_name != POST ) {
+						RESPONSE_file( http_session, local_file_path ); /* Zapytanie HEAD jest weryfikowane w funkcji RESPONSE_header */
 					} else {
-						/* Zwyk�e ��danie zasobu */
-						/*Zapytanie zweryfikowane - wysy�ka zawarto�ci zasobu */
-						if( http_session->http_info.method_name != POST ) {
-							RESPONSE_file( http_session, local_file_path ); /* Zapytanie HEAD jest weryfikowane w funkcji RESPONSE_header */
-						} else {
-							RESPONSE_error( http_session, HTTP_401_AUTHORIZATION_REQUIRED, HTTP_ERR_401_MSG, HEADER_AUTHENTICATION );
-						}
+						RESPONSE_error( http_session, HTTP_401_AUTHORIZATION_REQUIRED, HTTP_ERR_401_MSG, HEADER_AUTHENTICATION );
 					}
 				} else {
 					RESPONSE_error( http_session, HTTP_401_AUTHORIZATION_REQUIRED, HTTP_ERR_401_MSG, HEADER_AUTHENTICATION );

@@ -160,7 +160,6 @@ struct HTTP_INFO {
 	char*				user_login;					/* Odszyfrowany login u�ytkownika */
 	char*				user_pwd;					/* Odszyfrowane has�o u�ytkownika */
 	short				keep_alive;					/* Przechowuje informacj� o typie po��czenia ( Close/Keep-Alive ) */
-	short				is_cgi;						/* 1 = ��danie jest operacj� na skrypcie, 0 = przes�anie zawarto�ci zasobu */
 	short				received_all;				/* Dla ��da� typu POST - informuje, czy odebrano ca�� wiadomo�� */
 };
 

@@ -105,21 +105,43 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	/* Stworzenie potoku ze skryptem CGI. Weryfikacja poprawno�ci nazwy nast�pi�a w funkcji
 	CGI_valid. Odczyt danych w trybie binarnym. */
 	cgi_script_file = popen( cgi_script_exec, READ_BINARY );
+
 	//cgi_script_file = battery_fopen( cgi_script_exec, READ_BINARY, 1, http_session->socket_descriptor, SCRIPT );
 
 	if( !cgi_script_file ) {
 		/* Zwolnienie pami�ci */
-		free( cgi_script_exec );
-		cgi_script_exec = NULL;
+		if( cgi_script_exec ) {
+			free( cgi_script_exec );
+			cgi_script_exec = NULL;
+		}
 
-		free( exec_filename );
-		exec_filename = NULL;
+		if( exec_filename ) {
+			free( exec_filename );
+			exec_filename = NULL;
+		}
 
-		free( cgi_param );
-		cgi_param = NULL;
+		if( cgi_param ) {
+			free( cgi_param );
+			cgi_param = NULL;
+		}
 
 		/* Problem - plik zosta� wcze�niej odnaleziony w REQUEST_process, ale teraz si� go nie da otworzy� */
 		RESPONSE_error( http_session, HTTP_500_SERVER_ERROR, HTTP_ERR_500_MSG, NULL );
+		return;
+	}
+
+	/* Wczytanie wyniku dzia�ania skryptu CGI i pobranie rozmiaru danych */
+	result_size = fread( buf, sizeof( char ), MAX_BUFFER, cgi_script_file );
+
+	/* Zamkni�cie potoku */
+	if( cgi_script_file) {
+		pclose( cgi_script_file );
+		cgi_script_file = NULL;
+	}
+
+	/* Weryfikacja rozmiaru outputu */
+	if( result_size <= 0 ) {
+		RESPONSE_error( http_session, HTTP_204_NO_CONTENT, HTTP_ERR_204_MSG, NULL );
 		return;
 	}
 
@@ -129,13 +151,6 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 
 	cgi_body = ( unsigned char* )calloc( MAX_BUFFER, sizeof( char ) );
 	mem_allocated( ( char* )cgi_body, 220 );
-
-	/* Wczytanie wyniku dzia�ania skryptu CGI i pobranie rozmiaru danych */
-	result_size = fread( buf, sizeof( char ), MAX_BUFFER, cgi_script_file );
-
-	/* Zamkni�cie potoku */
-	pclose( cgi_script_file );
-	cgi_script_file = NULL;
 
 	/* Skopiowanie wczytanego wyniku z buf do cgi_result */
 	for( i = 0, j = 0; i < result_size-1; i++, j++ ) {

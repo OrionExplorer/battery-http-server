@@ -9,10 +9,13 @@ Zbi�r funkcji przeznaczonych do obs�ugi plik�w i katalog�w
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #include "include/server_files_io.h"
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <signal.h>
+#include <fcntl.h>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -279,7 +282,7 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		/* Znaleziony element przechowujący informację o otwartym pliku */
 		if( opened_files[ i ].file == file && file ) {
-		    /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
+			/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
 			if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
 				//printf("Znalazlem.\n");
 				opened_files[ i ].socket_descriptor = 0;
@@ -293,7 +296,7 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 
 			}
 			/* Zliczenie ilości klientów korzystających z pliku */
-            clients_count++;
+			clients_count++;
 		}
 	}
 
@@ -301,12 +304,12 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 	/* Z pliku korzystał jeden lub mniej klientów */
 	if( clients_count == 2 && file_found > 0 ) {
 		//printf("Zamykam plik dla socketu %d\n", socket_descriptor );
-        if( file ) {
+		if( file ) {
 			if( type == STD_FILE ) {
 				fclose( file );
 			} else if( type == SCRIPT ) {
 				pclose( file );
 			}
-        }
+		}
 	}
 }

@@ -175,7 +175,7 @@ static void SOCKET_send_all_data( void ) {
 				send_d[ j ].http_content_size -= nwrite;
 
 				if(nwrite == -1 || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
-				    SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
+					SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 				}
 			}
 		}

@@ -121,7 +121,6 @@ static void SESSION_reset( HTTP_SESSION *http_session ) {
 	http_session->http_info.range_st = -1;
 	http_session->http_info.range_en = -1;
 	/* Wyzerowanie zmiennej odpowiedzialnej za informowanie, czy zapytanie jest ��daniem zasobu, czy wykonaniem skryptu CGI */
-	http_session->http_info.is_cgi = 0;
 }
 
 /*
@@ -331,8 +330,8 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		SOCKET_disconnect_client( http_session );
 		SESSION_release( http_session );
 		if( temp_http_method_name ) {
-            free( temp_http_method_name );
-            temp_http_method_name = NULL;
+			free( temp_http_method_name );
+			temp_http_method_name = NULL;
 		}
 		return;
 	}
@@ -527,7 +526,6 @@ void SESSION_release( HTTP_SESSION *http_session )
 	/* Zerowanie zmiennych liczbowych */
 	http_session->http_info.range_st = -1;
 	http_session->http_info.range_en = -1;
-	http_session->http_info.is_cgi = -1;
 	http_session->http_info.content_length = -1;
 	/* Ustawienie metody na nieprzypisan� */
 	http_session->http_info.method_name = UNKNOWN_HTTP_METHOD;
