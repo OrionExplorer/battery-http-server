@@ -23,7 +23,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-
+#include <pthread.h>
 /*Sockety */
 #ifdef _WIN32
 /*Inicjalizacja WinSock */
@@ -53,7 +53,7 @@ static void		SOCKET_prepare( void );
 static void		SOCKET_process( int socket_fd );
 static void		SOCKET_send_all_data( void );
 void			SOCKET_stop( void );
-pthread_t        sthread;
+pthread_t		sthread;
 
 /*
 SOCKET_initialization( void )
@@ -92,7 +92,7 @@ static void SOCKET_initialization( void ) {
 }
 
 void *THREAD_SOCKET_send_all_data( void ) {
-    SOCKET_send_all_data();
+	SOCKET_send_all_data();
 }
 /*
 SOCKET_send_all_data( void )
@@ -107,19 +107,16 @@ static void SOCKET_send_all_data( void ) {
 		if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-			if( nread == 0 && send_d[ j ].http_content_size > 0 ) {
-				send_d[ j ].file = fopen( battery_get_filename( send_d[ j ].file ), READ_BINARY );
-			} else if( nread == 0 && send_d[ j ].http_content_size <= 0 ) {
-				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
-			} else {
+
+			nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
+
+			if( nwrite > 0 ) {
 				send_d[ j ].sent_size += nread;
-				nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
-
 				send_d[ j ].http_content_size -= nwrite;
+			}
 
-				if(nwrite == -1 || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
-					SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
-				}
+			if( (nwrite == -1 && GetLastError() != EWOULDBLOCK )|| (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
+				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			}
 		}
 	}
@@ -129,7 +126,7 @@ static void SOCKET_send_all_data( void ) {
 SOCKET_prepare( void )
 - nas�uchiwanie w celu odbioru danych od klienta */
 static void SOCKET_prepare( void ) {
-	unsigned long b = 0;
+	unsigned long b = 1;
 	int i = 1;
 	int wsa_result = 0;
 
@@ -249,11 +246,12 @@ static void SOCKET_process( int socket_fd ) {
 	char tmp_buf[ MAX_BUFFER ];
 	extern int errno;
 
-    errno = 0;
+	errno = 0;
 	session->http_info.received_all = http_session_.http_info.received_all;
 	session->address = http_session_.address;
 	session->socket_descriptor = socket_fd;
 	session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
+
 	if( session->address_length < MAX_URI_LENGTH ) {
 		if( errno > 1) {
 			SESSION_delete_send_struct( socket_fd );

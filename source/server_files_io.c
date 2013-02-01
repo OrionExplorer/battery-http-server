@@ -195,7 +195,7 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 
 	/* Weryfikacja, czy plik jest już otwarty przez serwer */
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
-		if( strcmp( opened_files[ i ].filename, filename ) == 0 && type == opened_files[ i ].type) {
+		if( strcmp( opened_files[ i ].filename, filename ) == 0 && type == opened_files[ i ].type ) {
 			tmp = opened_files[ i ].file;
 			break;
 		}
@@ -218,7 +218,7 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
 				if( opened_files[ i ].file == NULL ) {
 					opened_files[ i ] .file = tmp;
 					opened_files[ i ] .socket_descriptor = socket_descriptor;
-					strcpy( opened_files[ i ].filename, filename );
+					strncpy( opened_files[ i ].filename, filename, FILENAME_MAX );
 					opened_files[ i ].size = ftell( tmp );
 					opened_files[ i ].type = type;
 					break;
@@ -253,10 +253,12 @@ battery_get_filename( FILE *file )
 @file - wskaźnik do otwartego pliku
 - funkcja zwraca nazwę pliku na podstawie jego deskryptora */
 char* battery_get_filename( FILE *file ) {
-	int i = FOPEN_MAX;
+	int i;
 
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( opened_files[ i ].file == file ) {
+			printf("requested filename: \"%s\"\n", opened_files[ i ].filename );
+			system("pause");
 			return opened_files[ i ].filename;
 		}
 	}
@@ -281,10 +283,9 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		/* Znaleziony element przechowujący informację o otwartym pliku */
-		if( opened_files[ i ].file == file && file ) {
+		if( file && opened_files[ i ].file == file ) {
 			/* Usunięcie elementu przechowującego informacje dla żądanego klienta */
 			if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
-				//printf("Znalazlem.\n");
 				opened_files[ i ].socket_descriptor = 0;
 				opened_files[ i ].file = NULL;
 				opened_files[ i ].size = 0;

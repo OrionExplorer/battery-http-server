@@ -593,11 +593,11 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
 
 	for( i = 0; i <= MAX_CLIENTS-1; i++ ){
 		if( send_d[ i ].socket_descriptor == socket_descriptor ) {
-		    if( send_d[ i ].keep_alive <= 0 ) {
-		        SOCKET_close( send_d[ i ].socket_descriptor );
-		    }
+			if( send_d[ i ].keep_alive <= 0 ) {
+				SOCKET_close( send_d[ i ].socket_descriptor );
+			}
 
-			battery_fclose( send_d[ i ] .file, socket_descriptor );
+			battery_fclose( send_d[ i ].file, socket_descriptor );
 			send_d[ i ].socket_descriptor = 0;
 			send_d[ i ].sent_size = 0;
 			send_d[ i ].http_content_size = 0;

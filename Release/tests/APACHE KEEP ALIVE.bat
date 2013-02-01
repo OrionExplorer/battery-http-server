@@ -1,4 +1,4 @@
 @echo off
 echo APACHE:
-"C:\var\ab.exe" -n 10000 -k -c 50 http://localhost/index.html
+"C:\var\ab.exe" -n 100000 -k -c 100 http://localhost/index.html
 pause
