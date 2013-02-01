@@ -5,9 +5,6 @@ battery-http-server
 Marcin Kelar (marcin.kelar@gmail.com)
 ==================
 
-Source is written in ANSI C, so you can simply compile and run it under Windows/Linux/Mac OS X.
-I'm sure it's not perfect, not even finish, but it works pretty well right now.
-
 For performance test please visit http://pastebin.com/zBG7nHbL
 
 Featured HTTP versions:
@@ -38,35 +35,37 @@ Featured HTTP response codes:
 • 503 Service Unavailable
 • 504 Not Supported
 
-Additional information:
-• Multiplatform
-• Event log
-• Simple configuration based on text files
+Other features:
 • High performance (tested with Apache Benchmark - http://pastebin.com/zBG7nHbL)
+• Multiplatform (Windows/Linux/MacOS X)
+• Basic Access Authentication
+• Simple configuration
+• Event log
 
 TODO:
-• Rebuild CGI/PHP algorithm
+• Extend Basic Access Authentication configuration
 • Rebuild range-based data send
-• Rebuild HTTP authorization mechanism
-• Add HTTP Proxy support
+• New CGI/PHP algorithm and restore POST method
 • Add method PUT
 • Add method DELETE
+• Add HTTP Proxy support
 • Add IPv6 support
 • Add HTTPS support
 • Higher performance!
 
 
-What you have to do to run this program:
-1. (REQUIRED) In file Release/configuration/network.conf you must configure 3 lines:
-	0: IP protocol version (4 or 6) - this is under construction [number]
-	1: port [number]
-	2: your "var/www" catalog [string]
+#To run Battery HTTP Server:
+1. File "configuration/network.conf" should contain following lines (without quotes):
+	"0 [number]" - IP protocol version (4 or 6). This is under construction.
+	"1 [number]" - Port number
+	"2 [string]" - Document root
+This step is required.
 
-2. (OPTIONAL) HTTP authorization is under construction and should not be used for production environment, but in file Release/configuration/ht_access.conf you can authorize access to any content, eg:
-	"D:\battery-server\index.php my_login my_password"
-where "my_login" and "my_password" must be passed by user before access to the requested resource.
+2. File "configuration/ht_access.conf" can contain resource access information in following format (without quotes):
+	"resource login password" - Neither resource, nor login, nor password can contain spaces.
+This step is optional.
 
-3. Compilation requirements.
+#Compilation requirements:
 	• Win32: -lws2_32 -lpthread
 	• Linux: -lpthread
 
