@@ -174,7 +174,7 @@ struct SEND_INFO {
 	long				http_content_size;			/* Rozmiar pliku */
 	long				sent_size;					/* Ilość danych wysłana do tej pory */
 	int					socket_descriptor;			/* Deksryptor podłączonego klienta, który wysłał żądanie */
-	short               keep_alive;                 /* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
+	short				keep_alive;					/* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
 };
 
 /* Struktura przechowuje informacje o otwartym pliku */
@@ -184,14 +184,6 @@ struct OPENED_FILE {
 	long				size;						/* Rozmiar */
 	int					socket_descriptor;			/* Deskryptor podłączonego klienta, który wysłał żądanie */
 	RESOURCE_TYPE		type;						/* Rodzaj zasobu */
-};
-
-/* Struktura przechowuj�ca informacje o innych mo�liwych rozszerzeniach plik�w,
-kt�re maj� uprawnienia do wykonania jako skrypt CGI */
-struct OTHER_SCRIPTS {
-	char 				ext[ EXT_LEN];					/* Rozszerzenie*/
-	char 				external_app[ STD_BUFF_SIZE];	/* Zewn�trzna aplikacja do uruchamiania skryptu */
-	char 				param[ STD_BUFF_SIZE];			/* Parametr, z kt�rym ma zosta� uruchomiona aplikacja ze zmiennej external_app */
 };
 
 /* G��wna struktura, kt�ra b�dzie przechowywa�a wszystkie informacje o po��czonym kliencie */
@@ -231,11 +223,6 @@ extern OPENED_FILE			opened_files[ FOPEN_MAX ];
 extern fd_set				master;
 extern int					http_conn_count;
 char*						server_get_remote_hostname( HTTP_SESSION *http_session );
-
-/* Przechowuje wczytane rozszerzenia plik�w uprawnionych do wykonania jako skrypt CGI */
-OTHER_SCRIPTS				other_script_type[ 8 ];
-extern int					cgi_other_count;
-#define STD_EXEC			"<exec>"
 
 /* Przechowuje informacje o dost�pach do zasob�w */
 HT_ACCESS					ht_access[ 256 ];

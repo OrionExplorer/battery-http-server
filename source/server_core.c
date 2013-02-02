@@ -25,7 +25,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 
 /* �cie�ka startowa aplikacji */
-char	app_path[];
+extern char	app_path[];
 
 /* Katalog roboczy - udost�pnione klientom zasoby */
 char	*working_dir;

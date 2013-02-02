@@ -678,8 +678,9 @@ char* REQUEST_get_index( const char *path ) {
 	for( i = 0; i < index_file_count; ++i ) {
 		strncpy( filename, path, MAX_PATH_LENGTH );
 		strncat( filename, index_file_list[ i ], MAX_PATH_LENGTH );
-		/* Sprawdzenie, czy plik istnieje nastąpi później */
-		return index_file_list[ i ];
+		if( file_exists( filename ) == 1) {
+			return index_file_list[ i ];
+		}
 	}
 
 	/* Je�eli nie znaleziono �adnego z plik�w index_file_list to zwracamy SITE_INDEX */
