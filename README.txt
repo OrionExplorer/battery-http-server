@@ -54,6 +54,7 @@ TODO:
 • Higher performance!
 
 
+
 #To run Battery HTTP Server:
 1. File "configuration/network.conf" should contain following lines (without quotes):
 	"0 [number]" - IP protocol version (4 or 6). This is under construction.
@@ -61,12 +62,19 @@ TODO:
 	"2 [string]" - Document root
 This step is required.
 
-2. File "configuration/ht_access.conf" can contain resource access information in following format (without quotes):
+2. File "configuration/ht_access.conf" should contain resource access information in following format (without quotes):
 	"resource login password" - Neither resource, nor login, nor password can contain spaces.
 This step is optional.
+
+3. File "configuration/index.conf" should contain plain list of possible "index" file names.
+This step is optional.
+
+
 
 #Compilation requirements:
 	• Win32: -lws2_32 -lpthread
 	• Linux: -lpthread
+
+
 
 FOR COPYRIGHT INFO PLEASE READ COPYING.txt
