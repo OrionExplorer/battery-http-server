@@ -40,6 +40,7 @@ Other features:
 • Multiplatform (Windows/Linux/MacOS X)
 • Basic Access Authentication
 • Simple configuration
+• Single-threaded
 • Event log
 
 TODO:
@@ -72,8 +73,8 @@ This step is optional.
 
 
 #Compilation requirements:
-	• Win32: -lws2_32 -lpthread
-	• Linux: -lpthread
+	• Win32: -lws2_32
+	• Linux: none, so far
 
 
 

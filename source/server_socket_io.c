@@ -23,7 +23,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <pthread.h>
+
 /*Sockety */
 #ifdef _WIN32
 /*Inicjalizacja WinSock */
@@ -53,7 +53,6 @@ static void		SOCKET_prepare( void );
 static void		SOCKET_process( int socket_fd );
 static void		SOCKET_send_all_data( void );
 void			SOCKET_stop( void );
-pthread_t		sthread;
 
 /*
 SOCKET_initialization( void )
@@ -91,9 +90,6 @@ static void SOCKET_initialization( void ) {
 	server_address.sin_port = htons( ( u_short )active_port );
 }
 
-void *THREAD_SOCKET_send_all_data( void ) {
-	SOCKET_send_all_data();
-}
 /*
 SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
@@ -180,7 +176,6 @@ static void SOCKET_prepare( void ) {
 	LOG_print( "- Port: %d.\n", active_port );
 	LOG_print( "Lock and load...\n" );
 	printf( "Lock and load...\n" );
-	pthread_create(&sthread, NULL, THREAD_SOCKET_send_all_data, NULL );
 	/* Teraz czekamy na poï¿½ï¿½czenia i dane */
 }
 
