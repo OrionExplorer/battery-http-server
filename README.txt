@@ -46,7 +46,7 @@ Other features:
 TODO:
 • Extend Basic Access Authentication configuration
 • Rebuild range-based data send
-• New CGI/PHP algorithm and restore POST method
+• New CGI/PHP algorithm and POST method restoration
 • Add method PUT
 • Add method DELETE
 • Add HTTP Proxy support
