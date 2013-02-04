@@ -60,7 +60,3 @@ For performance test please visit http://pastebin.com/zBG7nHbL
 Compilation requirements:
 	• Win32: -lws2_32
 	• Linux: none, so far
-
-
-
-FOR COPYRIGHT INFO PLEASE READ COPYING.txt
