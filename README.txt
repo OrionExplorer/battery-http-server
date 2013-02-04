@@ -1,9 +1,9 @@
-==================
+###############################################################################
 battery-http-server
 - fast and portable HTTP server.
 
 Marcin Kelar (marcin.kelar@gmail.com)
-==================
+###############################################################################
 
 For performance test please visit http://pastebin.com/zBG7nHbL
 
@@ -56,23 +56,26 @@ TODO:
 
 
 
-#To run Battery HTTP Server:
-1. File "configuration/network.conf" should contain following lines (without quotes):
-	"0 [number]" - IP protocol version (4 or 6). This is under construction.
-	"1 [number]" - Port number
-	"2 [string]" - Document root
-This step is required.
+###############################################################################
 
-2. File "configuration/ht_access.conf" should contain resource access information in following format (without quotes):
-	"resource login password" - Neither resource, nor login, nor password can contain spaces.
-This step is optional.
+Battery HTTP Server configuration (configuration/battery.conf).
+File must contain following lines (without quotes):
+• "ip_ver [number]" - IP protocol version (4 or 6). This is under construction.
+• "port_number [number]" - Port number
+• "document_root [path]" - Document root path
 
-3. File "configuration/index.conf" should contain plain list of possible "index" file names.
-This step is optional.
+Lines below are optional:
+• "site_index [filename]" - default filename to open if not provided by client
+• "mime_type [.extension] [mime_type]" - new mime type
+• "global_ht_access [path/filename] [username] [password]" - resource listed as "[path/filename]" will be protected with "[username]" and "[password]"
+
+For further information please see "Release/configuration/battery.conf".
+
+###############################################################################
 
 
 
-#Compilation requirements:
+Compilation requirements:
 	• Win32: -lws2_32
 	• Linux: none, so far
 
