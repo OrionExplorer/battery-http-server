@@ -4,5 +4,4 @@ obj/
 *.layout
 *.cbTemp
 *.conf
-Release/configuration
 Release/battery-http-server.exe
