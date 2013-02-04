@@ -28,7 +28,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 extern char	app_path[];
 
 /* Katalog roboczy - udost�pnione klientom zasoby */
-char	*working_dir;
+char	*document_root;
 
 /*Pe�na nazwa pliku ( +�cie�ka dost�pu ) "log.txt" */
 char	LOG_filename[ MAX_PATH_LENGTH ];
@@ -117,56 +117,59 @@ static void server_validate_paths( void ) {
 	tmp_path = NULL;
 }
 
-short CORE_load_index_names( const char* filename ) {
-	FILE *cfg_file;
+short CORE_load_index_names( FILE *cfg_file ) {
 	char *buf;
+	char *option;
 	char *index_filename;
 	int len = 0;
 
+	if( !cfg_file ) {
+		return 0;
+	}
+
+	rewind( cfg_file );
+
 	/* Alokacja pami�ci */
 	buf = malloc( STD_BUFF_SIZE_CHAR );
-	mem_allocated( buf, 1060 );
+	mem_allocated( buf, 1 );
+
+	option = malloc( STD_BUFF_SIZE );
+	mem_allocated( option, 2 );
 
 	index_filename = malloc( STD_BUFF_SIZE );
-	mem_allocated( buf, 1061 );
-
-	LOG_print( "Loading index list..." );
-
-	cfg_file = fopen( filename, "rt" );
-	if( !cfg_file ) {
-		LOG_print( "error.\n" );
-		printf( "Error loading index file list.\n" );
-		return 0;
-	} else {
-		LOG_print( "ok.\n" );
-	}
+	mem_allocated( index_filename, 3 );
 
 	index_file_count = 0;
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
-		if( sscanf( buf, "%s", index_filename ) == 1 ) {
-			/* Wczytano maksymaln� ilo�� plik�w */
-			if( index_file_count == MICRO_BUFF_SIZE ) {
-				LOG_print( "Reached maximum list index count.\n" );
-				break;
+		if( sscanf( buf, "%s %s", option, index_filename ) == 2 ) {
+			if( strncmp( option, "site_index", STD_BUFF_SIZE ) == 0 ) {
+				/* Wczytano maksymaln� ilo�� plik�w */
+				if( index_file_count == MICRO_BUFF_SIZE ) {
+					LOG_print( "Reached maximum list index count.\n" );
+					break;
+				}
+
+				/* Pobranie d�ugo�ci wczytanej nazwy pliku */
+				len = strlen( buf );
+
+				/* Stworzenie nowego obiektu */
+				index_file_list[ index_file_count ] = ( char* )calloc( len, sizeof( char ) );
+				mem_allocated( index_file_list[ index_file_count ], 4 );
+
+				strncpy( index_file_list[ index_file_count ], index_filename, len );
+				LOG_print( "\t- new site index: %s.\n", index_file_list[ index_file_count ] );
+				index_file_count++;
 			}
-
-			/* Pobranie d�ugo�ci wczytanej nazwy pliku */
-			len = strlen( buf );
-
-			/* Stworzenie nowego obiektu */
-			index_file_list[ index_file_count ] = ( char* )calloc( len, sizeof( char ) );
-			mem_allocated( index_file_list[ index_file_count ], 1062 );
-
-			strncpy( index_file_list[ index_file_count ], index_filename, len );
-			LOG_print( "\t- %d new index file: %s.\n", index_file_count, index_file_list[ index_file_count ] );
-			index_file_count++;
 		}
 	}
 
 	/* Zwolnienie pami�ci */
 	free( buf );
 	buf = NULL;
+
+	free( option );
+	option = NULL;
 
 	free( index_filename );
 	index_filename = NULL;
@@ -182,117 +185,84 @@ CORE_load_configuration()
 short CORE_load_configuration( void ) {
 	FILE *cfg_file;
 	char *network_configuration_filename;		/* Nazwa pliku konfiguracji sieci */
-	char *script_configuration_filename;		/* Nazwa pliku konfiguracji skrypt�w CGI */
-	char *mime_types_configuration_filename;	/* Nazwa pliku konfiguracji typ�w MIME */
-	char *ht_access_configuration_filename;		/* Nazwa pliku konfiguracji dost�p�w */
-	char *index_list_configuration_filename;	/* Nazwa pliku konfiguracji listy plik�w index */
 	char *buf;									/* Wczytana linia z pliku konfiguracyjnego */
+	char *option;								/* Wczytana warto�� z buf */
 	char *value;								/* Wczytana warto�� z buf */
-	int option = 0;								/* Wczytana warto�� z buf */
-	int lines_count = 1;
-
-	/* Alokacja pami�ci */
-	buf = malloc( STD_BUFF_SIZE_CHAR );
-	mem_allocated( buf, 350 );
 
 	network_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( network_configuration_filename, 351 );
-
-	script_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( script_configuration_filename, 352 );
-
-	mime_types_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( mime_types_configuration_filename, 353 );
-
-	ht_access_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( ht_access_configuration_filename, 354 );
-
-	index_list_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( index_list_configuration_filename, 355 );
-
-	value = malloc( STD_BUFF_SIZE_CHAR );
-	mem_allocated( value, 356 );
-
-	/* Reset zmiennych */
-	ip_proto_ver = -1;
-	active_port = -1;
+	mem_allocated( network_configuration_filename, 5 );
 
 	/*Przypisanie �cie�ki, z kt�rej uruchamiana jest aplikacja */
 	strncpy( network_configuration_filename, app_path, MAX_PATH_LENGTH );
-	strncpy( script_configuration_filename, app_path, MAX_PATH_LENGTH );
-	strncpy( mime_types_configuration_filename, app_path, MAX_PATH_LENGTH );
-	strncpy( ht_access_configuration_filename, app_path, MAX_PATH_LENGTH );
-	strncpy( index_list_configuration_filename, app_path, MAX_PATH_LENGTH );
 	/*Dopisanie nazw plik�w z konfiguracj� */
 	strncat( network_configuration_filename, NETWORK_CFG_PATH, MAX_PATH_LENGTH );
-	strncat( script_configuration_filename, SCRIPTS_CFG_PATH, MAX_PATH_LENGTH );
-	strncat( mime_types_configuration_filename, MIME_TYPES_CFG_PATH, MAX_PATH_LENGTH );
-	strncat( ht_access_configuration_filename, HT_ACCESS_CFG_PATH, MAX_PATH_LENGTH );
-	strncat( index_list_configuration_filename, INDEX_FILE_CFG_PATH, MAX_PATH_LENGTH );
 
 	LOG_print( "Loading configuration file ( %s )...", network_configuration_filename );
 	cfg_file = fopen( network_configuration_filename, "rt" );
 
 	if( cfg_file ) {
+		/* Alokacja pami�ci */
+		buf = malloc( STD_BUFF_SIZE_CHAR );
+		mem_allocated( buf, 6 );
+
+		option = malloc( STD_BUFF_SIZE_CHAR );
+		mem_allocated( option, 7 );
+
+		value = malloc( STD_BUFF_SIZE_CHAR );
+		mem_allocated( value, 8 );
+
+		/* Reset zmiennych */
+		ip_proto_ver = -1;
+		active_port = -1;
+
+
+
 		LOG_print( "\n\t- file opened successfully...\n" );
+
 		while( fgets( buf, STD_BUFF_SIZE, cfg_file ) != NULL ) {
-			option = -1;
-			if( sscanf( buf, "%d %s", &option, value ) == 2 ) {
-				if( option >= 0 && option <= 65535 ) {
-					switch( option ) {
-					case 0: {	/*Wczytanie informacji o typie adresu IP */
-						switch( atoi( value ) )
-						{
-						case IPv4:	ip_proto_ver = IPv4; break;
-						case IPv6:	ip_proto_ver = IPv6; break;
-						default: ip_proto_ver = IPv4; break;
-						}
-						LOG_print( "\t- variable loaded: ip_proto_ver = %d.\n", ip_proto_ver );
-						break;
-							}
+			if( sscanf( buf, "%s %s", option, value ) == 2 ) {
+				if( strncmp( option, "ip_ver", STD_BUFF_SIZE) == 0 ) {
+					switch ( atoi( value ) ) {
+						case IPv4 : ip_proto_ver = IPv4; break;
+						case IPv6 : ip_proto_ver = IPv6; break;
+						default : ip_proto_ver = IPv4; break;
+					}
+					LOG_print( "\t- variable loaded: ip_proto_ver = %d.\n", ip_proto_ver );
+				} else if( strncmp( option, "port_number", STD_BUFF_SIZE ) == 0 ) {
+					active_port = atoi( value );
+					LOG_print( "\t- variable loaded: active_port = %d.\n", active_port );
+				} else if( strncmp( option, "document_root", STD_BUFF_SIZE ) == 0 ) {
+					/* Alokacja pami�ci */
+					document_root = malloc( MAX_PATH_LENGTH );
+					mem_allocated( document_root, 9 );
 
-					case 1: {	/* Wczytanie informacji o numerze portu */
-						active_port = atoi( value );
-						LOG_print( "\t- variable loaded: active_port = %d.\n", active_port );
-						break;
-							}
-
-					case 2: {	/* Wczytanie informacji o udost�pnionym zasobie */
-						/* Alokacja pami�ci */
-						working_dir = malloc( MAX_PATH_LENGTH );
-						mem_allocated( working_dir, 999 );
-
-						strncpy( working_dir, value, MAX_PATH_LENGTH );
-						if( directory_exists( working_dir ) == 0 ) {/* Podany zas�b nie istnieje */
-							LOG_print( "\t- Error: working dir is invalid.\n" );
-							printf( "Error: working dir is invalid: \"%s\"\n", working_dir );
-							exit( EXIT_FAILURE );
-						} else {
-							LOG_print( "\t- working dir: %s\n", working_dir );
-						}
-						break;
-							}
+					strncpy( document_root, value, MAX_PATH_LENGTH );
+					if( directory_exists( document_root ) == 0 ) {/* Podany zas�b nie istnieje */
+						LOG_print( "\t- Error: working dir is invalid.\n" );
+						printf( "Error: working dir is invalid: \"%s\"\n", document_root );
+						exit( EXIT_FAILURE );
+					} else {
+						LOG_print( "\t- working dir: %s\n", document_root );
 					}
 				}
 			}
-			lines_count++;
 		}
 
 		/* Zamkni�cie pliku konfiguracji */
-		fclose( cfg_file );
+		//fclose( cfg_file );
 
 		/* Wczytanie typ�w MIME */
-		if( !MIME_load_configuration( mime_types_configuration_filename ) ) {
+		if( MIME_load_configuration( cfg_file ) == 0 ) {
 			LOG_save();
 			return 0;
 		}
 		/* Wczytanie praw dost�p�w do zasob�w */
-		if( !HTACCESS_load_configuration( ht_access_configuration_filename ) ) {
+		if( HTACCESS_load_configuration( cfg_file ) == 0 ) {
 			LOG_save();
 			return 0;
 		}
 		/* Wczytanie listy plik�w index */
-		if( !CORE_load_index_names( index_list_configuration_filename ) ) {
+		if( CORE_load_index_names( cfg_file ) == 0 ) {
 			LOG_save();
 			return 0;
 		}
@@ -305,23 +275,20 @@ short CORE_load_configuration( void ) {
 		free( network_configuration_filename );
 		network_configuration_filename = NULL;
 
+		free( option );
+		option = NULL;
+
 		free( value );
 		value = NULL;
 
 		return 1;
+	} else {
+		free( network_configuration_filename );
+		network_configuration_filename = NULL;
+		return 0;
 	}
 
-	LOG_print( "error or file not found.\n", network_configuration_filename );
-	LOG_print( "Loading configuration file ( %s )...error or file not found.\n", network_configuration_filename );
-
-	free( buf );
-	buf = NULL;
-
-	free( network_configuration_filename );
-	network_configuration_filename = NULL;
-
-	free( value );
-	value = NULL;
+	LOG_print( "error or file not found.\n" );
 
 	return 0;
 }
@@ -358,7 +325,7 @@ void CORE_initialize( void ) {
 	atexit( SOCKET_stop );
 
 	/* Prze��czenie si� na folder, z kt�rego b�d� udost�pniane zasoby */
-	strncpy( app_path, working_dir, MAX_PATH_LENGTH );
+	strncpy( app_path, document_root, MAX_PATH_LENGTH );
 
 	/* Uruchomienie sieci */
 	SOCKET_main();

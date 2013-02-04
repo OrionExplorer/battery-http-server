@@ -196,7 +196,7 @@ void SOCKET_run( void ) {
 
 	FD_SET( socket_server, &master );
 
-	tv.tv_sec = 1;
+	tv.tv_sec = 5;
 	tv.tv_usec = 500000;
 
 	fdmax = socket_server;
@@ -229,9 +229,11 @@ void SOCKET_run( void ) {
 				} else {
 					/* Pod��czony klient przes�a� dane... */
 					SOCKET_process( i );
+					SOCKET_mysterious_transfer_increaser();
 				}
 			} /*nowe po��czenie */
 			SOCKET_send_all_data();
+			SOCKET_mysterious_transfer_increaser();
 		} /*p�tla deskryptor�w while( --i )*/
 	} /*for( ;; ) */
 }

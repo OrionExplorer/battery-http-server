@@ -120,7 +120,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 		/* Pobranie informacji o ostatniej dacie modyfikacji zasobu */
 		if( !http_session->local_info.date_res_last_modified ) {
 			http_session->local_info.date_res_last_modified = malloc( TIME_BUFF_SIZE_CHAR );
-			mem_allocated( http_session->local_info.date_res_last_modified, 1111 );
+			mem_allocated( http_session->local_info.date_res_last_modified, 20 );
 		}
 
 		strftime( http_session->local_info.date_res_last_modified, TIME_BUFF_SIZE, RFC1123FMT, gmtime( &file_stat.st_mtime ) );

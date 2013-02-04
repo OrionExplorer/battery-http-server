@@ -53,11 +53,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #define LOGS_PATH							"logs"SLASH
 #define CONFIG_PATH							"configuration"SLASH
-#define NETWORK_CFG_PATH					CONFIG_PATH"network.conf"
-#define SCRIPTS_CFG_PATH					CONFIG_PATH"scripts.conf"
-#define MIME_TYPES_CFG_PATH					CONFIG_PATH"mime_type.conf"
-#define HT_ACCESS_CFG_PATH					CONFIG_PATH"ht_access.conf"
-#define INDEX_FILE_CFG_PATH					CONFIG_PATH"index.conf"
+#define NETWORK_CFG_PATH					CONFIG_PATH"battery.conf"
 
 #define DEFAULT_PORT						80
 
@@ -95,7 +91,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #define RFC1123FMT							"%a, %d %b %Y %H:%M:%S GMT"
 
 char							app_path[ MAX_PATH_LENGTH ];
-extern char*					working_dir;
+extern char*					document_root;
 /* Zaimplementowane metody dost�pu do zasob�w serwera */
 extern const char				*http_method_list[ ];
 

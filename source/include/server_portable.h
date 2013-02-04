@@ -41,6 +41,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define MSG_NOSIGNAL	0
 	//#define GetLastError WSAGetLastError
 	#define EWOULDBLOCK	WSAEWOULDBLOCK
+	#define sleep		Sleep
 
 	#define APP_NAME	"battery-http-server (Win32)"
 #else
@@ -52,6 +53,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define EXIT_FAILURE ( 1 )
 	#define READ_BINARY	"re"
 	#define sighandler	__sighandler_t
+	#define Sleep(x)	usleep(x*1000)
 
 	#define APP_NAME	"battery-http-server (Linux)"
 #endif

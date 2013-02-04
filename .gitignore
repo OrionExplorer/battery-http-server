@@ -6,5 +6,6 @@ obj/
 *.conf
 Release/configuration
 Release/battery-http-server.exe
+Release/tests
 Release/logs
 Release/www

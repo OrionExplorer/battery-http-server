@@ -79,7 +79,7 @@ short SESSION_local_path_is_valid( HTTP_SESSION *http_session ) {
 	/* Jeï¿½eli podano samï¿½ nazwï¿½ katalogu to automatycznie dodajemy plik indeksu */
 	if( strncmp( file_get_name( http_session->http_info.http_local_path ), "", 1 ) == 0 ) {
 		tmp_local_file_path = malloc( MAX_PATH_LENGTH_CHAR+1 );
-		mem_allocated( tmp_local_file_path, 9003 );
+		mem_allocated( tmp_local_file_path, 10 );
 
 		strncpy( tmp_local_file_path, app_path, MAX_PATH_LENGTH );
 		strncat( tmp_local_file_path, http_session->http_info.http_local_path, MAX_PATH_LENGTH );
@@ -108,7 +108,7 @@ SESSION_get_http_header( HTTP_SESSION *http_session )
 - pobiera nag³ówek wiadomosci HTTP. */
 static void SESSION_get_http_header( HTTP_SESSION *http_session ) {
 	http_session->http_info.header = malloc( BIG_BUFF_SIZE_CHAR );
-	mem_allocated( http_session->http_info.header, 0 );
+	mem_allocated( http_session->http_info.header, 11 );
 	strncpy( http_session->http_info.header, REQUEST_get_message_header( http_session->http_info.content_data, http_session->address_length ), BIG_BUFF_SIZE );
 }
 
@@ -211,7 +211,7 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_CONNECTION ) ) {
 		/* Pobranie informacji o poï¿½ï¿½czeniu ( "Connection: Keep-Alive/Close" ) - przypisanie do zmiennej tymczasowej */
 		temp_conn_type_handle = malloc( SMALL_BUFF_SIZE_CHAR );
-		mem_allocated( temp_conn_type_handle, 9002 );
+		mem_allocated( temp_conn_type_handle, 12 );
 		strncpy( temp_conn_type_handle, REQUEST_get_header_value( http_session->http_info.header, HEADER_CONNECTION ), SMALL_BUFF_SIZE );
 		/* Ustawienie zmiennej keep-alive w zaleï¿½noï¿½ci od wartoï¿½ci zmiennej temp_conn_type_handle */
 		if( strncasecmp( temp_conn_type_handle, HEADER_KEEP_ALIVE_STR, SMALL_BUFF_SIZE ) == 0 ) {
@@ -256,7 +256,7 @@ SESSION_get_ip_addr( HTTP_SESSION *http_session )
 - pobiera adres IP pod³¹czonego klienta. */
 static void SESSION_get_ip_addr( HTTP_SESSION *http_session ) {
 	http_session->http_info.remote_addr = malloc( TINY_BUFF_SIZE_CHAR );
-	mem_allocated( http_session->http_info.remote_addr, 6 );
+	mem_allocated( http_session->http_info.remote_addr, 13 );
 	strncpy( http_session->http_info.remote_addr, SOCKET_get_remote_ip( http_session ), TINY_BUFF_SIZE );
 }
 
@@ -305,7 +305,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 
 	/* Pobranie pierwszej linijki ï¿½ï¿½dania */
 	http_session->http_info.request_line = malloc( BIG_BUFF_SIZE_CHAR );
-	mem_allocated( http_session->http_info.request_line, 1 );
+	mem_allocated( http_session->http_info.request_line, 14 );
 	/* Zmienna temp_entire_msg bï¿½dzie przechowywaï¿½ zawartoï¿½ï¿½ http_info.content_data na potrzeby funkcji strtok */
 	temp_entire_msg = malloc( MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( temp_entire_msg, http_session->http_info.content_data, MAX_PATH_LENGTH+TINY_BUFF_SIZE );
@@ -313,7 +313,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 
 	/* Pobranie ï¿½ï¿½danej metody z request_line */
 	temp_http_method_name = malloc( MICRO_BUFF_SIZE_CHAR );
-	mem_allocated( temp_http_method_name, 9001 );
+	mem_allocated( temp_http_method_name, 15 );
 	strncpy( temp_entire_msg, http_session->http_info.request_line, MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( temp_http_method_name, strtok( temp_entire_msg, " " ), MICRO_BUFF_SIZE );
 
@@ -341,7 +341,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 
 	/* Pamiï¿½ï¿½ na ï¿½cieï¿½kï¿½ lokalnï¿½ */
 	http_session->http_info.http_local_path = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( http_session->http_info.http_local_path, 2 );
+	mem_allocated( http_session->http_info.http_local_path, 16 );
 	/* Pobranie ï¿½cieï¿½ki do pliku */
 	strncpy( http_session->http_info.http_local_path, strtok( NULL, " " ), MAX_PATH_LENGTH );
 
@@ -352,7 +352,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 
 	/* Pamiï¿½ï¿½ na wersjï¿½ protokoï¿½u HTTP */
 	http_session->http_info.protocol_ver = malloc( PROTO_BUFF_SIZE_CHAR );
-	mem_allocated( http_session->http_info.protocol_ver, 3 );
+	mem_allocated( http_session->http_info.protocol_ver, 17 );
 	/* Pobranie wersji protokoï¿½u HTTP */
 	strncpy( http_session->http_info.protocol_ver, strtok( NULL, "\015" ), PROTO_BUFF_SIZE );
 
@@ -393,7 +393,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		http_session->http_info.content_length = atoi( REQUEST_get_header_value( http_session->http_info.header, HEADER_CONTENT_LENGTH ) );
 		/* Prï¿½ba pobrania zawartoï¿½ci ï¿½ï¿½dania do zmiennej tymczasowej */
 		tmp_post_data = malloc( MAX_BUFFER_CHAR );
-		mem_allocated( tmp_post_data, 9002 );
+		mem_allocated( tmp_post_data, 18 );
 		strncpy( tmp_post_data, REQUEST_get_message_body( http_session ), MAX_BUFFER );
 		/* Sprawdzenie, czy rozmiar pobranej zawartoï¿½ci jest zgodny z danymi z nagï¿½ï¿½wka "Content-Length" */
 		if( strlen( tmp_post_data ) < http_session->http_info.content_length ) {
@@ -412,7 +412,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		przypisanie do zmiennej http_info.query_string zawartoï¿½ci komunikatu */
 		if( !http_session->http_info.query_string ) {
 			http_session->http_info.query_string = malloc( MAX_BUFFER_CHAR );
-			mem_allocated( http_session->http_info.query_string, 15 );
+			mem_allocated( http_session->http_info.query_string, 19 );
 		}
 		strncpy( http_session->http_info.query_string, tmp_post_data, MAX_BUFFER );
 

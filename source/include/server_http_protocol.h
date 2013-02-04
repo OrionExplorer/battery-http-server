@@ -49,7 +49,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #define HEADER_LOCATION						"Location: "
 #define HEADER_RANGE						"Range: "
 #define HEADER_CONTENT_RANGE				"Content-Range: "
-#define HEADER_ACCEPT_RANGES				"Accept Ranges: bytes\r\n"
+#define HEADER_ACCEPT_RANGES				"Accept-Ranges: bytes\r\n"
 #define HEADER_AUTHORIZATION				"Authorization: "
 #define HEADER_AUTHENTICATION				"WWW-Authenticate: Basic realm=\"Secure Area\"\r\n"
 
