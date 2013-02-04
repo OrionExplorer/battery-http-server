@@ -23,9 +23,9 @@ void strdelbslash( char *s1 ) {
 	char *c1;
 
 #ifdef _WIN32
-	while( ( c1 = strstr(  s1, "\\\\"  ) ) ) {
+	while( ( c1 = strstr( s1, "\\\\" ) ) ) {
 #else
-	while( ( c1 = strstr(  s1, "//"  ) ) ) {
+	while( ( c1 = strstr( s1, "//" ) ) ) {
 #endif
 		strcpy( c1 + 1, c1 + 2 );
 	}

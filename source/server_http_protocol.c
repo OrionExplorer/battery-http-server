@@ -562,10 +562,6 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 	free( local_file_path );
 	local_file_path = NULL;
 
-	/* Jeďż˝eli typ poďż˝ďż˝czenia jest zamkniďż˝ty lub niezdefiniowany - rozďż˝ďż˝czamy siďż˝ */
-	//if( http_session->http_info.keep_alive != 1 ) {
-		//SOCKET_disconnect_client( http_session );
-	//}
 	 /* Zwalniamy pamiďż˝ďż˝ */
 	SESSION_release( http_session );
 }

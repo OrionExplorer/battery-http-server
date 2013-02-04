@@ -155,7 +155,6 @@ short file_exists( const char *filename ) {
 
 	if( ( resource = battery_fopen( filename, READ_BINARY, 1, -133, STD_FILE ) ) ) {
 		/* Uda�o si� otworzy� plik = istnieje */
-		//fclose( resource );
 		return 1;
 	} else {
 		/* Nie istnieje */
@@ -301,10 +300,8 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
 		}
 	}
 
-	//printf("clients: %d\nfile: %d\n", clients_count, file_found);
 	/* Z pliku korzystał jeden lub mniej klientów */
 	if( clients_count == 2 && file_found > 0 ) {
-		//printf("Zamykam plik dla socketu %d\n", socket_descriptor );
 		if( file ) {
 			if( type == STD_FILE ) {
 				fclose( file );

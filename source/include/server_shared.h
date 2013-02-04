@@ -79,8 +79,8 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #define PROTO_BUFF_SIZE_CHAR				10*sizeof( char )
 #define MICRO_BUFF_SIZE						8
 #define MICRO_BUFF_SIZE_CHAR				8*sizeof( char )
-#define EXT_LEN								8
-#define EXT_LEN_CHAR						8*sizeof( char )
+#define EXT_LEN								16
+#define EXT_LEN_CHAR						16*sizeof( char )
 
 #define MAX_THREADS							64
 

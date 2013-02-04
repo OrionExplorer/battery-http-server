@@ -46,6 +46,9 @@ void LOG_print( char *fmt, ... ) {
 	/* Dopisanie aktualnej linii do globalnej zawarto�ci loga */
 	strncat( log_object, output_text, LOG_BUFFER );
 
+	/* Uncomment line below to see log on screen */
+	/* printf("%s", output_text ); */
+
 	/* Zwolnienie pami�ci */
 	free( output_text );
 	output_text = NULL;

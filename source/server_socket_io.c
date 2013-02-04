@@ -244,7 +244,6 @@ SOCKET_process( int socket_fd )
 - funkcja odczytuje dane z gniazda */
 static void SOCKET_process( int socket_fd ) {
 	HTTP_SESSION *session = ( HTTP_SESSION* )malloc( sizeof( HTTP_SESSION ) );
-	//char* tmp_buf = malloc( MAX_BUFFER_CHAR );
 	char tmp_buf[ MAX_BUFFER ];
 	extern int errno;
 

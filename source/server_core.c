@@ -118,9 +118,9 @@ static void server_validate_paths( void ) {
 }
 
 short CORE_load_index_names( FILE *cfg_file ) {
-	char *buf;
-	char *option;
-	char *index_filename;
+	char buf[ STD_BUFF_SIZE ];
+	char option[ STD_BUFF_SIZE ];
+	char index_filename[ STD_BUFF_SIZE ];
 	int len = 0;
 
 	if( !cfg_file ) {
@@ -128,16 +128,6 @@ short CORE_load_index_names( FILE *cfg_file ) {
 	}
 
 	rewind( cfg_file );
-
-	/* Alokacja pami�ci */
-	buf = malloc( STD_BUFF_SIZE_CHAR );
-	mem_allocated( buf, 1 );
-
-	option = malloc( STD_BUFF_SIZE );
-	mem_allocated( option, 2 );
-
-	index_filename = malloc( STD_BUFF_SIZE );
-	mem_allocated( index_filename, 3 );
 
 	index_file_count = 0;
 
@@ -164,16 +154,6 @@ short CORE_load_index_names( FILE *cfg_file ) {
 		}
 	}
 
-	/* Zwolnienie pami�ci */
-	free( buf );
-	buf = NULL;
-
-	free( option );
-	option = NULL;
-
-	free( index_filename );
-	index_filename = NULL;
-
 	return 1;
 }
 
@@ -184,13 +164,10 @@ CORE_load_configuration()
 + active_port */
 short CORE_load_configuration( void ) {
 	FILE *cfg_file;
-	char *network_configuration_filename;		/* Nazwa pliku konfiguracji sieci */
-	char *buf;									/* Wczytana linia z pliku konfiguracyjnego */
-	char *option;								/* Wczytana warto�� z buf */
-	char *value;								/* Wczytana warto�� z buf */
-
-	network_configuration_filename = malloc( MAX_PATH_LENGTH_CHAR );
-	mem_allocated( network_configuration_filename, 5 );
+	char network_configuration_filename[ MAX_PATH_LENGTH ];		/* Nazwa pliku konfiguracji sieci */
+	char buf[ STD_BUFF_SIZE ];									/* Wczytana linia z pliku konfiguracyjnego */
+	char option[ STD_BUFF_SIZE ];								/* Wczytana warto�� z buf */
+	char value[ STD_BUFF_SIZE ];								/* Wczytana warto�� z buf */
 
 	/*Przypisanie �cie�ki, z kt�rej uruchamiana jest aplikacja */
 	strncpy( network_configuration_filename, app_path, MAX_PATH_LENGTH );
@@ -201,21 +178,9 @@ short CORE_load_configuration( void ) {
 	cfg_file = fopen( network_configuration_filename, "rt" );
 
 	if( cfg_file ) {
-		/* Alokacja pami�ci */
-		buf = malloc( STD_BUFF_SIZE_CHAR );
-		mem_allocated( buf, 6 );
-
-		option = malloc( STD_BUFF_SIZE_CHAR );
-		mem_allocated( option, 7 );
-
-		value = malloc( STD_BUFF_SIZE_CHAR );
-		mem_allocated( value, 8 );
-
 		/* Reset zmiennych */
 		ip_proto_ver = -1;
 		active_port = -1;
-
-
 
 		LOG_print( "\n\t- file opened successfully...\n" );
 
@@ -248,43 +213,31 @@ short CORE_load_configuration( void ) {
 			}
 		}
 
-		/* Zamkni�cie pliku konfiguracji */
-		//fclose( cfg_file );
+		/* Wczytanie praw dost�p�w do zasob�w */
+		if( HTACCESS_load_configuration( cfg_file ) == 0 ) {
+			LOG_save();
+			return 0;
+		}
+
+		/* Wczytanie listy plik�w index */
+		if( CORE_load_index_names( cfg_file ) == 0 ) {
+			LOG_save();
+			return 0;
+		}
 
 		/* Wczytanie typ�w MIME */
 		if( MIME_load_configuration( cfg_file ) == 0 ) {
 			LOG_save();
 			return 0;
 		}
-		/* Wczytanie praw dost�p�w do zasob�w */
-		if( HTACCESS_load_configuration( cfg_file ) == 0 ) {
-			LOG_save();
-			return 0;
-		}
-		/* Wczytanie listy plik�w index */
-		if( CORE_load_index_names( cfg_file ) == 0 ) {
-			LOG_save();
-			return 0;
-		}
+
 		LOG_print( "Configuration file loaded successfully.\n" );
 
-		/* Zwolnienie pami�ci */
-		free( buf );
-		buf = NULL;
-
-		free( network_configuration_filename );
-		network_configuration_filename = NULL;
-
-		free( option );
-		option = NULL;
-
-		free( value );
-		value = NULL;
+		/* Zamkni�cie pliku konfiguracji */
+		fclose( cfg_file );
 
 		return 1;
 	} else {
-		free( network_configuration_filename );
-		network_configuration_filename = NULL;
 		return 0;
 	}
 

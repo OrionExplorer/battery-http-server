@@ -39,7 +39,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define S_IXOTH		S_IEXEC
 	#define sighandler	__p_sig_fn_t
 	#define MSG_NOSIGNAL	0
-	//#define GetLastError WSAGetLastError
 	#define EWOULDBLOCK	WSAEWOULDBLOCK
 	#define sleep		Sleep
 
