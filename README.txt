@@ -2,10 +2,8 @@
 battery-http-server
 - fast and portable HTTP server.
 
-Marcin Kelar (marcin.kelar@gmail.com)
+Copyright (C) 2010-2013 Marcin Kelar (marcin.kelar@gmail.com)
 ###############################################################################
-
-For performance test please visit http://pastebin.com/zBG7nHbL
 
 Featured HTTP versions:
 • HTTP/1.0
@@ -56,24 +54,8 @@ TODO:
 
 
 
-###############################################################################
-
-Battery HTTP Server configuration (configuration/battery.conf).
-File must contain following lines (without quotes):
-• "ip_ver [number]" - IP protocol version (4 or 6). This is under construction.
-• "port_number [number]" - Port number
-• "document_root [path]" - Document root path
-
-Lines below are optional:
-• "site_index [filename]" - default filename to open if not provided by client
-• "mime_type [.extension] [mime_type]" - new mime type
-• "global_ht_access [path/filename] [username] [password]" - resource listed as "[path/filename]" will be protected with "[username]" and "[password]"
-
-For further information please see "Release/configuration/battery.conf".
-
-###############################################################################
-
-
+Battery HTTP Server configuration file is  "Release/configuration/battery.conf".
+For performance test please visit http://pastebin.com/zBG7nHbL
 
 Compilation requirements:
 	• Win32: -lws2_32

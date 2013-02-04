@@ -203,11 +203,11 @@ short CORE_load_configuration( void ) {
 
 					strncpy( document_root, value, MAX_PATH_LENGTH );
 					if( directory_exists( document_root ) == 0 ) {/* Podany zas�b nie istnieje */
-						LOG_print( "\t- Error: working dir is invalid.\n" );
-						printf( "Error: working dir is invalid: \"%s\"\n", document_root );
+						LOG_print( "\t- Error: document root path is invalid.\n" );
+						printf( "Error: ocument root path is invalid: \"%s\"\n", document_root );
 						exit( EXIT_FAILURE );
 					} else {
-						LOG_print( "\t- working dir: %s\n", document_root );
+						LOG_print( "\t- ocument root path: %s\n", document_root );
 					}
 				}
 			}
