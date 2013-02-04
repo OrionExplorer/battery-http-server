@@ -35,9 +35,7 @@ int main( void ) {
 
 void app_terminate( void ) {
 	LOG_print( "Server is being closed...\n" );
-	printf( "Server is being closed..." );
 	SOCKET_stop();
 	LOG_print( "Server closed.\n" );
-	printf( "ok.\n" );
 	LOG_save();
 }
