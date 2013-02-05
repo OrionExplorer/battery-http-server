@@ -24,7 +24,7 @@ Featured HTTP response codes:
 • 403 Forbidden
 • 404 Not Found
 • 411 Length Required
-• 412 Predondition Failed
+• 412 Precondition Failed
 • 413 Request Entity Too Large
 • 414 Request Uri Too Long
 • 416 Request Range Not Satisfiable
