@@ -39,7 +39,7 @@ short MIME_load_configuration( FILE *cfg_file) {
 	mime_types_count = 0;
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
-		if( ( sscanf( buf, "%s %s %s", option, mime_ext, mime_type ) == 3 ) && ( mime_types_count < STD_BUFF_SIZE ) ) {
+		if( ( sscanf( buf, "%256s %16s %32s", option, mime_ext, mime_type ) == 3 ) && ( mime_types_count < STD_BUFF_SIZE ) ) {
 			if( strncmp( option, "mime_type", STD_BUFF_SIZE ) == 0 ) {
 				/* Wczytanie rozszerzenia pliku */
 				strncpy( mime_types[ mime_types_count ].ext, mime_ext, EXT_LEN );

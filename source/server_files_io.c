@@ -256,8 +256,6 @@ char* battery_get_filename( FILE *file ) {
 
 	for( i = 0; i <= FOPEN_MAX-1; i++ ) {
 		if( opened_files[ i ].file == file ) {
-			printf("requested filename: \"%s\"\n", opened_files[ i ].filename );
-			system("pause");
 			return opened_files[ i ].filename;
 		}
 	}

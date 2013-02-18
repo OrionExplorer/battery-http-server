@@ -53,6 +53,8 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define READ_BINARY	"re"
 	#define sighandler	__sighandler_t
 	#define Sleep(x)	usleep(x*1000)
+	#define GetLastError() errno
+	#define WSAGetLastError() errno
 
 	#define APP_NAME	"battery-http-server (Linux)"
 #endif

@@ -131,8 +131,8 @@ struct HT_ACCESS {
 
 /* Struktura przechowuj�ca informacje o mime-type dla danego rozszerzenia pliku */
 struct MIME_TYPE {
-	char ext[ EXT_LEN];								/* Rozszerzenie */
-	char mime_type[ SMALL_BUFF_SIZE];				/* MIME */
+	char ext[ EXT_LEN ];							/* Rozszerzenie */
+	char mime_type[ SMALL_BUFF_SIZE ];				/* MIME */
 };
 
 /* Struktura przechowuj�ca informacje o ��daniu HTTP */
