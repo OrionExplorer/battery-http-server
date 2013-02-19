@@ -39,7 +39,7 @@ short HTACCESS_load_configuration( FILE *cfg_file ) {
 	rewind( cfg_file );
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
-		if( sscanf( buf, "%s %s %s %s", option, res_filename, res_login, res_pwd ) == 4 ) {
+		if( sscanf( buf, "%256s %1024s %32s %32s", option, res_filename, res_login, res_pwd ) == 4 ) {
 			if( strncmp( option, "global_ht_access", STD_BUFF_SIZE ) == 0 ) {
 				/* Wczytanie danych z pliku */
 				strncpy( ht_access[ ht_access_count ].res_filename, res_filename, MAX_PATH_LENGTH );

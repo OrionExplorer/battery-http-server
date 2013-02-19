@@ -132,7 +132,7 @@ short CORE_load_index_names( FILE *cfg_file ) {
 	index_file_count = 0;
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
-		if( sscanf( buf, "%s %s", option, index_filename ) == 2 ) {
+		if( sscanf( buf, "%256s %256s", option, index_filename ) == 2 ) {
 			if( strncmp( option, "site_index", STD_BUFF_SIZE ) == 0 ) {
 				/* Wczytano maksymaln� ilo�� plik�w */
 				if( index_file_count == MICRO_BUFF_SIZE ) {
@@ -185,7 +185,7 @@ short CORE_load_configuration( void ) {
 		LOG_print( "\n\t- file opened successfully...\n" );
 
 		while( fgets( buf, STD_BUFF_SIZE, cfg_file ) != NULL ) {
-			if( sscanf( buf, "%s %s", option, value ) == 2 ) {
+			if( sscanf( buf, "%256s %256s", option, value ) == 2 ) {
 				if( strncmp( option, "ip_ver", STD_BUFF_SIZE) == 0 ) {
 					switch ( atoi( value ) ) {
 						case IPv4 : ip_proto_ver = IPv4; break;
