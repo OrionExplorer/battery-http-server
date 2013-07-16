@@ -90,10 +90,6 @@ static void SOCKET_initialization( void ) {
 	server_address.sin_port = htons( ( u_short )active_port );
 }
 
-static void SOCKET_mysterious_transfer_increaser( void ) {
-	if( http_conn_count < 10 ) printf(" \r");
-}
-
 /*
 SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy s¹ do wys³ania dane z którego kolwiek elementu tablicy SEND_INFO. Je¿eli tak, to nastêpuje wysy³ka kolejnego fragmentu pliku. */
@@ -115,9 +111,7 @@ static void SOCKET_send_all_data( void ) {
 				send_d[ j ].http_content_size -= nwrite;
 			}
 
-			SOCKET_mysterious_transfer_increaser();
-
-			if( (nwrite == -1 && GetLastError() != EWOULDBLOCK )|| (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
+			if( (nwrite == -1 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
 				SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
 			}
 		}
@@ -229,12 +223,11 @@ void SOCKET_run( void ) {
 				} else {
 					/* Podï¿½ï¿½czony klient przesï¿½aï¿½ dane... */
 					SOCKET_process( i );
-					SOCKET_mysterious_transfer_increaser();
 				}
 			} /*nowe poï¿½ï¿½czenie */
 			SOCKET_send_all_data();
-			SOCKET_mysterious_transfer_increaser();
 		} /*pï¿½tla deskryptorï¿½w while( --i )*/
+		SOCKET_send_all_data();
 	} /*for( ;; ) */
 }
 

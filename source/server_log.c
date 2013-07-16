@@ -47,7 +47,6 @@ void LOG_print( char *fmt, ... ) {
 	strncat( log_object, output_text, LOG_BUFFER );
 
 	/* Uncomment line below to see log on screen */
-	/* printf("%s", output_text ); */
 
 	/* Zwolnienie pami�ci */
 	free( output_text );
