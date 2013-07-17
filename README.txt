@@ -1,9 +1,9 @@
-###############################################################################
 battery-http-server
-- fast and portable HTTP server.
+Copyright (C) 2012
+Marcin Kelar (marcin.kelar@gmail.com)
+========
 
-Copyright (C) 2010-2013 Marcin Kelar (marcin.kelar@gmail.com)
-###############################################################################
+Fast and portable HTTP server.
 
 Featured HTTP versions:
 • HTTP/1.0
