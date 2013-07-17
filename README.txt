@@ -1,5 +1,5 @@
 battery-http-server
-Copyright (C) 2012
+Copyright (C) 2012 - 2013
 Marcin Kelar (marcin.kelar@gmail.com)
 ========
 
