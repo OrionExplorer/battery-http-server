@@ -9,6 +9,9 @@ battery: batteryServer.o server_create_session.o server_mem_manager.o server_fil
 batteryServer.o: source/batteryServer.c
 	gcc -c source/batteryServer.c
 
+server_create_session.o: source/server_create_session.c
+	gcc -c source/server_create_session.c
+
 server_mem_manager.o: source/server_mem_manager.c
 	gcc -c source/server_mem_manager.c
 
