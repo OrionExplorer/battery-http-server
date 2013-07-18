@@ -7,12 +7,12 @@ Fast and portable HTTP server.
 Travis status: https://api.travis-ci.org/OrionExplorer/battery-http-server.png?branch=master
 
 Featured HTTP versions:
-• HTTP/1.0
-• HTTP/1.1
+* HTTP/1.0
+* HTTP/1.1
 
 Featured HTTP methods:
-• GET
-• HEAD
+* GET
+* HEAD
 
 Featured HTTP response codes:
 • 200 OK
