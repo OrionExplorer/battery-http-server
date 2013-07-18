@@ -1,2 +1,4 @@
 language: c
 compiler: gcc
+install: make get-deps
+./configure && make && make test
