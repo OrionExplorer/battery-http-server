@@ -1,10 +1,8 @@
-######battery-http-server
+###battery-http-server [![Build Status](https://travis-ci.org/OrionExplorer/battery-http-server.png?branch=master)](https://travis-ci.org/OrionExplorer/battery-http-server)
 ######Copyright (C) 2012 - 2013
 ######Marcin Kelar (marcin.kelar@gmail.com)
 
 Fast and portable HTTP server.
-
-[![Build Status](https://travis-ci.org/OrionExplorer/battery-http-server.png?branch=master)](https://travis-ci.org/OrionExplorer/battery-http-server)
 
 Featured HTTP versions:
 * HTTP/1.0
