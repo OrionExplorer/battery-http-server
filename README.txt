@@ -5,6 +5,8 @@ Marcin Kelar (marcin.kelar@gmail.com)
 
 Fast and portable HTTP server.
 
+Travis status: https://api.travis-ci.org/OrionExplorer/battery-http-server.png?branch=master
+
 Featured HTTP versions:
 • HTTP/1.0
 • HTTP/1.1
