@@ -1,7 +1,6 @@
 battery-http-server
 Copyright (C) 2012 - 2013
 Marcin Kelar (marcin.kelar@gmail.com)
-========
 
 Fast and portable HTTP server.
 
