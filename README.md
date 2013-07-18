@@ -4,7 +4,7 @@
 
 Fast and portable HTTP server.
 
-Travis status: https://api.travis-ci.org/OrionExplorer/battery-http-server.png?branch=master
+[![Build Status](https://travis-ci.org/OrionExplorer/battery-http-server.png?branch=master)](https://travis-ci.org/OrionExplorer/battery-http-server)
 
 Featured HTTP versions:
 * HTTP/1.0
@@ -59,8 +59,8 @@ Battery HTTP Server configuration file is  "Release/configuration/battery.conf".
 For performance test please visit http://pastebin.com/zBG7nHbL
 
 Compilation requirements:
-	* Win32: -lws2_32
-	* Linux: none, so far
+* Win32: -lws2_32
+* Linux: none, so far
 
 
 
