@@ -237,7 +237,7 @@ void RESPONSE_header( HTTP_SESSION *http_session, const char *http_status_code, 
 
 	/* Content-Length: */
 	if( http_content_length != 0 ) {
-		sprintf( http_single_header_line,"%s%d\r\n", HEADER_CONTENT_LENGTH, http_content_length );
+		sprintf( http_single_header_line,"%s%zu\r\n", HEADER_CONTENT_LENGTH, http_content_length );
 		strncat( http_header_to_send, http_single_header_line, MAX_BUFFER );
 	}
 
