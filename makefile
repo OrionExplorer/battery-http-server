@@ -44,3 +44,6 @@ server_log.o: source/server_log.c
 
 server_time_util.o: source/server_time_util.c
 	gcc -c source/server_time_util.c
+
+clean:
+	rm *.o
