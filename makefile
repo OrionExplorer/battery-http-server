@@ -1,7 +1,7 @@
 CC=gcc 
 CFLAGS=-Wall
 
-all: battery-http-server
+all: battery
 
 battery: batteryServer.o server_create_session.o server_mem_manager.o server_files_io.o server_mime_types.o server_base64.o server_htaccess_manager.o server_socket_io.o server_http_protocol.o server_strings_util.o server_core.o server_log.o server_time_util.o 
 	@ mkdir build/configuration -p
