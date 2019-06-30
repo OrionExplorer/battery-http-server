@@ -228,6 +228,7 @@ void SOCKET_run( void ) {
 			SOCKET_send_all_data();
 		} /*p�tla deskryptor�w while( --i )*/
 		SOCKET_send_all_data();
+		Sleep(1);
 	} /*for( ;; ) */
 }
 

@@ -4,7 +4,11 @@ CFLAGS=-Wall
 all: battery
 
 battery: batteryServer.o server_create_session.o server_mem_manager.o server_files_io.o server_mime_types.o server_base64.o server_htaccess_manager.o server_socket_io.o server_http_protocol.o server_strings_util.o server_core.o server_log.o server_time_util.o 
-	gcc batteryServer.o server_create_session.o server_mem_manager.o server_files_io.o server_mime_types.o server_base64.o server_htaccess_manager.o server_socket_io.o server_http_protocol.o server_strings_util.o server_core.o server_log.o server_time_util.o  -o battery
+	@ mkdir build/configuration -p
+	cp source/configuration/battery.conf build/configuration/battery.conf
+	gcc batteryServer.o server_create_session.o server_mem_manager.o server_files_io.o server_mime_types.o server_base64.o server_htaccess_manager.o server_socket_io.o server_http_protocol.o server_strings_util.o server_core.o server_log.o server_time_util.o  -o build/battery
+	@ rm *.o
+	@ rm build/logs -rf
 
 batteryServer.o: source/batteryServer.c
 	gcc -c source/batteryServer.c
