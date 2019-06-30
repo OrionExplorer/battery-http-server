@@ -122,9 +122,13 @@ static void SOCKET_send_all_data( void ) {
 SOCKET_prepare( void )
 - nasï¿½uchiwanie w celu odbioru danych od klienta */
 static void SOCKET_prepare( void ) {
-	unsigned long b = 1;
+	unsigned long b = 0;
 	int i = 1;
 	int wsa_result = 0;
+	struct timeval tv = {0, 0};
+
+	tv.tv_sec = 0;
+	tv.tv_usec = 20000;
 
 	FD_ZERO( &master );
 	FD_ZERO( &read_fds );
@@ -134,6 +138,39 @@ static void SOCKET_prepare( void ) {
 	setgid( 0 );
 #endif
 
+	if( setsockopt( socket_server, SOL_SOCKET, SO_REUSEADDR, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
+		wsa_result = WSAGetLastError();
+		LOG_print( "setsockopt( SO_REUSEADDR ) error: %d.\n", wsa_result );
+		printf( "setsockopt( SO_REUSEADDR ) error: %d.\n", wsa_result );
+	}
+
+	if( setsockopt( socket_server, SOL_SOCKET, SO_RCVTIMEO, ( char* )&tv, sizeof( struct timeval ) ) == SOCKET_ERROR ) {
+		wsa_result = WSAGetLastError();
+		LOG_print( "setsockopt( SO_RCVTIMEO ) error: %d.\n", wsa_result );
+		printf( "setsockopt( SO_RCVTIMEO ) error: %d.\n", wsa_result );
+	}
+
+	if( setsockopt( socket_server, SOL_SOCKET, SO_SNDTIMEO, ( char* )&tv, sizeof( struct timeval ) ) == SOCKET_ERROR ) {
+		wsa_result = WSAGetLastError();
+		LOG_print( "setsockopt( SO_SNDTIMEO ) error: %d.\n", wsa_result );
+		printf( "setsockopt( SO_SNDTIMEO ) error: %d.\n", wsa_result );
+	}
+
+	if( setsockopt( socket_server, IPPROTO_TCP, TCP_NODELAY, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
+		wsa_result = WSAGetLastError();
+		LOG_print( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
+		printf( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
+	}
+
+	/* Ustawienie na non-blocking socket */
+	if( fcntl( socket_server, F_SETFL, &b ) == SOCKET_ERROR ) {
+		wsa_result = WSAGetLastError();
+		LOG_print( "ioctlsocket() error: %d.\n", wsa_result );
+		printf( "ioctlsocket() error: %d.\n", wsa_result );
+		SOCKET_stop();
+		exit( EXIT_FAILURE );
+	}
+
 	if ( bind( socket_server, ( struct sockaddr* )&server_address, sizeof( server_address ) ) == SOCKET_ERROR ) {
 		wsa_result = WSAGetLastError();
 		LOG_print( "bind() error: %d.\n", wsa_result );
@@ -142,28 +179,7 @@ static void SOCKET_prepare( void ) {
 		exit( EXIT_FAILURE );
 	}
 
-	if( setsockopt( socket_server, IPPROTO_TCP, TCP_NODELAY, ( char * )&i, sizeof( int ) ) == SOCKET_ERROR ) {
-		wsa_result = WSAGetLastError();
-		LOG_print( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
-		printf( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
-	}
-
-	if( setsockopt( socket_server, SOL_SOCKET, SO_REUSEADDR, ( char * )&i, sizeof( int ) ) == SOCKET_ERROR ) {
-		wsa_result = WSAGetLastError();
-		LOG_print( "setsockopt( SO_REUSEADDR ) error: %d.\n", wsa_result );
-		printf( "setsockopt( SO_REUSEADDR ) error: %d.\n", wsa_result );
-	}
-
-	/* Ustawienie na non-blocking socket */
-	if( fcntl( socket_server, F_SETFL, &b ) == SOCKET_ERROR ) {
-		wsa_result = WSAGetLastError();
-		LOG_print( "ioctlsocket(): error: %d.\n", wsa_result );
-		printf( "ioctlsocket(): error: %d.\n", wsa_result );
-		SOCKET_stop();
-		exit( EXIT_FAILURE );
-	}
-
-	/* Rozpoczï¿½cie nasï¿½uchiwania */
+	/* Rozpoczêcie nas³uchiwania */
 	if( listen( socket_server, MAX_CLIENTS ) == SOCKET_ERROR ) {
 		wsa_result = WSAGetLastError();
 		LOG_print( "listen() error: %d.\n", wsa_result );
@@ -174,8 +190,9 @@ static void SOCKET_prepare( void ) {
 
 	LOG_print( "ok.\nSocket server is running:\n" );
 	LOG_print( "- Port: %d.\n", active_port );
-	LOG_print( "Lock and load...\n" );
-	/* Teraz czekamy na poï¿½ï¿½czenia i dane */
+	LOG_print( "Communication Interface ready...\n" );
+	printf( "ok.\n" );
+	/* Teraz czekamy na po³¹czenia i dane */
 }
 
 /*
