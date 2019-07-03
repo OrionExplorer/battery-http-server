@@ -1,6 +1,6 @@
 /*******************************************************************
 
-Projekt battery_Server
+Projekt battery-http-server
 
 Plik: server_cgi_manager.h
 
