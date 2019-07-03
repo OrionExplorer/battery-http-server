@@ -4,15 +4,15 @@
 
 Fast and portable HTTP server.
 
-### Featured HTTP versions:
+### Featured HTTP versions
 * HTTP/1.0
 * HTTP/1.1
 
-### Featured HTTP methods:
+### Featured HTTP methods
 * GET
 * HEAD
 
-### Featured HTTP response codes:
+### Featured HTTP response codes
 * 200 OK
 * 204 No Content
 * 206 Partial Content
@@ -32,7 +32,7 @@ Fast and portable HTTP server.
 * 503 Service Unavailable
 * 504 Not Supported
 
-### Other features:
+### Other features
 * High performance (tested with Apache Benchmark - http://pastebin.com/zBG7nHbL)
 * Multiplatform (Windows/Linux/MacOS X)
 * Basic Access Authentication
@@ -40,7 +40,7 @@ Fast and portable HTTP server.
 * Single-threaded
 * Event log
 
-### TODO:
+### TODO
 - [ ] Extend Basic Access Authentication configuration
 - [ ] Rebuild range-based data send
 - [ ] New CGI/PHP algorithm and POST method restoration
@@ -56,7 +56,7 @@ Fast and portable HTTP server.
 Battery HTTP Server configuration file is  "build/configuration/battery.conf".
 For performance test please visit http://pastebin.com/zBG7nHbL
 
-### Compilation and installation:
+### Compilation and installation
 #### Linux
 * make
 * sudo make install
