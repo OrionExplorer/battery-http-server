@@ -5,7 +5,7 @@ Projekt battery_Server
 Plik: server_mem_manager.c
 
 Przeznaczenie:
-Funkcje u�atwiaj�ce zarz�dzanie pami�ci�
+Funkcje ułatwiające zarządzanie pamięcią
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
@@ -17,16 +17,16 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 /*
 mem_allocated( char* ptr, int n )
-@ptr - wska�nik do przydzielonej pami�ci �a�cucha
-@n - numer porz�dkowy, s�u��cy do p�niejszej analizy problemu
-- funkcja sprawdza, czy uda�o si� przydzieli� pami�� dla danego wska�nika, ko�czy program, je�eli wyst�pi� problem */
+@ptr - wskaźnik do przydzielonej pamięci łańcucha
+@n - numer porządkowy, służący do póniejszej analizy problemu
+- funkcja sprawdza, czy udało się przydzielić pamięć dla danego wskaźnika, kończy program, jeżeli wystąpił problem */
 void mem_allocated( char *ptr, int n ) {
-	/* B��d alokacji pami�ci, ptr = NULL */
+	/* Błąd alokacji pamięci, ptr = NULL */
 	if( !ptr ) {
 		LOG_print( "Error: malloc( %d ).\n", n );
 		printf( "Error: malloc( %d ).\n", n );
 		exit( EXIT_FAILURE );
 	}
-	/* Wszystko ok, kontynuuje dzia�anie programu */
+	/* Wszystko ok, kontynuuje działanie programu */
 }
 

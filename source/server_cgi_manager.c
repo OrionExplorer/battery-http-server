@@ -6,7 +6,7 @@ Plik:
 server_cgi_manager.c
 
 Przeznaczenie:
-Uruchamia skrypty CGI i odczytuje wyniki ich dzia�a�
+Uruchamia skrypty CGI i odczytuje wyniki ich działania
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
@@ -28,9 +28,9 @@ static void		CGI_set_env( const char *var, const char *val );
 
 /*
 CGI_execute( HTTP_SESSION *http_session, const char *filename )
-@http_session - wska�nik do pod��czonego klienta
-@filename - nazwa pliku skryptu CGI pobranego z ��dania
-- funkcja wykonuje ��dany skrypt i wysy�a odpowied� do pod��czonego klienta. */
+@http_session - wskaźnik do podłączonego klienta
+@filename - nazwa pliku skryptu CGI pobranego z żądania
+- funkcja wykonuje żąday skrypt i wysyła odpowiedź do podłączonego klienta. */
 void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 	FILE *cgi_script_file;
 	size_t result_size = 0;		/* Ilo�� wczytanych bajt�w z wyniku dzia�ania CGI */
@@ -220,7 +220,7 @@ static void CGI_set_env( const char *var, const char *val ) {
 
 /*
 CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename )
-@http_session - wska�nik do pod��czonego klienta
+@http_session - wskaźnik do podłączonego klienta
 @filename - pe�na nazwa pliku skryptu
 - funkcja ustawia zmienne �rodowiskowe, zgodnie ze specyfikacj� CGI/1.1 ( RFC3875 )*/
 static void CGI_set_env_variables( HTTP_SESSION *http_session, const char *filename ) {
@@ -367,13 +367,13 @@ short CGI_load_configuration( const char *filename ) {
 /*
 CGI_valid( const char *filename )
 @filename - nazwa pliku, kt�ry ma by� zweryfikowany jako skrypt CGI
-@valid_res - wska�nik do int z funkcji wywo�uj�cej. Zwraca:
+@valid_res - wskaźnik do int z funkcji wywo�uj�cej. Zwraca:
 + 0 - plik nie jest skryptem CGI
 + 1 - plik jest skryptem CGI i sam w sobie jest wykonywalny
 + 2 - plik jest skryptem CGI, ale potrzebuje zewn�trznej aplikacji
 + 3 - plik jest skryptem CGI, ale potrzebuje zewn�trznej aplikacji uruchamianej z parametrem
-@exec_name - wska�nik do char z funkcji wywo�uj�cej. Zwraca nazw� zewn�trznego programu wywo�uj�cego skrypt.
-@param - wska�nik do char z funkcji wywo�uj�cej. Zwraca parametr, z kt�rym ma zosta� wywo�any zewn�trzny program. */
+@exec_name - wskaźnik do char z funkcji wywo�uj�cej. Zwraca nazw� zewn�trznego programu wywo�uj�cego skrypt.
+@param - wskaźnik do char z funkcji wywo�uj�cej. Zwraca parametr, z kt�rym ma zosta� wywo�any zewn�trzny program. */
 void CGI_valid( const char *filename, int *valid_res, char *exec_name, char *param ) {
 	char *ext;
 	int i = 0;

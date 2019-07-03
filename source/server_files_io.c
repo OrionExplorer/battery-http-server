@@ -4,7 +4,7 @@ Projekt battery_Server
 
 Plik: server_files_io.c
 Przeznaczenie:
-Zbi�r funkcji przeznaczonych do obs�ugi plik�w i katalog�w
+Zbiór funkcji przeznaczonych do obsługi plików i katalogów
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
@@ -24,7 +24,7 @@ OPENED_FILE opened_files[ FOPEN_MAX ];
 
 /*
 get_app_path( void )
-- zwraca ci�g znak�w - folder startowy aplikacji */
+- zwraca ciąg znaków - folder startowy aplikacji */
 char* get_app_path( void ) {
 	static char buf[ MAX_PATH_LENGTH ];
 	if( getcwd( buf, MAX_PATH_LENGTH ) ) {
@@ -36,9 +36,9 @@ char* get_app_path( void ) {
 
 /*
 directory_exists( const char *path )
-@path - �cie�ka, kt�ra ma zosta� sprawdzona
-- funkcja pr�buje ustawi� katalog roboczy na �cie�k� podan� w zmiennej path
-- zwraca int, gdzie 0 = �cie�ka nie istnieje, 1 = �cie�ka istnieje */
+@path - ścieżka, która ma zostać sprawdzona
+- funkcja próbuje ustawić katalog roboczy na ścieżkę podaną w zmiennej path
+- zwraca int, gdzie 0 = ścieżka nie istnieje, 1 = ścieżka istnieje */
 short directory_exists( const char *path ) {
 	if( chdir( path ) == 0 ) {
 		return 1;
@@ -49,9 +49,9 @@ short directory_exists( const char *path ) {
 
 /*
 file_get_name( const char *full_filename )
-@full_filename - pe�na nazwa pliku ( +�cie�ka )
-- pobiera nazw� pliku z pe�nej nazwy ( +�cie�ka )
-- zwraca char *z nazw� pliku */
+@full_filename - pełna nazwa pliku ( +ścieżka )
+- pobiera nazwę pliku z pełnej nazwy ( +ścieżka )
+- zwraca char *z nazwą pliku */
 char* file_get_name( const char *full_filename ) {
 	char *filename;
 
@@ -61,7 +61,7 @@ char* file_get_name( const char *full_filename ) {
 		filename = ( char* )strrchr( full_filename, '/' );
 	}
 
-	/*Usuni�cie znaku "\" z pocz�tku filename */
+	/*Usunięcie znaku "\" z początku filename */
 	if( filename ) {
 		return ++filename;
 	}
@@ -71,7 +71,7 @@ char* file_get_name( const char *full_filename ) {
 
 /*
 file_get_ext( const char *filename )
-@filename - nazwa pliku lub pe�na nazwa pliku ( +�cie�ka )
+@filename - nazwa pliku lub pełna nazwa pliku ( +ścieżka )
 - pobiera rozszerzenie z podanej nazwy pliku
 - zwraca char *z rozszerzeniem */
 char* file_get_ext( const char *filename ) {
@@ -85,13 +85,13 @@ char* file_get_ext( const char *filename ) {
 
 /*
 file_params( const char *filename )
-@filename - nazwa pliku ( +�cie�ka )
+@filename - nazwa pliku ( +ścieżka )
 - sprawdza, czy podany w zmiennej filename plik istnieje
-- pr�buje otworzy� plik
+- próbuje otworzyć plik
 - zwraca int, gdzie:
 + 0 = nie istnieje
 + 1 = istnieje, jest do odczytu, nie wymaga autentykacji
-+ 2 = istnieje, brak uprawnie� do odczytu
++ 2 = istnieje, brak uprawnień do odczytu
 + 3 = istnieje, wymagana autentykacja */
 short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd ) {
 	FILE *resource;
@@ -99,7 +99,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 	int tmp_socket;
 	int i = 0;
 
-	/* Weryfikacja, czy podany parametr jest prawid�ow� nazw� pliku */
+	/* Weryfikacja, czy podany parametr jest prawidłową nazwę pliku */
 	stat( filename, &file_stat );
 	if( file_stat.st_mode & S_IFREG );
 	else {/* Nie jest... */
@@ -107,7 +107,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 	}
 
 	tmp_socket = ( http_session ? http_session->socket_descriptor : -133 );
-	/*Sprawdza, czy uda�o si� otworzy� plik */
+	/* Sprawdza, czy udało się otworzyć plik */
 	resource = battery_fopen( filename, READ_BINARY, 1, tmp_socket, STD_FILE );
 
 	if( !resource ) {
@@ -130,7 +130,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 			if( ht_access_pwd && ht_access_count > 0 ) {
 				for( i = 0; i < ht_access_count; i++ ) {
 					if( strncmp( ht_access[ i ].res_filename, filename, MAX_PATH_LENGTH ) == 0 ) {
-						/* Zas�b wymaga autoryzacji */
+						/* Zasób wymaga autoryzacji */
 						strncpy( ht_access_pwd, ht_access[ i ].res_auth, STD_BUFF_SIZE );
 
 						return 3;
@@ -154,7 +154,7 @@ short file_exists( const char *filename ) {
 	FILE *resource;	/* Uchwyt do pliku */
 
 	if( ( resource = battery_fopen( filename, READ_BINARY, 1, -133, STD_FILE ) ) ) {
-		/* Uda�o si� otworzy� plik = istnieje */
+		/* Udało się otworzyć plik = istnieje */
 		return 1;
 	} else {
 		/* Nie istnieje */
@@ -164,10 +164,10 @@ short file_exists( const char *filename ) {
 
 /*
 file_extract_path( const char *full_filename, char delim )
-@full_filename - �cie�ka dost�pu do pliku, z kt�rej b�dzie pobrana sama �cie�ka
-@delim - znak, od kt�rego ma zosta� "obci�ta" �cie�ka
-- zwraca ci�g znak�w, kt�ry jest wyci�t� �cie�k� z pe�nej �cie�ki.
-Rezultat nale�y p�niej zwolni� poprzez funkcj� free(). */
+@full_filename - ścieżka dostępu do pliku, z której będzie pobrana sama ścieżka
+@delim - znak, od którego ma zostać "obcięta" ścieżka
+- zwraca ciąg znaków, który jest wyciętą ścieżką z pełnej ścieżki.
+Rezultat należy później zwolnić poprzez funkcję free(). */
 void file_extract_path(char *full_filename, char delim)
 {
 	int i = strlen(full_filename);

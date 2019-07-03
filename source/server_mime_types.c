@@ -5,7 +5,7 @@ Projekt battery_Server
 Plik: server_mime_types.c
 
 Przeznaczenie:
-Wczytanie typ�w mime obs�ugiwanych przez serwer
+Wczytanie typów mime obsługiwanych przez serwer
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
@@ -16,13 +16,13 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <stdlib.h>
 #include <string.h>
 
-/* Przechowuje informacj� o ilo�ci wczytanych typ�w mime */
+/* Przechowuje informację o liczbie wczytanych typów mime */
 int			mime_types_count;
 
 /*
 MIME_load_configuration( const char *filename )
 @filename - nazwa pliku konfiguracyjnego
-- zwraca int, gdzie 1 = uda�o si� wczyta� konfiguracj�, a 0 = nie uda�o si�. */
+- zwraca int, gdzie 1 = udało się wczytać konfigurację, a 0 = nie udało się. */
 short MIME_load_configuration( FILE *cfg_file) {
 	char buf[ STD_BUFF_SIZE ];				/* Wczytana linia z pliku */
 	char mime_ext[ EXT_LEN ];				/* Wczytane rozszerzenie pliku z buf */
@@ -35,7 +35,7 @@ short MIME_load_configuration( FILE *cfg_file) {
 
 	rewind( cfg_file );
 
-	/* Ilo�� wczytanych typ�w MIME */
+	/* Liczba wczytanych typów MIME */
 	mime_types_count = 0;
 
 	while( fgets( buf, STD_BUFF_SIZE, cfg_file ) ) {
