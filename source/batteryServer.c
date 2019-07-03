@@ -17,7 +17,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include "include/server_socket_io.h"
 #include "include/server_log.h"
 
-void app_terminate( void );
+static void app_terminate( void );
 
 int main( void ) {
 
@@ -33,7 +33,7 @@ int main( void ) {
 	return 0;
 }
 
-void app_terminate( void ) {
+static void app_terminate( void ) {
 	LOG_print( "Server is being closed...\n" );
 	SOCKET_stop();
 	LOG_print( "Server closed.\n" );

@@ -18,5 +18,6 @@ SEND_INFO*		SESSION_find_response_struct_by_id( int socket );
 HTTP_SESSION*	SESSION_find_by_id( int socket );
 void			SESSION_add_new_send_struct( int socket_descriptor );
 void			SESSION_delete_send_struct( int socket_descriptor );
+void			SESSION_init( HTTP_SESSION *http_session );
 
 #endif

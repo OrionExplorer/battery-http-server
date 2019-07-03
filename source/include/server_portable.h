@@ -41,8 +41,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define MSG_NOSIGNAL	0
 	#define EWOULDBLOCK	WSAEWOULDBLOCK
 	#define sleep		Sleep
-
-	#define APP_NAME	"battery-http-server (Win32)"
 #else
 /* �cie�ki do plik�w/folder�w na systemach LINUX s� oddzielone "/" */
 	#define SLASH		"/"
@@ -55,8 +53,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 	#define Sleep(x)	usleep(x*1000)
 	#define GetLastError() errno
 	#define WSAGetLastError() errno
-
-	#define APP_NAME	"battery-http-server (Linux)"
 #endif
 
 #endif

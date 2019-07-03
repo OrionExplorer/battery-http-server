@@ -6,7 +6,7 @@ Plik: server_create_session.c
 
 Przeznaczenie:
 Interpretacja danych otrzymanych od klienta
-Przekazanie danych do funkcji wykonuj�cej ��danie
+Przekazanie danych do funkcji wykonujï¿½cej ï¿½ï¿½danie
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
@@ -35,11 +35,11 @@ short			SESSION_check_connections_limit( HTTP_SESSION *http_session );
 
 /*
 SESSION_http_protocol_is_valid( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- weryfikuje protok�, kt�rego u�ywa pod��czony klient. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- weryfikuje protokó³, którego u¿ywa pod³¹czony klient. */
 short SESSION_http_protocol_is_valid( HTTP_SESSION *http_session ) {
 	if( strncmp( http_session->http_info.protocol_ver, HTTP_VER, PROTO_BUFF_SIZE ) == 0 ) {
-		/* HTTP/1.1: Sprawdzenie, czy jest nag��wek "Host:" */
+		/* HTTP/1.1: Sprawdzenie, czy jest nagï¿½ï¿½wek "Host:" */
 		if( strstr( http_session->http_info.header, HEADER_HOST ) == 0 ) {
 			/* brak... */
 			RESPONSE_error( http_session, HTTP_400_BAD_REQUEST, HTTP_ERR_400_MSG, NULL );
@@ -47,10 +47,10 @@ short SESSION_http_protocol_is_valid( HTTP_SESSION *http_session ) {
 			SESSION_release( http_session );
 			return 0;
 		}
-	} else if( ( strcmp( http_session->http_info.protocol_ver, HTTP_VER ) != 0 ) && /* Sprawdzenie, czy protok� jest obs�ugiwany */
+	} else if( ( strcmp( http_session->http_info.protocol_ver, HTTP_VER ) != 0 ) && /* Sprawdzenie, czy protokï¿½ jest obsï¿½ugiwany */
 			( strcmp( http_session->http_info.protocol_ver, HTTP_VER_1_0 ) != 0 ) ) {
 
-		/* Protok� w wersji innej ni� HTTP/1.0 i HTTP/1.1 - b��d 505 */
+		/* Protokï¿½ w wersji innej niï¿½ HTTP/1.0 i HTTP/1.1 - bï¿½ï¿½d 505 */
 		RESPONSE_error( http_session, HTTP_505_HTTP_VERSION_NOT_SUPPORTED, HTTP_ERR_505_MSG, NULL );
 		SOCKET_disconnect_client( http_session );
 		SESSION_release( http_session );
@@ -62,12 +62,12 @@ short SESSION_http_protocol_is_valid( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_local_path_is_valid( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- weryfikuje poprawnos� ��danej scie�ki do zasobu. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- weryfikuje poprawnosæ ¿¹danej scie¿ki do zasobu. */
 short SESSION_local_path_is_valid( HTTP_SESSION *http_session ) {
-	char *tmp_local_file_path;		/* Przechowuje rzeczywist� �cie�k� do pliku na dysku */
+	char *tmp_local_file_path;		/* Przechowuje rzeczywistï¿½ ï¿½cieï¿½kï¿½ do pliku na dysku */
 
-	/* Weryfikacja d�ugo�ci ��danej �cie�ki */
+	/* Weryfikacja dï¿½ugoï¿½ci ï¿½ï¿½danej ï¿½cieï¿½ki */
 	if( strlen( http_session->http_info.http_local_path ) > MAX_URI_LENGTH ) {
 		LOG_print( "URI too long.\n" );
 		RESPONSE_error( http_session, HTTP_414_REQUEST_URI_TOO_LONG, HTTP_ERR_414_MSG, NULL );
@@ -76,7 +76,7 @@ short SESSION_local_path_is_valid( HTTP_SESSION *http_session ) {
 		return 0;
 	}
 
-	/* Je�eli podano sam� nazw� katalogu to automatycznie dodajemy plik indeksu */
+	/* Jeï¿½eli podano samï¿½ nazwï¿½ katalogu to automatycznie dodajemy plik indeksu */
 	if( strncmp( file_get_name( http_session->http_info.http_local_path ), "", 1 ) == 0 ) {
 		tmp_local_file_path = malloc( MAX_PATH_LENGTH_CHAR+1 );
 		mem_allocated( tmp_local_file_path, 10 );
@@ -91,7 +91,7 @@ short SESSION_local_path_is_valid( HTTP_SESSION *http_session ) {
 		tmp_local_file_path = NULL;
 	}
 
-	/* Sprawdzenie, czy w ��danej �cie�ce zawieraj� si� znaki ".." lub "/." */
+	/* Sprawdzenie, czy w ï¿½ï¿½danej ï¿½cieï¿½ce zawierajï¿½ siï¿½ znaki ".." lub "/." */
 	if( ( strstr( http_session->http_info.http_local_path, ".." ) ) || ( strstr( http_session->http_info.http_local_path, "/." ) ) ) {
 		RESPONSE_error( http_session, HTTP_400_BAD_REQUEST, HTTP_ERR_400_MSG, NULL );
 		SOCKET_disconnect_client( http_session );
@@ -104,8 +104,8 @@ short SESSION_local_path_is_valid( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_http_header( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera nag��wek wiadomosci HTTP. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera nag³ówek wiadomosci HTTP. */
 static void SESSION_get_http_header( HTTP_SESSION *http_session ) {
 	http_session->http_info.header = malloc( BIG_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.header, 11 );
@@ -114,26 +114,26 @@ static void SESSION_get_http_header( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_reset( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
+@http_session - wskaŸnik do pod³¹czonego klienta
 - zeruje zmienne liczbowe ze struktury HTTP_SESSION. */
 static void SESSION_reset( HTTP_SESSION *http_session ) {
-	/* Wyzerowanie zmiennych odpowiedzialnych za zakres wysy�anych danych z pliku */
+	/* Wyzerowanie zmiennych odpowiedzialnych za zakres wysyï¿½anych danych z pliku */
 	http_session->http_info.range_st = -1;
 	http_session->http_info.range_en = -1;
-	/* Wyzerowanie zmiennej odpowiedzialnej za informowanie, czy zapytanie jest ��daniem zasobu, czy wykonaniem skryptu CGI */
+	/* Wyzerowanie zmiennej odpowiedzialnej za informowanie, czy zapytanie jest ï¿½ï¿½daniem zasobu, czy wykonaniem skryptu CGI */
 }
 
 /*
  SESSION_check_auth( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
+@http_session - wskaŸnik do pod³¹czonego klienta
 - pobiera dane autoryzacyjne do zasobu od klienta. */
 static void SESSION_check_auth( HTTP_SESSION *http_session ) {
-	char *user_auth_enc;			/* Przechowuje odszyfrowane login i has�o */
+	char *user_auth_enc;			/* Przechowuje odszyfrowane login i hasï¿½o */
 
 	if( strstr( http_session->http_info.header, HEADER_AUTHORIZATION ) ) {
 		http_session->http_info.authorization = malloc( STD_BUFF_SIZE_CHAR );
 		strncpy( http_session->http_info.authorization, REQUEST_get_header_value( http_session->http_info.header, HEADER_AUTHORIZATION ), STD_BUFF_SIZE );
-		/* Kodowanie metod� Digest jest nieobs�ugiwane */
+		/* Kodowanie metodï¿½ Digest jest nieobsï¿½ugiwane */
 		if( strstr( " Digest ", http_session->http_info.authorization ) ) {
 			RESPONSE_error( http_session, HTTP_400_BAD_REQUEST, HTTP_ERR_400_MSG, NULL );
 			SESSION_release( http_session );
@@ -143,10 +143,10 @@ static void SESSION_check_auth( HTTP_SESSION *http_session ) {
 			/* Odszyfrowanie danych */
 			user_auth_enc = ( char* )calloc( STD_BUFF_SIZE, sizeof( char ) );
 			base64_decode( http_session->http_info.authorization, ( unsigned char* )user_auth_enc, STD_BUFF_SIZE );
-			/* Pobranie nazwy u�ytkownika */
+			/* Pobranie nazwy uï¿½ytkownika */
 			http_session->http_info.user_login = malloc( SMALL_BUFF_SIZE_CHAR );
 			strncpy( http_session->http_info.user_login, strtok( user_auth_enc, ":" ), SMALL_BUFF_SIZE );
-			/* Pobranie has�a */
+			/* Pobranie hasï¿½a */
 			http_session->http_info.user_pwd = malloc( SMALL_BUFF_SIZE_CHAR );
 			strncpy( http_session->http_info.user_pwd, strtok( NULL, ":" ), SMALL_BUFF_SIZE );
 
@@ -158,8 +158,8 @@ static void SESSION_check_auth( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_content_type( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera informacj� o nag��wku "Content-Type". */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera informacjê o nag³ówku "Content-Type". */
 static void SESSION_get_content_type( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_CONTENT_TYPE ) ) {
 		http_session->http_info.content_type = malloc( STD_BUFF_SIZE_CHAR );
@@ -169,8 +169,8 @@ static void SESSION_get_content_type( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_res_range( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera informacj� o ��danym przez klienta fragmencie zasobu. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera informacjê o ¿¹danym przez klienta fragmencie zasobu. */
 static void SESSION_get_res_range( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_RANGE ) ) {
 		http_session->http_info.range_st = REQUEST_get_range( http_session, 0 );
@@ -180,8 +180,8 @@ static void SESSION_get_res_range( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_if_unmodified_since( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera informacje o nag��wku "If-Unmodified-Since". */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera informacje o nag³ówku "If-Unmodified-Since". */
 static void SESSION_get_if_unmodified_since( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_IF_UNMODIFIED_SINCE ) ) {
 		http_session->http_info.date_if_unmodified_since = malloc( TIME_BUFF_SIZE_CHAR );
@@ -191,8 +191,8 @@ static void SESSION_get_if_unmodified_since( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_if_modified_since( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera informacje o nag��wku "If-Modified-Since". */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera informacje o nag³ówku "If-Modified-Since". */
 static void SESSION_get_if_modified_since( HTTP_SESSION *http_session ) {
 	if( strstr( http_session->http_info.header, HEADER_IF_MODIFIED_SINCE ) ) {
 		http_session->http_info.date_if_modified_since = malloc( TIME_BUFF_SIZE_CHAR );
@@ -202,18 +202,18 @@ static void SESSION_get_if_modified_since( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_connection( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera informacj� o nag��wku "Connection". */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera informacjê o nag³ówku "Connection". */
 static void SESSION_get_connection( HTTP_SESSION *http_session ) {
-	char *temp_conn_type_handle;	/* Do wczytania informacji o rodzaju po��czenia */
+	char *temp_conn_type_handle;	/* Do wczytania informacji o rodzaju poï¿½ï¿½czenia */
 	SEND_INFO *send_struct;
 
 	if( strstr( http_session->http_info.header, HEADER_CONNECTION ) ) {
-		/* Pobranie informacji o po��czeniu ( "Connection: Keep-Alive/Close" ) - przypisanie do zmiennej tymczasowej */
+		/* Pobranie informacji o poï¿½ï¿½czeniu ( "Connection: Keep-Alive/Close" ) - przypisanie do zmiennej tymczasowej */
 		temp_conn_type_handle = malloc( SMALL_BUFF_SIZE_CHAR );
 		mem_allocated( temp_conn_type_handle, 12 );
 		strncpy( temp_conn_type_handle, REQUEST_get_header_value( http_session->http_info.header, HEADER_CONNECTION ), SMALL_BUFF_SIZE );
-		/* Ustawienie zmiennej keep-alive w zale�no�ci od warto�ci zmiennej temp_conn_type_handle */
+		/* Ustawienie zmiennej keep-alive w zaleï¿½noï¿½ci od wartoï¿½ci zmiennej temp_conn_type_handle */
 		if( strncasecmp( temp_conn_type_handle, HEADER_KEEP_ALIVE_STR, SMALL_BUFF_SIZE ) == 0 ) {
 			http_session->http_info.keep_alive = 1;
 		} else {
@@ -224,7 +224,7 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
 		temp_conn_type_handle = NULL;
 
 	} else {
-		/* Brak - po��czenie zamkni�te */
+		/* Brak - poï¿½ï¿½czenie zamkniï¿½te */
 		http_session->http_info.keep_alive = 0;
 	}
 
@@ -236,10 +236,10 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_check_connections_limit( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- weryfikuje ilos� pod��czonych klient�w */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- weryfikuje ilosæ pod³¹czonych klientów */
 short SESSION_check_connections_limit( HTTP_SESSION *http_session ) {
-	/* Sprawdzenie ilo�ci pod��czonych klient�w. Je�eli jest max = b��d 503 */
+	/* Sprawdzenie iloï¿½ci podï¿½ï¿½czonych klientï¿½w. Jeï¿½eli jest max = bï¿½ï¿½d 503 */
 	if( http_conn_count == MAX_CLIENTS ) {
 		RESPONSE_error( http_session, HTTP_503_SERVICE_UNAVAILABLE, HTTP_ERR_503_MSG, NULL );
 		SOCKET_disconnect_client( http_session );
@@ -252,8 +252,8 @@ short SESSION_check_connections_limit( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_get_ip_addr( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- pobiera adres IP pod��czonego klienta. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- pobiera adres IP pod³¹czonego klienta. */
 static void SESSION_get_ip_addr( HTTP_SESSION *http_session ) {
 	http_session->http_info.remote_addr = malloc( TINY_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.remote_addr, 13 );
@@ -262,33 +262,33 @@ static void SESSION_get_ip_addr( HTTP_SESSION *http_session ) {
 
 /*
 SESSION_prepare( HTTP_SESSION *http_session, const char *content_data )
-@http_session - wska�nik do danych pod��czonego klienta
-- przeprowadza weryfikacj� przes�anych danych:
-+ metoda ( obs�ugiwane: GET, HEAD, POST )
-+ d�ugo�� adresu URI
-+ obecno�� nag��wka "Host"
-+ typ po��czenia ( close/keep-alive )
-+ obecno�� nag��wka "If-Modified-Since"
-+ obecno�� nag��wka "If-Unmodified-Since"
-+ obecno�� nag��wka "Content-Length"
-+ obecno�� nag��wka "Content-Type"
-+ obecno�� nag��wka "Range"
-+ po pomy�lnej weryfikacji struktury przekazuje dane do wykonania przez funkcj� REQUEST_process */
+@http_session - wskaï¿½nik do danych podï¿½ï¿½czonego klienta
+- przeprowadza weryfikacjï¿½ przesï¿½anych danych:
++ metoda ( obsï¿½ugiwane: GET, HEAD, POST )
++ dï¿½ugoï¿½ï¿½ adresu URI
++ obecnoï¿½ï¿½ nagï¿½ï¿½wka "Host"
++ typ poï¿½ï¿½czenia ( close/keep-alive )
++ obecnoï¿½ï¿½ nagï¿½ï¿½wka "If-Modified-Since"
++ obecnoï¿½ï¿½ nagï¿½ï¿½wka "If-Unmodified-Since"
++ obecnoï¿½ï¿½ nagï¿½ï¿½wka "Content-Length"
++ obecnoï¿½ï¿½ nagï¿½ï¿½wka "Content-Type"
++ obecnoï¿½ï¿½ nagï¿½ï¿½wka "Range"
++ po pomyï¿½lnej weryfikacji struktury przekazuje dane do wykonania przez funkcjï¿½ REQUEST_process */
 void SESSION_prepare( HTTP_SESSION *http_session ) {
-	char *temp_http_method_name;	/* Do wczytania ��danej metody */
-	char *temp_entire_msg;			/* Do przechowania ca�ej wiadomo�ci. Tre�� b�dzie traktowana funkcj� strtok, a oryginaln� zawarto�� zmiennej http_info.content_data chcemy zatrzyma� */
+	char *temp_http_method_name;	/* Do wczytania ï¿½ï¿½danej metody */
+	char *temp_entire_msg;			/* Do przechowania caï¿½ej wiadomoï¿½ci. Treï¿½ï¿½ bï¿½dzie traktowana funkcjï¿½ strtok, a oryginalnï¿½ zawartoï¿½ï¿½ zmiennej http_info.content_data chcemy zatrzymaï¿½ */
 	char *tmp_post_data;			/* Do przechowania POST data */
 
-	/* Tutaj jest zabezpieczenie przed otrzymaniem metody POST w cz�ciach.
+	/* Tutaj jest zabezpieczenie przed otrzymaniem metody POST w czï¿½ciach.
 	Zmienna received_all jest ustawiana na 0 przy sprawdzaniu "Content-Length",
-	kiedy pobrana zawarto�� ( content ) ma rozmiar mniejszy ni� warto�� tego nag��wka.
-	Wtedy podczas odbioru danych z socketa otrzymane dane zostaj� sklejone z http_info.content_data
-	i dopiero komunikat jest procesowany. received_all ma warto�� -1, je�eli metod� jest GET lub HEAD.*/
+	kiedy pobrana zawartoï¿½ï¿½ ( content ) ma rozmiar mniejszy niï¿½ wartoï¿½ï¿½ tego nagï¿½ï¿½wka.
+	Wtedy podczas odbioru danych z socketa otrzymane dane zostajï¿½ sklejone z http_info.content_data
+	i dopiero komunikat jest procesowany. received_all ma wartoï¿½ï¿½ -1, jeï¿½eli metodï¿½ jest GET lub HEAD.*/
 	if( http_session->http_info.received_all == 1 ) {
-		/* Reset zmiennej odpowiedzialnej za odbi�r kolejnej cz�ci komunikatu */
+		/* Reset zmiennej odpowiedzialnej za odbiï¿½r kolejnej czï¿½ci komunikatu */
 		http_session->http_info.received_all = -1;
 
-		/* Przej�cie do wywo�ania funkcji procesuj�cej ��danie i zarz�dzanie roz��czeniem klienta */
+		/* Przejï¿½cie do wywoï¿½ania funkcji procesujï¿½cej ï¿½ï¿½danie i zarzï¿½dzanie rozï¿½ï¿½czeniem klienta */
 		REQUEST_process( http_session );
 
 		return;
@@ -296,22 +296,21 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 
 	/* Wyzerowanie zmiennych liczbowych */
 	SESSION_reset( http_session );
-
 	/*Pobranie adresu IP */
 	SESSION_get_ip_addr( http_session );
 
-	/*Pobranie nag��wka wiadomo�ci */
+	/*Pobranie nagï¿½ï¿½wka wiadomoï¿½ci */
 	SESSION_get_http_header( http_session );
 
-	/* Pobranie pierwszej linijki ��dania */
+	/* Pobranie pierwszej linijki ï¿½ï¿½dania */
 	http_session->http_info.request_line = malloc( BIG_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.request_line, 14 );
-	/* Zmienna temp_entire_msg b�dzie przechowywa� zawarto�� http_info.content_data na potrzeby funkcji strtok */
+	/* Zmienna temp_entire_msg bï¿½dzie przechowywaï¿½ zawartoï¿½ï¿½ http_info.content_data na potrzeby funkcji strtok */
 	temp_entire_msg = malloc( MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( temp_entire_msg, http_session->http_info.content_data, MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 	strncpy( http_session->http_info.request_line, strtok( temp_entire_msg, "\015\012" ), MAX_PATH_LENGTH+TINY_BUFF_SIZE );
 
-	/* Pobranie ��danej metody z request_line */
+	/* Pobranie ï¿½ï¿½danej metody z request_line */
 	temp_http_method_name = malloc( MICRO_BUFF_SIZE_CHAR );
 	mem_allocated( temp_http_method_name, 15 );
 	strncpy( temp_entire_msg, http_session->http_info.request_line, MAX_PATH_LENGTH+TINY_BUFF_SIZE );
@@ -325,7 +324,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	} else if( strncmp( temp_http_method_name, "POST", MICRO_BUFF_SIZE ) == 0 ) {
 		http_session->http_info.method_name = POST;
 	} else {
-		/* Metoda nieobs�ugiwana - papa... */
+		/* Metoda nieobsï¿½ugiwana - papa... */
 		RESPONSE_error( http_session, HTTP_501_NOT_SUPPORTED, HTTP_ERR_501_MSG, NULL );
 		SOCKET_disconnect_client( http_session );
 		SESSION_release( http_session );
@@ -339,37 +338,37 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	free( temp_http_method_name );
 	temp_http_method_name = NULL;
 
-	/* Pami�� na �cie�k� lokaln� */
+	/* Pamiï¿½ï¿½ na ï¿½cieï¿½kï¿½ lokalnï¿½ */
 	http_session->http_info.http_local_path = malloc( MAX_PATH_LENGTH_CHAR );
 	mem_allocated( http_session->http_info.http_local_path, 16 );
-	/* Pobranie �cie�ki do pliku */
+	/* Pobranie ï¿½cieï¿½ki do pliku */
 	strncpy( http_session->http_info.http_local_path, strtok( NULL, " " ), MAX_PATH_LENGTH );
 
-	/* Weryfikacja scie�ki do ��danego zasobu */
+	/* Weryfikacja scie¿ki do ¿¹danego zasobu */
 	if( SESSION_local_path_is_valid( http_session ) == 0 ) {
 		return;
 	}
 
-	/* Pami�� na wersj� protoko�u HTTP */
+	/* Pamiï¿½ï¿½ na wersjï¿½ protokoï¿½u HTTP */
 	http_session->http_info.protocol_ver = malloc( PROTO_BUFF_SIZE_CHAR );
 	mem_allocated( http_session->http_info.protocol_ver, 17 );
-	/* Pobranie wersji protoko�u HTTP */
+	/* Pobranie wersji protokoï¿½u HTTP */
 	strncpy( http_session->http_info.protocol_ver, strtok( NULL, "\015" ), PROTO_BUFF_SIZE );
 
 	free( temp_entire_msg );
 	temp_entire_msg = NULL;
 
-	/* Sprawdzenie wersji protoko�u przegl�darki */
+	/* Sprawdzenie wersji protokoï¿½u przeglï¿½darki */
 	if( SESSION_http_protocol_is_valid( http_session ) == 0 ) {
 		return;
 	}
 
-	/* Sprawdzenie ilosci pod��czonych klient�w. W razie maksymalnej iloci przestaje procesowa� ��danie i wysy�a informacj� do klienta */
+	/* Sprawdzenie ilosci pod³¹czonych klientów. W razie maksymalnej iloci przestaje procesowaæ ¿¹danie i wysy³a informacjê do klienta */
 	if( SESSION_check_connections_limit( http_session ) == 0 ) {
 		return;
 	}
 
-	/* Sprawdzenie, czy jest nag��wek "Connection:" */
+	/* Sprawdzenie, czy jest nagï¿½ï¿½wek "Connection:" */
 	SESSION_get_connection( http_session );
 
 	/* Pobranie informacji o parametrze "If-Modified-Since" */
@@ -384,21 +383,21 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 	/* Pobranie informacji o parametrze "Content-Type" */
 	SESSION_get_content_type( http_session );
 
-	/* Pobranie informacji o nag��wku "Authorization" */
+	/* Pobranie informacji o nagï¿½ï¿½wku "Authorization" */
 	SESSION_check_auth( http_session );
 
 	/* Pobranie informacji o parametrze "Content-Length" */
 	if( strstr( http_session->http_info.header, HEADER_CONTENT_LENGTH ) ) {
-		/* Przypisanie zmiennej http_info.content_length zawarto�ci nag��wka "Content-Length" */
+		/* Przypisanie zmiennej http_info.content_length zawartoï¿½ci nagï¿½ï¿½wka "Content-Length" */
 		http_session->http_info.content_length = atoi( REQUEST_get_header_value( http_session->http_info.header, HEADER_CONTENT_LENGTH ) );
-		/* Pr�ba pobrania zawarto�ci ��dania do zmiennej tymczasowej */
+		/* Prï¿½ba pobrania zawartoï¿½ci ï¿½ï¿½dania do zmiennej tymczasowej */
 		tmp_post_data = malloc( MAX_BUFFER_CHAR );
 		mem_allocated( tmp_post_data, 18 );
 		strncpy( tmp_post_data, REQUEST_get_message_body( http_session ), MAX_BUFFER );
-		/* Sprawdzenie, czy rozmiar pobranej zawarto�ci jest zgodny z danymi z nag��wka "Content-Length" */
+		/* Sprawdzenie, czy rozmiar pobranej zawartoï¿½ci jest zgodny z danymi z nagï¿½ï¿½wka "Content-Length" */
 		if( strlen( tmp_post_data ) < http_session->http_info.content_length ) {
-			/* Nie odebrano ca�ego ��dania, przekazanie informacji do funkcji odbieraj�cej dane
-			o tym, �e kolejna porcja danych z socketa nie b�dzie now� sesj�, tylko doko�czeniem starej */
+			/* Nie odebrano caï¿½ego ï¿½ï¿½dania, przekazanie informacji do funkcji odbierajï¿½cej dane
+			o tym, ï¿½e kolejna porcja danych z socketa nie bï¿½dzie nowï¿½ sesjï¿½, tylko dokoï¿½czeniem starej */
 			http_session->http_info.received_all = 0;
 
 			free( tmp_post_data );
@@ -409,7 +408,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		}
 
 		/* Odebrano wszystko za jednym razem;
-		przypisanie do zmiennej http_info.query_string zawarto�ci komunikatu */
+		przypisanie do zmiennej http_info.query_string zawartoï¿½ci komunikatu */
 		if( !http_session->http_info.query_string ) {
 			http_session->http_info.query_string = malloc( MAX_BUFFER_CHAR );
 			mem_allocated( http_session->http_info.query_string, 19 );
@@ -428,7 +427,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 
 		free( tmp_post_data );
 		tmp_post_data = NULL;
-	} else {	/* Brak nag��wka "Content-Length", a ��dana metoda to POST = b��d 411 */
+	} else {	/* Brak nagï¿½ï¿½wka "Content-Length", a ï¿½ï¿½dana metoda to POST = bï¿½ï¿½d 411 */
 		if( http_session->http_info.method_name == POST ) {
 			RESPONSE_error( http_session, HTTP_411_LENGTH_REQUIRED, HTTP_ERR_411_MSG, NULL );
 			SOCKET_disconnect_client( http_session );
@@ -437,17 +436,44 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
 		}
 	}
 
-	/* Przej�cie do wywo�ania funkcji procesuj�cej ��danie i zarz�dzanie roz��czeniem klienta */
+	/* Przejï¿½cie do wywoï¿½ania funkcji procesujï¿½cej ï¿½ï¿½danie i zarzï¿½dzanie rozï¿½ï¿½czeniem klienta */
 	REQUEST_process( http_session );
 }
 
 /*
-SESSION_release( HTTP_SESSION *http_session, int release_content )
-@http_session - wska�nik do pod��czonego klienta
-- sprawdza, czy elementy struktury HTTP_SESSION zajmuj� pami�� i w razie potrzeby zwalnia j� */
-void SESSION_release( HTTP_SESSION *http_session )
-{
-	/* Zwalnianie ci�g�w znak�w */
+SESSION_init( HTTP_SESSION *http_session )
+@http_session - wskaźnik do podłączonego klienta
+- zeruje elementy struktury */
+void SESSION_init( HTTP_SESSION *http_session ) {
+	http_session->http_info.content_data = NULL;
+	http_session->http_info.http_local_path = NULL;
+	http_session->http_info.protocol_ver = NULL;
+	http_session->http_info.remote_addr = NULL;
+	http_session->http_info.remote_host = NULL;
+	http_session->http_info.header = NULL;
+	http_session->http_info.request_line = NULL;
+	http_session->http_info.date_if_modified_since = NULL;
+	http_session->http_info.date_if_unmodified_since = NULL;
+	http_session->http_info.query_string = NULL;
+	http_session->http_info.content_type = NULL;
+	http_session->local_info.date_res_last_modified = NULL;
+	http_session->http_info.authorization = NULL;
+	http_session->http_info.user_login = NULL;
+	http_session->http_info.user_pwd = NULL;
+	/* Zerowanie zmiennych liczbowych */
+	http_session->http_info.range_st = -1;
+	http_session->http_info.range_en = -1;
+	http_session->http_info.content_length = -1;
+	/* Ustawienie metody na nieprzypisaną */
+	http_session->http_info.method_name = UNKNOWN_HTTP_METHOD;
+}
+
+/*
+SESSION_release( HTTP_SESSION *http_session )
+@http_session - wskaï¿½nik do podï¿½ï¿½czonego klienta
+- sprawdza, czy elementy struktury HTTP_SESSION zajmujï¿½ pamiï¿½ï¿½ i w razie potrzeby zwalnia jï¿½ */
+void SESSION_release( HTTP_SESSION *http_session ) {
+	/* Zwalnianie ciï¿½gï¿½w znakï¿½w */
 	if( http_session->http_info.content_data != NULL ) {
 		free( http_session->http_info.content_data );
 		http_session->http_info.content_data = NULL;
@@ -527,16 +553,16 @@ void SESSION_release( HTTP_SESSION *http_session )
 	http_session->http_info.range_st = -1;
 	http_session->http_info.range_en = -1;
 	http_session->http_info.content_length = -1;
-	/* Ustawienie metody na nieprzypisan� */
+	/* Ustawienie metody na nieprzypisanï¿½ */
 	http_session->http_info.method_name = UNKNOWN_HTTP_METHOD;
 }
 
 /*
 SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int http_content_size )
-@http_session - wska�nik do pod��czonego klienta
-@content_data - dane, kt�re maj� zosta� wys�ane
-@http_content_size - rozmiar danych do wys�ania
-- wysy�a pakiet danych content_data do aktualnie pod��czonego klienta */
+@http_session - wskaï¿½nik do podï¿½ï¿½czonego klienta
+@content_data - dane, ktï¿½re majï¿½ zostaï¿½ wysï¿½ane
+@http_content_size - rozmiar danych do wysï¿½ania
+- wysyï¿½a pakiet danych content_data do aktualnie podï¿½ï¿½czonego klienta */
 int SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int http_content_size ) {
 	int result = 0;
 
@@ -544,7 +570,7 @@ int SESSION_send_response( HTTP_SESSION *http_session, const char *content_data,
 		return 0;
 	}
 
-	/*Wysy�ka przez socket */
+	/*Wysyï¿½ka przez socket */
 	SOCKET_send( http_session, content_data, http_content_size, &result );
 
 	return result;
@@ -553,7 +579,7 @@ int SESSION_send_response( HTTP_SESSION *http_session, const char *content_data,
 /*
 SESSION_find_response_struct_by_id( int socket )
 @socket - identyfikator gniazda
-- funkcja na podstawie identyfikatora gniazda odnajduje struktur� z danymi do wysy�ki */
+- funkcja na podstawie identyfikatora gniazda odnajduje strukturê z danymi do wysy³ki */
 SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 	int i;
 
@@ -569,7 +595,7 @@ SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 /*
 SESSION_add_new_send_struct( int socket_descriptor )
 @socket_descriptor - identyfikator gniazda
-- funkcja znajduje pust� struktur� w tablicy SEND_INFO i przydziela jej identyfikator gniazda w celu umo�liwienia p�niejszej wysy�ki danych */
+- funkcja znajduje pust¹ strukturê w tablicy SEND_INFO i przydziela jej identyfikator gniazda w celu umo¿liwienia póŸniejszej wysy³ki danych */
 void SESSION_add_new_send_struct( int socket_descriptor ) {
 	int i;
 
@@ -578,6 +604,7 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
 			send_d[ i ].socket_descriptor = socket_descriptor;
 			send_d[ i ].sent_size = 0;
 			send_d[ i ].http_content_size = 0;
+			send_d[ i ].total_size = 0;
 			send_d[ i ].keep_alive = 0;
 			return;
 		}
@@ -587,7 +614,7 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
 /*
 SESSION_add_new_send_struct( int socket_descriptor )
 @socket_descriptor - identyfikator gniazda
-- funkcja usuwa struktur� SEND_INFO, poniewa� wysy�anie contentu zako�czy�o si� lub klient si� roz��czy� */
+- funkcja usuwa strukturê SEND_INFO, poniewa¿ wysy³anie contentu zakoñczy³o siê lub klient siê roz³¹czy³ */
 void SESSION_delete_send_struct( int socket_descriptor ) {
 	int i;
 
@@ -602,6 +629,7 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
 			send_d[ i ].sent_size = 0;
 			send_d[ i ].http_content_size = 0;
 			send_d[ i ].keep_alive = 0;
+			send_d[ i ].total_size = 0;
 
 			return;
 		}

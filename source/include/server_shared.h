@@ -48,7 +48,8 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <errno.h>
 #endif
 
-#define APP_VER								"0.7"
+#define APP_NAME							"battery"
+#define APP_VER								"1.0.0"
 #define SERVER_NAME							APP_NAME"/"APP_VER
 
 #define LOGS_PATH							"logs"SLASH
@@ -170,6 +171,7 @@ struct SEND_INFO {
 	long				http_content_size;			/* Rozmiar pliku */
 	long				sent_size;					/* Ilość danych wysłana do tej pory */
 	int					socket_descriptor;			/* Deksryptor podłączonego klienta, który wysłał żądanie */
+	long				total_size;					/* Przechowuje całkowity rozmiar pliku */
 	short				keep_alive;					/* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
 };
 

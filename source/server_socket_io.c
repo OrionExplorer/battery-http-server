@@ -5,8 +5,8 @@ Projekt battery_Server
 Plik: server_socket_io.c
 
 Przeznaczenie:
-Inicjalizacja socket�w
-Konfiguracja socket�w
+Inicjalizacja socketï¿½w
+Konfiguracja socketï¿½w
 Odbieranie danych z sieci i przekazanie do interpretacji
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
@@ -71,7 +71,7 @@ static void SOCKET_initialization( void ) {
 		exit( EXIT_FAILURE );
 	}
 #endif
-	/*Utworzenie socketa nas�uchuj�cego */
+	/*Utworzenie socketa nasï¿½uchujï¿½cego */
 	socket_server = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
 	if ( socket_server == SOCKET_ERROR ) {
 		LOG_print( "Error creating socket.\n" );
@@ -92,11 +92,11 @@ static void SOCKET_initialization( void ) {
 
 /*
 SOCKET_send_all_data( void )
-- funkcja weryfikuje, czy s� do wys�ania dane z kt�rego kolwiek elementu tablicy SEND_INFO. Je�eli tak, to nast�puje wysy�ka kolejnego fragmentu pliku. */
+- funkcja weryfikuje, czy są do wysłania dane z którego kolwiek elementu tablicy SEND_INFO. Jeżeli tak, to nastêpuje wysyłka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
 	int j;
-	char m_buf[ UPLOAD_BUFFER ];
-	int nwrite;
+	static char m_buf[ UPLOAD_BUFFER ];
+	size_t nwrite;
 	size_t nread;
 
 	for( j = 0; j < MAX_CLIENTS; j++ ) {
@@ -104,9 +104,10 @@ static void SOCKET_send_all_data( void ) {
 			fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
-			nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, MSG_NOSIGNAL );
+			nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
+			//printf("write( %d, m_buf, %ld );\n", send_d[ j ].socket_descriptor, nread );
 
-			if( nwrite > 0 ) {
+			if( nwrite > 0  && nread == nwrite ) {
 				send_d[ j ].sent_size += nread;
 				send_d[ j ].http_content_size -= nwrite;
 			}
@@ -120,7 +121,7 @@ static void SOCKET_send_all_data( void ) {
 
 /*
 SOCKET_prepare( void )
-- nas�uchiwanie w celu odbioru danych od klienta */
+- nasłuchiwanie w celu odbioru danych od klienta */
 static void SOCKET_prepare( void ) {
 	unsigned long b = 0;
 	int i = 1;
@@ -179,7 +180,7 @@ static void SOCKET_prepare( void ) {
 		exit( EXIT_FAILURE );
 	}
 
-	/* Rozpocz�cie nas�uchiwania */
+	/* Rozpoczêcie nas³uchiwania */
 	if( listen( socket_server, MAX_CLIENTS ) == SOCKET_ERROR ) {
 		wsa_result = WSAGetLastError();
 		LOG_print( "listen() error: %d.\n", wsa_result );
@@ -191,18 +192,17 @@ static void SOCKET_prepare( void ) {
 	LOG_print( "ok.\nSocket server is running:\n" );
 	LOG_print( "- Port: %d.\n", active_port );
 	LOG_print( "Communication Interface ready...\n" );
-	printf( "ok.\n" );
-	/* Teraz czekamy na po��czenia i dane */
+	/* Teraz czekamy na po³¹czenia i dane */
 }
 
 /*
 SOCKET_run( void )
-- funkcja zarz�dza po��czeniami przychodz�cymi do gniazda. */
+- funkcja zarzï¿½dza poï¿½ï¿½czeniami przychodzï¿½cymi do gniazda. */
 void SOCKET_run( void ) {
 	register int i = 0;
 	struct timeval tv;
 
-	/* Reset zmiennej informuj�cej o cz�ciowym odbiorze przychodz�cej tre�ci */
+	/* Reset zmiennej informujï¿½cej o czï¿½ciowym odbiorze przychodzï¿½cej treï¿½ci */
 	http_session_.http_info.received_all = -1;
 
 	FD_SET( socket_server, &master );
@@ -221,10 +221,10 @@ void SOCKET_run( void ) {
 
 		i = fdmax+1;
 		while( --i ) {
-			if( FD_ISSET( i, &read_fds ) ) { /* Co� si� dzieje na sockecie... */
+			if( FD_ISSET( i, &read_fds ) ) { /* Coï¿½ siï¿½ dzieje na sockecie... */
 				if( i == socket_server ) {
-					/* Pod��czy� si� nowy klient */
-					SOCKET_modify_clients_count( 1 ); /* Kolejny klient - do obs�ugi b��du 503 */
+					/* Podï¿½ï¿½czyï¿½ siï¿½ nowy klient */
+					SOCKET_modify_clients_count( 1 ); /* Kolejny klient - do obsï¿½ugi bï¿½ï¿½du 503 */
 					http_session_.address_length = sizeof( struct sockaddr );
 					newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &http_session_.address_length );
 
@@ -238,12 +238,12 @@ void SOCKET_run( void ) {
 						}
 					}
 				} else {
-					/* Pod��czony klient przes�a� dane... */
+					/* Podï¿½ï¿½czony klient przesï¿½aï¿½ dane... */
 					SOCKET_process( i );
 				}
-			} /*nowe po��czenie */
+			} /*nowe poï¿½ï¿½czenie */
 			SOCKET_send_all_data();
-		} /*p�tla deskryptor�w while( --i )*/
+		} /*pï¿½tla deskryptorï¿½w while( --i )*/
 		SOCKET_send_all_data();
 		Sleep(1);
 	} /*for( ;; ) */
@@ -258,6 +258,7 @@ static void SOCKET_process( int socket_fd ) {
 	char tmp_buf[ MAX_BUFFER ];
 	extern int errno;
 
+	SESSION_init( session );
 	errno = 0;
 	session->http_info.received_all = http_session_.http_info.received_all;
 	session->address = http_session_.address;
@@ -270,14 +271,14 @@ static void SOCKET_process( int socket_fd ) {
 			SOCKET_close( socket_fd );
 		} else {
 			if ( session->address_length <= 0 ) {
-				/* ...ale to jednak by�o roz��czenie */
+				/* ...ale to jednak byï¿½o rozï¿½ï¿½czenie */
 				SESSION_delete_send_struct( socket_fd );
 				SOCKET_close( socket_fd );
 			} else if (session->address_length > 0 ) {
-				/* Nie zosta�y wcze�niej odebrane wszystkie dane - metoda POST.
-				Teraz trzeba je doklei� do http_info.content_data */
+				/* Nie zostaï¿½y wczeï¿½niej odebrane wszystkie dane - metoda POST.
+				Teraz trzeba je dokleiï¿½ do http_info.content_data */
 				if( session->http_info.received_all == 0 ) {
-					/* Obiekt jest ju� stworzony, nie trzeba przydziela� pami�ci */
+					/* Obiekt jest juï¿½ stworzony, nie trzeba przydzielaï¿½ pamiï¿½ci */
 					session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
 					strncat( session->http_info.content_data, tmp_buf, session->address_length );
 					session->http_info.received_all = 1;
@@ -317,7 +318,7 @@ void SOCKET_close( int socket_descriptor ) {
     FD_CLR( socket_descriptor, &master );
     shutdown( socket_descriptor, SHUT_RDWR );
     close( socket_descriptor );
-    /* Zmniejszensie licznika pod��czonych klient�w */
+    /* Zmniejszensie licznika podï¿½ï¿½czonych klientï¿½w */
     SOCKET_modify_clients_count( -1 );
 }
 
@@ -348,8 +349,8 @@ void SOCKET_stop( void ) {
 
 /*
 SOCKET_release( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- funkcja resetuje zmienne informuj�ce o pod��czonym sockecie. */
+@http_session - wskaï¿½nik do podï¿½ï¿½czonego klienta
+- funkcja resetuje zmienne informujï¿½ce o podï¿½ï¿½czonym sockecie. */
 void SOCKET_release( HTTP_SESSION *http_session ) {
 	http_session->socket_descriptor = -1;
 	http_session->address_length = -1;
@@ -358,7 +359,7 @@ void SOCKET_release( HTTP_SESSION *http_session ) {
 
 /*
 SOCKET_disconnect_client( HTTP_SESSION *http_session )
-- roz��cza klienta podanego jako struktura http_session */
+- rozï¿½ï¿½cza klienta podanego jako struktura http_session */
 void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
 	if( http_session->socket_descriptor != SOCKET_ERROR ) {
 		SOCKET_close( http_session->socket_descriptor );
@@ -369,7 +370,7 @@ void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
 
 /*
 SOCKET_send( HTTP_SESSION *http_session, char *buf, int http_content_size )
-- wysy�a pakiet danych ( buf ) do danego klienta ( http_session ) */
+- wysyï¿½a pakiet danych ( buf ) do danego klienta ( http_session ) */
 void SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size, int *res ) {
 	if( ( http_session->address_length = send( http_session->socket_descriptor, buf, http_content_size, 0 ) ) <= 0 ) {
 		SOCKET_disconnect_client( http_session );
@@ -379,8 +380,8 @@ void SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_
 
 /*
 server_get_remote_hostname( const char *remote_addr )
-@http_session - wska�nik do pod��czonego klienta
-- zwraca ci�g znak�w b�d�cy nazw� hosta. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- zwraca ciï¿½g znakï¿½w bï¿½dï¿½cy nazwï¿½ hosta. */
 char* server_get_remote_hostname( HTTP_SESSION *http_session ) {
 	static char remote_name[ TINY_BUFF_SIZE ];
 	memset( remote_name, '\0', TINY_BUFF_SIZE );
@@ -390,8 +391,8 @@ char* server_get_remote_hostname( HTTP_SESSION *http_session ) {
 
 /*
 SOCKET_get_remote_ip( HTTP_SESSION *http_session )
-@http_session - wska�nik do pod��czonego klienta
-- zwraca ci�g znak�w b�d�cy adresem IP. */
+@http_session - wskaŸnik do pod³¹czonego klienta
+- zwraca ciï¿½g znakï¿½w bï¿½dï¿½cy adresem IP. */
 char* SOCKET_get_remote_ip( HTTP_SESSION *http_session ) {
 	static char ip_addr[ TINY_BUFF_SIZE ];
 	memset( ip_addr, '\0', TINY_BUFF_SIZE );
@@ -401,7 +402,7 @@ char* SOCKET_get_remote_ip( HTTP_SESSION *http_session ) {
 
 /*
 SOCKET_main( void )
-- obs�uga funkcji socket�w */
+- obsï¿½uga funkcji socketï¿½w */
 void SOCKET_main( void ) {
 	( void )SOCKET_initialization();
 	( void )SOCKET_prepare();

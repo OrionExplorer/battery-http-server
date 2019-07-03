@@ -399,6 +399,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
 				if( send_struct ) {
 					send_struct->file = file;
 					send_struct->http_content_size = filesize;
+					send_struct->total_size = filesize;
 					send_struct->sent_size = 0;
 				}
 			} else {

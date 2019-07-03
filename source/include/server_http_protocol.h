@@ -42,7 +42,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #define HEADER_CONTENT_LENGTH				"Content-Length: "
 #define HEADER_CONNECTION					"Connection: "
 #define HEADER_HOST							"Host: "
-#define HEADER_SERVER						"Server: "APP_NAME"/"APP_VER
+#define HEADER_SERVER						"Server: "SERVER_NAME
 #define HEADER_LAST_MODIFIED				"Last-Modified: "
 #define HEADER_IF_MODIFIED_SINCE			"If-Modified-Since: "
 #define HEADER_IF_UNMODIFIED_SINCE			"If-Unmodified-Since: "
