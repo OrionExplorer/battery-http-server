@@ -105,7 +105,6 @@ static void SOCKET_send_all_data( void ) {
 			nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
 
 			nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
-			//printf("write( %d, m_buf, %ld );\n", send_d[ j ].socket_descriptor, nread );
 
 			if( nwrite > 0  && nread == nwrite ) {
 				send_d[ j ].sent_size += nread;
@@ -259,6 +258,7 @@ static void SOCKET_process( int socket_fd ) {
 	extern int errno;
 
 	SESSION_init( session );
+
 	errno = 0;
 	session->http_info.received_all = http_session_.http_info.received_all;
 	session->address = http_session_.address;
@@ -280,6 +280,7 @@ static void SOCKET_process( int socket_fd ) {
 				if( session->http_info.received_all == 0 ) {
 					/* Obiekt jest juï¿½ stworzony, nie trzeba przydzielaï¿½ pamiï¿½ci */
 					session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
+					/* TODO: BINARY DATA!!! */
 					strncat( session->http_info.content_data, tmp_buf, session->address_length );
 					session->http_info.received_all = 1;
 				} else if( session->http_info.received_all == -1 ) {
