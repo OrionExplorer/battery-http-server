@@ -1,5 +1,6 @@
 CC=gcc 
 CFLAGS=-Wall
+INSTALL_DIR=/opt/battery
 
 all: battery
 
@@ -51,3 +52,14 @@ server_time_util.o: source/server_time_util.c
 
 clean:
 	rm *.o
+
+install:
+	@ rm -rf $(INSTALL_DIR)/battery
+	@ mkdir $(INSTALL_DIR) -p
+	@ mkdir $(INSTALL_DIR)/configuration -p
+	@ cp build/battery $(INSTALL_DIR)/battery
+	@ cp source/scripts/run.sh $(INSTALL_DIR)/run.sh
+	@ cp source/configuration/battery.conf $(INSTALL_DIR)/configuration/battery.conf
+	@ chmod +x $(INSTALL_DIR)/run.sh
+	@ chown pi:pi $(INSTALL_DIR) -R || echo "Unable to chown!"
+
