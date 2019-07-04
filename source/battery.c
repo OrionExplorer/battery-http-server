@@ -7,8 +7,6 @@ Plik: batteryServer.c
 Przeznaczenie:
 Uruchomenie funkcji CORE_initialize()
 
-Kompilacja na Win32: -lws2_32
-
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #include <stdio.h>

@@ -5,7 +5,7 @@ Projekt battery-http-server
 Plik: server_http_protocol.c
 
 Przeznaczenie:
-Przechowuje zmienne, sta�e oraz funkcje u�ywane przy pracy serwera w trybie HTTP
+Przechowuje zmienne, stałe oraz funkcje używane przy pracy serwera w trybie HTTP
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/

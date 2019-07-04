@@ -11,7 +11,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #include "server_shared.h"
 
-#define CGI_VER				"CGI/1.1"		/* Wersja protoko≥u CGI */
+#define CGI_VER				"CGI/1.1"		/* Wersja protoko≈Çu CGI */
 
 void			CGI_execute( HTTP_SESSION *http_session, const char *filename );
 short			CGI_load_configuration( const char *cfg_file );
