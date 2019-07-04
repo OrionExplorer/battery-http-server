@@ -4,15 +4,15 @@
 
 Fast and portable HTTP server.
 
-### Featured HTTP versions
+### Supported HTTP versions
 * HTTP/1.0
 * HTTP/1.1
 
-### Featured HTTP methods
+### Supported HTTP methods
 * GET
 * HEAD
 
-### Featured HTTP response codes
+### Supported HTTP response codes
 * 200 OK
 * 204 No Content
 * 206 Partial Content
@@ -41,19 +41,19 @@ Fast and portable HTTP server.
 * Event log
 
 ### TODO
-- [ ] Extend Basic Access Authentication configuration
+- [ ] Add HTTPS support
+- [ ] New CGI algorithm and effort to restore POST method
+- [ ] Extend Basic Access Authentication configuration to work with .htaccess files
 - [ ] Rebuild range-based data send
-- [ ] New CGI/PHP algorithm and POST method restoration
 - [ ] Add method PUT
 - [ ] Add method DELETE
 - [ ] Add HTTP Proxy support
 - [ ] Add IPv6 support
-- [ ] Add HTTPS support
 - [ ] Higher performance!
 
 
 
-Battery HTTP Server configuration file is  "build/configuration/battery.conf".
+Battery HTTP Server configuration file is "build/configuration/battery.conf".
 For performance test please visit http://pastebin.com/zBG7nHbL
 
 ### Compilation and installation
