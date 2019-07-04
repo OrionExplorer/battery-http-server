@@ -2,15 +2,15 @@
 
 Projekt battery-http-server
 
-Plik: server_strings_util.c
+Plik: strings_utils.c
 
 Przeznaczenie:
 Zbiór funkcji rozszerzających działania na ciągach znaków
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_strings_util.h"
-#include "include/server_shared.h"
+#include "include/string_utils.h"
+#include "include/shared.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>

@@ -2,16 +2,16 @@
 
 Projekt battery-http-server
 
-Plik: server_mem_manager.c
+Plik: mem_manager.c
 
 Przeznaczenie:
 Funkcje ułatwiające zarządzanie pamięcią
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_shared.h"
-#include "include/server_mem_manager.h"
-#include "include/server_log.h"
+#include "include/shared.h"
+#include "include/mem_manager.h"
+#include "include/log.h"
 #include <stdio.h>
 #include <stdlib.h>
 

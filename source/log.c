@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_log.c
+Plik: log.c
 
 Przeznaczenie:
 Obsługa logowania zdarzeń do pliku logs/log.txt
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_shared.h"
+#include "include/shared.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

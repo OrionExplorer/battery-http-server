@@ -2,21 +2,20 @@
 
 Projekt battery-http-server
 
-Plik:
-server_cgi_manager.c
+Plik: cgi_manager.c
 
 Przeznaczenie:
 Uruchamia skrypty CGI i odczytuje wyniki ich działania
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_shared.h"
-#include "include/server_cgi_manager.h"
-#include "include/server_files_io.h"
-#include "include/server_http_protocol.h"
-#include "include/server_create_session.h"
-#include "include/server_portable.h"
-#include "include/server_log.h"
+#include "include/shared.h"
+#include "include/cgi_manager.h"
+#include "include/files_io.h"
+#include "include/http_protocol.h"
+#include "include/session.h"
+#include "include/portable.h"
+#include "include/log.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>

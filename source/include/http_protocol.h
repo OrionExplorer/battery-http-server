@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_http_protocol.h
+Plik: http_protocol.h
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#ifndef SERVER_HTTP_PROTOCOL_H
-#define SERVER_HTTP_PROTOCOL_H
+#ifndef HTTP_PROTOCOL_H
+#define HTTP_PROTOCOL_H
 
-#include "server_shared.h"
+#include "shared.h"
 
 #define MAX_URI_LENGTH                              1024
 

@@ -2,16 +2,16 @@
 
 Projekt battery-http-server
 
-Plik: server_mime_types.c
+Plik: mime_types.c
 
 Przeznaczenie:
 Wczytanie typów mime obsługiwanych przez serwer
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_shared.h"
-#include "include/server_log.h"
-#include "include/server_mime_types.h"
+#include "include/shared.h"
+#include "include/log.h"
+#include "include/mime_types.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

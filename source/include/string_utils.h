@@ -2,12 +2,12 @@
 
 Projekt battery-http-server
 
-Plik: sever_strings_util.h
+Plik: string_utils.h
 
 Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
-#ifndef SERVER_STRINGS_UTIL
-#define SERVER_STRINGS_UTIL
+#ifndef STRING_UTILS
+#define STRING_UTILS
 
 void            strdelbslash( char *s1 );
 int             strpos( const char *s1, const char *s2 );

@@ -2,15 +2,15 @@
 
 Projekt battery-http-server
 
-Plik: server_mime_types.h
+Plik: htaccess_manager.h
 
-Autor: Marcin Kelar ( marcin.kelar@gmail.com )
+Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#ifndef SERVER_MIME_TYPES_H
-#define SERVER_MIME_TYPES_H
+#ifndef HTACCESS_MANAGER_H
+#define HTACCESS_MANAGER_H
 
 #include <stdio.h>
 
-short   MIME_load_configuration( FILE *cfg_file );
+short   HTACCESS_load_configuration( FILE *cfg_file );
 
 #endif

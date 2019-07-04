@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_socket_io.h
+Plik: socket_io.h
 
 Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
-#ifndef SERVER_SOCKET_IO_H
-#define SERVER_SOCKET_IO_H
+#ifndef SOCKET_IO_H
+#define SOCKET_IO_H
 
-#include "server_shared.h"
+#include "shared.h"
 
 void    SOCKET_main( void );
 void    SOCKET_run( void );

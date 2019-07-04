@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_cgi_manager.h
+Plik: cgi_manager.h
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#ifndef SERVER_CGI_MANAGER_H
-#define SERVER_CGI_MANAGER_H
+#ifndef CGI_MANAGER_H
+#define CGI_MANAGER_H
 
-#include "server_shared.h"
+#include "shared.h"
 
 #define CGI_VER "CGI/1.1"       /* Wersja protokołu CGI */
 

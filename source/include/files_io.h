@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_files_io.h
+Plik: files_io.h
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#ifndef SERVER_FILES_IO_H
-#define SERVER_FILES_IO_H
+#ifndef FILES_IO_H
+#define FILES_IO_H
 
-#include "server_shared.h"
+#include "shared.h"
 
 char*   get_app_path( void );
 char*   file_get_ext( const char *filename );

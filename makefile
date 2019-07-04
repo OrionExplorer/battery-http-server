@@ -4,51 +4,51 @@ INSTALL_DIR=/opt/battery
 
 all: battery
 
-battery: battery.o server_create_session.o server_mem_manager.o server_files_io.o server_mime_types.o server_base64.o server_htaccess_manager.o server_socket_io.o server_http_protocol.o server_strings_util.o server_core.o server_log.o server_time_util.o 
+battery: battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o 
 	@ mkdir build/configuration -p
 	cp source/configuration/battery.conf build/configuration/battery.conf
-	gcc battery.o server_create_session.o server_mem_manager.o server_files_io.o server_mime_types.o server_base64.o server_htaccess_manager.o server_socket_io.o server_http_protocol.o server_strings_util.o server_core.o server_log.o server_time_util.o  -o build/battery
+	gcc battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o  -o build/battery
 	@ rm *.o
 	@ rm build/logs -rf
 
 battery.o: source/battery.c
 	gcc -c source/battery.c
 
-server_create_session.o: source/server_create_session.c
-	gcc -c source/server_create_session.c
+session.o: source/session.c
+	gcc -c source/session.c
 
-server_mem_manager.o: source/server_mem_manager.c
-	gcc -c source/server_mem_manager.c
+mem_manager.o: source/mem_manager.c
+	gcc -c source/mem_manager.c
 
-server_files_io.o: source/server_files_io.c
-	gcc -c source/server_files_io.c
+files_io.o: source/files_io.c
+	gcc -c source/files_io.c
 
-server_mime_types.o: source/server_mime_types.c
-	gcc -c source/server_mime_types.c
+mime_types.o: source/mime_types.c
+	gcc -c source/mime_types.c
 
-server_base64.o: source/server_base64.c
-	gcc -c source/server_base64.c
+base64.o: source/base64.c
+	gcc -c source/base64.c
 
-server_htaccess_manager.o: source/server_htaccess_manager.c
-	gcc -c source/server_htaccess_manager.c
+htaccess_manager.o: source/htaccess_manager.c
+	gcc -c source/htaccess_manager.c
 
-server_socket_io.o: source/server_socket_io.c
-	gcc -c source/server_socket_io.c
+socket_io.o: source/socket_io.c
+	gcc -c source/socket_io.c
 
-server_http_protocol.o: source/server_http_protocol.c
-	gcc -c source/server_http_protocol.c
+http_protocol.o: source/http_protocol.c
+	gcc -c source/http_protocol.c
 
-server_strings_util.o: source/server_strings_util.c
-	gcc -c source/server_strings_util.c
+string_utils.o: source/string_utils.c
+	gcc -c source/string_utils.c
 
-server_core.o: source/server_core.c
-	gcc -c source/server_core.c
+core.o: source/core.c
+	gcc -c source/core.c
 
-server_log.o: source/server_log.c
-	gcc -c source/server_log.c
+log.o: source/log.c
+	gcc -c source/log.c
 
-server_time_util.o: source/server_time_util.c
-	gcc -c source/server_time_util.c
+time_utils.o: source/time_utils.c
+	gcc -c source/time_utils.c
 
 clean:
 	rm *.o

@@ -2,7 +2,7 @@
 
 Projekt battery-http-server
 
-Plik: server_socket_io.c
+Plik: socket_io.c
 
 Przeznaczenie:
 Inicjalizacja socketów
@@ -11,12 +11,12 @@ Odbieranie danych z sieci i przekazanie do interpretacji
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_socket_io.h"
-#include "include/server_create_session.h"
-#include "include/server_http_protocol.h"
-#include "include/server_shared.h"
-#include "include/server_log.h"
-#include "include/server_files_io.h"
+#include "include/socket_io.h"
+#include "include/session.h"
+#include "include/http_protocol.h"
+#include "include/shared.h"
+#include "include/log.h"
+#include "include/files_io.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

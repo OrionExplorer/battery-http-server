@@ -2,13 +2,13 @@
 
 Projekt battery-http-server
 
-Plik: server_mem_manager.h
+Plik: time_utils.h
 
 Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
-#ifndef SERVER_MEM_MANAGER_H
-#define SERVER_MEM_MANAGER_H
+#ifndef TIME_UTILS_H
+#define TIME_UTILS_H
 
-void    mem_allocated( char *ptr, int n );
+char*   get_actual_time_gmt( void );
 
 #endif

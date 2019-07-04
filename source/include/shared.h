@@ -2,17 +2,17 @@
 
 Projekt battery-http-server
 
-Plik: server_shared.h
+Plik: shared.h
 
 Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
-#ifndef SERVER_SHARED_H
-#define SERVER_SHARED_H
+#ifndef SHARED_H
+#define SHARED_H
 
-#include "server_portable.h"
-#include "server_strings_util.h"
-#include "server_time_util.h"
-#include "server_mem_manager.h"
+#include "portable.h"
+#include "string_utils.h"
+#include "time_utils.h"
+#include "mem_manager.h"
 #include <stdio.h>
 #include <time.h>
 

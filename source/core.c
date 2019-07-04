@@ -2,7 +2,7 @@
 
 Projekt battery-http-server
 
-Plik: server_core.c
+Plik: core.c
 
 Przeznaczenie:
 Konfiguracja aplikacji
@@ -10,14 +10,14 @@ Ustawienie nasłuchiwania socketów
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_core.h"
-#include "include/server_shared.h"
-#include "include/server_files_io.h"
-#include "include/server_socket_io.h"
-#include "include/server_base64.h"
-#include "include/server_log.h"
-#include "include/server_mime_types.h"
-#include "include/server_htaccess_manager.h"
+#include "include/core.h"
+#include "include/shared.h"
+#include "include/files_io.h"
+#include "include/socket_io.h"
+#include "include/base64.h"
+#include "include/log.h"
+#include "include/mime_types.h"
+#include "include/htaccess_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

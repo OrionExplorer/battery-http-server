@@ -2,13 +2,13 @@
 
 Projekt battery-http-server
 
-Plik: server_files_io.c
+Plik: files_io.c
 Przeznaczenie:
 Zbiór funkcji przeznaczonych do obsługi plików i katalogów
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_files_io.h"
+#include "include/files_io.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +17,7 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 #include <signal.h>
 #include <fcntl.h>
 #ifndef _MSC_VER
-#include <unistd.h>
+    #include <unistd.h>
 #endif
 
 OPENED_FILE opened_files[ FOPEN_MAX ];

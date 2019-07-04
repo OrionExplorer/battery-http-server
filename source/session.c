@@ -2,7 +2,7 @@
 
 Projekt battery-http-server
 
-Plik: server_create_session.c
+Plik: session.c
 
 Przeznaczenie:
 Interpretacja danych otrzymanych od klienta
@@ -10,12 +10,12 @@ Przekazanie danych do funkcji wykonującej żądanie
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_create_session.h"
-#include "include/server_socket_io.h"
-#include "include/server_http_protocol.h"
-#include "include/server_files_io.h"
-#include "include/server_log.h"
-#include "include/server_base64.h"
+#include "include/session.h"
+#include "include/socket_io.h"
+#include "include/http_protocol.h"
+#include "include/files_io.h"
+#include "include/log.h"
+#include "include/base64.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

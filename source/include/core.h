@@ -2,12 +2,12 @@
 
 Projekt battery-http-server
 
-Plik: server_core.h
+Plik: core.h
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#ifndef SERVER_CORE_H
-#define SERVER_CORE_H
+#ifndef CORE_H
+#define CORE_H
 
 #include <stdio.h>
 

@@ -2,18 +2,18 @@
 
 Projekt battery-http-server
 
-Plik: server_http_protocol.c
+Plik: http_protocol.c
 
 Przeznaczenie:
 Przechowuje zmienne, stałe oraz funkcje używane przy pracy serwera w trybie HTTP
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_http_protocol.h"
-#include "include/server_create_session.h"
-#include "include/server_files_io.h"
-#include "include/server_log.h"
-#include "include/server_socket_io.h"
+#include "include/http_protocol.h"
+#include "include/session.h"
+#include "include/files_io.h"
+#include "include/log.h"
+#include "include/socket_io.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -11,9 +11,9 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
 #include <stdio.h>
 #include <signal.h>
-#include "include/server_core.h"
-#include "include/server_socket_io.h"
-#include "include/server_log.h"
+#include "include/core.h"
+#include "include/socket_io.h"
+#include "include/log.h"
 
 static void app_terminate( void );
 

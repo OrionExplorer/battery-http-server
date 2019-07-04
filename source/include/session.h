@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_create_session.h
+Plik: session.h
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#ifndef SERVER_CREATE_SESSION_H
-#define SERVER_CREATE_SESSION_H
+#ifndef SESSION_H
+#define SESSION_H
 
-#include "server_shared.h"
+#include "shared.h"
 
 void            SESSION_prepare( HTTP_SESSION *http_session );
 void            SESSION_release( HTTP_SESSION *http_session );

@@ -2,7 +2,7 @@
 
 Projekt battery-http-server
 
-Plik: server_portable.h
+Plik: portable.h
 
 Przeznaczenie:
 Dzięki definicjom w tym pliku możliwe jest ujednolicenie kodu dla rónych platform.
@@ -10,8 +10,8 @@ Definicje, które nie są uniwersalne swoje miejsce znalazły w adekwatnych plik
 
 Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
-#ifndef SERVER_PORTABLE_H
-#define SERVER_PORTABLE_H
+#ifndef PORTABLE_H
+#define PORTABLE_H
 
 
 #ifdef _WIN32

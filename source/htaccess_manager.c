@@ -2,17 +2,17 @@
 
 Projekt battery-http-server
 
-Plik: server_htaccess_manager.c
+Plik: htaccess_manager.c
 
 Przeznaczenie:
 Wczytanie ustawień dotyczących dostępów do danych zasobów
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_shared.h"
-#include "include/server_htaccess_manager.h"
-#include "include/server_log.h"
-#include "include/server_base64.h"
+#include "include/shared.h"
+#include "include/htaccess_manager.h"
+#include "include/log.h"
+#include "include/base64.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

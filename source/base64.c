@@ -2,7 +2,7 @@
 
 Projekt battery-http-server
 
-Plik: server_base64.c
+Plik: base64.c
 
 Przeznaczenie:
 Kodowanie i dekodowanie tekstu wg base64

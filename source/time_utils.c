@@ -2,14 +2,14 @@
 
 Projekt battery-http-server
 
-Plik: server_time_util.c
+Plik: time_util.c
 
 Przeznaczenie:
 Zbiór funkcji przeznaczonych do zarządzania datą i czasem
 
 Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 *******************************************************************/
-#include "include/server_shared.h"
+#include "include/shared.h"
 #include <stdio.h>
 #include <string.h>
 
