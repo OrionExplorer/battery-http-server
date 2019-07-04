@@ -11,17 +11,17 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #include "server_shared.h"
 
-char*	get_app_path( void );
-char*	file_get_ext( const char *filename );
-char*	file_get_name( const char *full_filename );
-void	file_extract_path( char *full_filename, char delim );
-short	directory_exists( const char *path );
-short	file_exists( const char *filename );
-short	file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd );
+char*   get_app_path( void );
+char*   file_get_ext( const char *filename );
+char*   file_get_name( const char *full_filename );
+void    file_extract_path( char *full_filename, char delim );
+short   directory_exists( const char *path );
+short   file_exists( const char *filename );
+short   file_params( HTTP_SESSION *http_session, const char *filename, char *ht_access_pwd );
 
-FILE	*battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor, RESOURCE_TYPE type );
-void	battery_fclose( FILE *file, int socket_descriptor );
-long	battery_ftell( FILE *file );
-char*	battery_get_filename( FILE *file );
+FILE    *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor, RESOURCE_TYPE type );
+void    battery_fclose( FILE *file, int socket_descriptor );
+long    battery_ftell( FILE *file );
+char*   battery_get_filename( FILE *file );
 
 #endif

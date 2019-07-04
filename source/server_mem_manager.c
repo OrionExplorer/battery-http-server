@@ -21,12 +21,12 @@ mem_allocated( char* ptr, int n )
 @n - numer porządkowy, służący do póniejszej analizy problemu
 - funkcja sprawdza, czy udało się przydzielić pamięć dla danego wskaźnika, kończy program, jeżeli wystąpił problem */
 void mem_allocated( char *ptr, int n ) {
-	/* Błąd alokacji pamięci, ptr = NULL */
-	if( !ptr ) {
-		LOG_print( "Error: malloc( %d ).\n", n );
-		printf( "Error: malloc( %d ).\n", n );
-		exit( EXIT_FAILURE );
-	}
-	/* Wszystko ok, kontynuuje działanie programu */
+    /* Błąd alokacji pamięci, ptr = NULL */
+    if( !ptr ) {
+        LOG_print( "Error: malloc( %d ).\n", n );
+        printf( "Error: malloc( %d ).\n", n );
+        exit( EXIT_FAILURE );
+    }
+    /* Wszystko ok, kontynuuje działanie programu */
 }
 

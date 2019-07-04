@@ -11,6 +11,6 @@ Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
 
 #include <stdio.h>
 
-short			HTACCESS_load_configuration( FILE *cfg_file );
+short   HTACCESS_load_configuration( FILE *cfg_file );
 
 #endif

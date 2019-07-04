@@ -2,7 +2,7 @@
 
 Projekt battery-http-server
 
-Plik: batteryServer.c
+Plik: battery.c
 
 Przeznaczenie:
 Uruchomenie funkcji CORE_initialize()
@@ -19,21 +19,21 @@ static void app_terminate( void );
 
 int main( void ) {
 
-	signal( SIGINT, ( sighandler )&app_terminate );
-	#ifndef _WIN32
-		signal( SIGPIPE, SIG_IGN );
-	#endif
-	signal( SIGABRT, ( sighandler )&app_terminate );
-	signal( SIGTERM, ( sighandler )&app_terminate );
+    signal( SIGINT, ( sighandler )&app_terminate );
+    #ifndef _WIN32
+        signal( SIGPIPE, SIG_IGN );
+    #endif
+    signal( SIGABRT, ( sighandler )&app_terminate );
+    signal( SIGTERM, ( sighandler )&app_terminate );
 
-	printf( "%s\n", SERVER_NAME );
-	CORE_initialize();
-	return 0;
+    printf( "%s\n", SERVER_NAME );
+    CORE_initialize();
+    return 0;
 }
 
 static void app_terminate( void ) {
-	LOG_print( "Server is being closed...\n" );
-	SOCKET_stop();
-	LOG_print( "Server closed.\n" );
-	LOG_save();
+    LOG_print( "Server is being closed...\n" );
+    SOCKET_stop();
+    LOG_print( "Server closed.\n" );
+    LOG_save();
 }

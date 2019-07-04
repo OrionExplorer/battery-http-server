@@ -4,13 +4,13 @@ Projekt battery-http-server
 
 Plik: server_mime_types.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef SERVER_MIME_TYPES_H
 #define SERVER_MIME_TYPES_H
 
 #include <stdio.h>
 
-short		MIME_load_configuration( FILE *cfg_file );
+short   MIME_load_configuration( FILE *cfg_file );
 
 #endif

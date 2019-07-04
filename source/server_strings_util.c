@@ -20,15 +20,15 @@ strdelbslash( char *s1 )
 @s1 - ciąg znaków, z którego będą usunięte podwójne backslashe
 - usuwa z ciągu znaków s1 podwójne backslashe*/
 void strdelbslash( char *s1 ) {
-	char *c1;
+    char *c1;
 
 #ifdef _WIN32
-	while( ( c1 = strstr( s1, "\\\\" ) ) ) {
+    while( ( c1 = strstr( s1, "\\\\" ) ) ) {
 #else
-	while( ( c1 = strstr( s1, "//" ) ) ) {
+    while( ( c1 = strstr( s1, "//" ) ) ) {
 #endif
-		strcpy( c1 + 1, c1 + 2 );
-	}
+        strcpy( c1 + 1, c1 + 2 );
+    }
 }
 
 /*
@@ -38,16 +38,16 @@ strdelstr( const char *s1, const char s2 )
 - funkcja usuwa ciąg znaków s2 z ciągu s1*/
 void strdelstr( char *s1, const char* s2 )
 {
-	int t_len = strlen( s2 );
+    int t_len = strlen( s2 );
 
-	/* Jeżeli ciąg s2 nie występuje w ciągu s1 */
-	if( !strstr( s1, s2 ) ) {
-		return;
-	}
+    /* Jeżeli ciąg s2 nie występuje w ciągu s1 */
+    if( !strstr( s1, s2 ) ) {
+        return;
+    }
 
-	while( ( s1 = strstr( s1, s2 ) ) ) {
-		memmove( s1, s1 + t_len, 1 + strlen( s1 + t_len ) );
-	}
+    while( ( s1 = strstr( s1, s2 ) ) ) {
+        memmove( s1, s1 + t_len, 1 + strlen( s1 + t_len ) );
+    }
 }
 
 /*
@@ -57,18 +57,18 @@ strrepchar( char *s1, char c1, char c2 )
 @c2 - znak, którym ma zostać zastąpiony znak c1 w ciągu s1
 - funkcja zamienia pojedyncze znaki bezpośrednio w obiekcie, na który wskazuje s1. */
 void strrepchar( char *s1, char c1, char c2 ) {
-	int len = strlen( s1 );
+    int len = strlen( s1 );
 
-	if( len <= 1 ) {
-		return;
-	}
+    if( len <= 1 ) {
+        return;
+    }
 
-	while( len > -1 ) {
-		if( s1[ len ] == c1 ) {
-			s1[ len ] = c2;
-		}
-		len--;
-	}
+    while( len > -1 ) {
+        if( s1[ len ] == c1 ) {
+            s1[ len ] = c2;
+        }
+        len--;
+    }
 }
 
 /*
@@ -77,11 +77,11 @@ strpos( char *s1, char *s2 )
 @s2 - ciąg znaków, który będzie wyszukany w ciągu s1
 - zwraca int, który wskazuje na pozycję ciągu s2 w ciągu s1. Zwraca -1, gdy ciągu nie znaleziono */
 int strpos( const char *s1, const char *s2 ) {
-	char *p = ( char* )strstr( s1, s2 );
-	if( p ) {
-		return p - s1;
-	}
-	return -1;
+    char *p = ( char* )strstr( s1, s2 );
+    if( p ) {
+        return p - s1;
+    }
+    return -1;
 }
 
 /* Na platformie WIN32+Visual C++ brak funkcji strncasecmp */
@@ -94,20 +94,20 @@ strncasecmp( const char *s1, const char *s2 )
 - zwraca int, który wskazuje na różnicę pomiędzy ciągiem s1 a s2 */
 int strncasecmp( const char *s1, const char *s2, int n ) {
 {
-	if ( !s1 && !s2 )
-		return 0;
-	if ( !s1 )
-		return 1;
-	if ( !s2 )
-		return -1;
-	if ( n < 0 )
-		return 0;
-	while ( n && *s1 && *s2 && tolower( ( unsigned char )*s1 ) == tolower( ( unsigned char )*s2 ) ) {
-		s1++;
-		s2++;
-		n--;
-	}
+    if ( !s1 && !s2 )
+        return 0;
+    if ( !s1 )
+        return 1;
+    if ( !s2 )
+        return -1;
+    if ( n < 0 )
+        return 0;
+    while ( n && *s1 && *s2 && tolower( ( unsigned char )*s1 ) == tolower( ( unsigned char )*s2 ) ) {
+        s1++;
+        s2++;
+        n--;
+    }
 
-	return n == 0 ? 0 : tolower( ( unsigned char )*s1 ) - tolower( ( unsigned char )*s2 );
+    return n == 0 ? 0 : tolower( ( unsigned char )*s1 ) - tolower( ( unsigned char )*s2 );
 }
 #endif
