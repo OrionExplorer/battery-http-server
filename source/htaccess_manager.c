@@ -7,7 +7,7 @@ Plik: htaccess_manager.c
 Przeznaczenie:
 Wczytanie ustawień dotyczących dostępów do danych zasobów
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/shared.h"
 #include "include/htaccess_manager.h"

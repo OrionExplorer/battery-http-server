@@ -4,7 +4,7 @@ Projekt battery-http-server
 
 Plik: core.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef CORE_H
 #define CORE_H

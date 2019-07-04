@@ -7,7 +7,7 @@ Plik: mime_types.c
 Przeznaczenie:
 Wczytanie typów mime obsługiwanych przez serwer
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/shared.h"
 #include "include/log.h"

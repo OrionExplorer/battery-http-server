@@ -4,7 +4,7 @@ Projekt battery-http-server
 
 Plik: http_protocol.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef HTTP_PROTOCOL_H
 #define HTTP_PROTOCOL_H

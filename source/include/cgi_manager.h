@@ -4,7 +4,7 @@ Projekt battery-http-server
 
 Plik: cgi_manager.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef CGI_MANAGER_H
 #define CGI_MANAGER_H

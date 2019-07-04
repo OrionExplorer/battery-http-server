@@ -7,7 +7,7 @@ Plik: battery.c
 Przeznaczenie:
 Uruchomenie funkcji CORE_initialize()
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include <stdio.h>
 #include <signal.h>

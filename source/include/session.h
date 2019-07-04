@@ -4,7 +4,7 @@ Projekt battery-http-server
 
 Plik: session.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef SESSION_H
 #define SESSION_H

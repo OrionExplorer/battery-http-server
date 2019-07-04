@@ -8,7 +8,7 @@ Przeznaczenie:
 Konfiguracja aplikacji
 Ustawienie nasłuchiwania socketów
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/core.h"
 #include "include/shared.h"

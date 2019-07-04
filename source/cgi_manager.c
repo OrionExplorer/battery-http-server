@@ -7,7 +7,7 @@ Plik: cgi_manager.c
 Przeznaczenie:
 Uruchamia skrypty CGI i odczytuje wyniki ich działania
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/shared.h"
 #include "include/cgi_manager.h"

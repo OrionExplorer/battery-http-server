@@ -4,7 +4,7 @@ Projekt battery-http-server
 
 Plik: base64.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef BASE64_H
 #define BASE64_H

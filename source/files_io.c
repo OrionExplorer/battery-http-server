@@ -6,7 +6,7 @@ Plik: files_io.c
 Przeznaczenie:
 Zbiór funkcji przeznaczonych do obsługi plików i katalogów
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/files_io.h"
 #include <errno.h>

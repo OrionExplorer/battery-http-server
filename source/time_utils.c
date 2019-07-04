@@ -7,7 +7,7 @@ Plik: time_util.c
 Przeznaczenie:
 Zbiór funkcji przeznaczonych do zarządzania datą i czasem
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/shared.h"
 #include <stdio.h>

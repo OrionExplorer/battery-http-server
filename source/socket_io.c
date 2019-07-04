@@ -9,7 +9,7 @@ Inicjalizacja socketów
 Konfiguracja socketów
 Odbieranie danych z sieci i przekazanie do interpretacji
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/socket_io.h"
 #include "include/session.h"

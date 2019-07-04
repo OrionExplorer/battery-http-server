@@ -8,7 +8,7 @@ Przeznaczenie:
 Interpretacja danych otrzymanych od klienta
 Przekazanie danych do funkcji wykonującej żądanie
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/session.h"
 #include "include/socket_io.h"

@@ -7,7 +7,7 @@ Plik: http_protocol.c
 Przeznaczenie:
 Przechowuje zmienne, stałe oraz funkcje używane przy pracy serwera w trybie HTTP
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/http_protocol.h"
 #include "include/session.h"

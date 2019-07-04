@@ -7,7 +7,7 @@ Plik: log.c
 Przeznaczenie:
 Obsługa logowania zdarzeń do pliku logs/log.txt
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/shared.h"
 #include <stdio.h>

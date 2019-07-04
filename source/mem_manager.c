@@ -7,7 +7,7 @@ Plik: mem_manager.c
 Przeznaczenie:
 Funkcje ułatwiające zarządzanie pamięcią
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/shared.h"
 #include "include/mem_manager.h"

@@ -4,7 +4,7 @@ Projekt battery-http-server
 
 Plik: files_io.h
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #ifndef FILES_IO_H
 #define FILES_IO_H

@@ -7,7 +7,7 @@ Plik: strings_utils.c
 Przeznaczenie:
 Zbiór funkcji rozszerzających działania na ciągach znaków
 
-Autor: Marcin Kelar ( marcin.kelar@holicon.pl )
+Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/string_utils.h"
 #include "include/shared.h"
