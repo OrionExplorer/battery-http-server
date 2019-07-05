@@ -15,6 +15,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include "include/session.h"
 #include "include/http_protocol.h"
 #include "include/shared.h"
+#include "include/ssl.h"
 #include "include/log.h"
 #include "include/files_io.h"
 #include <sys/sendfile.h>
@@ -37,6 +38,10 @@ int                 socket_server;
 int                 addr_size;
 int                 active_port;
 struct sockaddr_in  server_address;
+char                *ssl_cert_file;
+char                *ssl_key_file;
+int                 ssl_on;
+SSL_CTX             *SSL_context;
 HTTP_SESSION        http_session_;
 int                 i_sac;
 fd_set              master;
@@ -64,7 +69,7 @@ static void SOCKET_initialization( void ) {
     LOG_print( "Waiting for socket server initialization..." );
 
 #ifdef _WIN32
-    /*Inicjalizacja WinSock */
+    /* Inicjalizacja WinSock */
     if ( WSAStartup( MAKEWORD( 2, 2 ), &wsk ) != 0 ) {
         LOG_print( "\nError creating Winsock.\n" );
         printf( "Error creating Winsock.\n" );
@@ -72,7 +77,7 @@ static void SOCKET_initialization( void ) {
         exit( EXIT_FAILURE );
     }
 #endif
-    /*Utworzenie socketa nasłuchującego */
+    /* Utworzenie socketa nasłuchującego */
     socket_server = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
     if ( socket_server == SOCKET_ERROR ) {
         LOG_print( "Error creating socket.\n" );
@@ -83,6 +88,13 @@ static void SOCKET_initialization( void ) {
 
     if( active_port < 0 || active_port > 65535 ) {
         active_port = DEFAULT_PORT;
+    }
+
+    /* Jeśli wybrany port to 443, inicjujemy SSL */
+    if( active_port == 443 && ssl_cert_file && ssl_key_file && ssl_on == 1 ) {
+        SSL_init();
+        SSL_context = SSL_create_context();
+        SSL_configure_context( SSL_context, ssl_cert_file, ssl_key_file );
     }
 
     memset( &server_address, 0, sizeof( server_address ) );
@@ -228,6 +240,7 @@ void SOCKET_run( void ) {
         while( --i ) {
             if( FD_ISSET( i, &read_fds ) ) { /* Coś się dzieje na sockecie... */
                 if( i == socket_server ) {
+                    SSL *ssl;
                     /* Podłączył się nowy klient */
                     SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                     http_session_.address_length = sizeof( struct sockaddr );
@@ -270,6 +283,12 @@ static void SOCKET_process( int socket_fd ) {
     session->address = http_session_.address;
     session->socket_descriptor = socket_fd;
     session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
+
+    /* Jeśli aktywna obsługa SSL */
+    if( ssl_on ) {
+        session->ssl = SSL_new( SSL_context );
+        SSL_set_fd( session->ssl, socket_fd );
+    }
 
     if( session->address_length < MAX_URI_LENGTH ) {
         if( errno > 1) {
@@ -346,6 +365,17 @@ void SOCKET_stop( void ) {
     LOG_print( "\t- close( %d )...", socket_server );
     close( socket_server );
     LOG_print( "ok.\n" );
+
+    /* Jeśli wybrany port to 443, zamykamy SSL */
+    if( active_port == 443 && ssl_cert_file && ssl_key_file && ssl_on == 1 ) {
+        LOG_print( "\t- SSL context..." );
+        SSL_CTX_free( SSL_context );
+        LOG_print( "ok.\n" );
+
+        LOG_print( "\t- SSL object..." );
+        SSL_destroy();
+        LOG_print( "ok.\n" );
+    }
 
 #ifdef _WIN32
     LOG_print( "\t- WSACleanup()..." );

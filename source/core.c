@@ -30,6 +30,15 @@ extern char app_path[];
 /* Katalog roboczy - udostępnione klientom zasoby */
 char    *document_root;
 
+/* Informuje, czy obsługa SSL jest aktywna */
+int     ssl_on;
+
+/* Plik certyfikatu SSL */
+char    *ssl_cert_file;
+
+/* Plik klucza prywatnego SSL */
+char    *ssl_key_file;
+
 /*Pełna nazwa pliku (ścieżka dostępu ) "log.txt" */
 char    LOG_filename[ MAX_PATH_LENGTH ];
 
@@ -203,12 +212,12 @@ short CORE_load_configuration( void ) {
                 }
 
                 else if( strncmp( option, "document_root", STD_BUFF_SIZE ) == 0 ) {
-                    /* Alokacja pami�ci */
+                    /* Alokacja pamięci */
                     document_root = malloc( MAX_PATH_LENGTH );
                     mem_allocated( document_root, 9 );
 
                     strncpy( document_root, value, MAX_PATH_LENGTH );
-                    if( directory_exists( document_root ) == 0 ) {/* Podany zasób nie istnieje */
+                    if( directory_exists( document_root ) == 0 ) { /* Podany zasób nie istnieje */
                         LOG_print( "\t- Error: document root path is invalid.\n" );
                         printf( "Error: document root path is invalid: \"%s\"\n", document_root );
                         exit( EXIT_FAILURE );
@@ -216,8 +225,43 @@ short CORE_load_configuration( void ) {
                         LOG_print( "\t- document root path: %s\n", document_root );
                     }
                 }
+
+                else if( strncmp( option, "ssl_certificate_file", STD_BUFF_SIZE ) == 0 ) {
+                    /* Weryfikacja czy plik istnieje */
+                    if( file_exists( value ) == 1 ) {
+                        LOG_print("\t- SSL certificate: %s.\n", value );
+                        LOG_save();
+                        /* Istnieje - alokacja pamięci */
+                        ssl_cert_file = malloc( MAX_PATH_LENGTH );
+                        mem_allocated( ssl_cert_file, 91 );
+                        strncpy( ssl_cert_file, value, MAX_PATH_LENGTH );
+                    } else {
+                        /* Nie istnieje */
+                        ssl_cert_file = NULL;
+                    }
+                }
+
+                else if( strncmp( option, "ssl_key_file", STD_BUFF_SIZE ) == 0 ) {
+                    /* Weryfikacja czy plik istnieje */
+                    if( file_exists( value ) == 1 ) {
+                        LOG_print("\t- SSL private key: %s.\n", value );
+                        LOG_save();
+                        /* Istnieje - alokacja pamięci */
+                        ssl_key_file = malloc( MAX_PATH_LENGTH );
+                        mem_allocated( ssl_key_file, 91 );
+                        strncpy( ssl_key_file, value, MAX_PATH_LENGTH );
+                    } else {
+                        /* Nie istnieje */
+                        ssl_key_file = NULL;
+                    }
+                }
             }
         }
+
+        /* Sprawdzenie, czy udało się wczytać pliki certyfikatu i klucza prywatnego SSL.
+            Jeśli tak - obsługa SSL może być aktywna na serwerze, o ile wybrany port to 443.
+         */
+        ssl_on = active_port == 443 && ssl_cert_file && ssl_key_file;
 
         /* Wczytanie praw dostępów do zasobów */
         if( HTACCESS_load_configuration( cfg_file ) == 0 ) {

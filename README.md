@@ -42,6 +42,7 @@ Fast and portable HTTP server.
 
 ### TODO
 - [ ] Add HTTPS support
+- [ ] Add Accept-Encoding/Content-Encoding header support (gzip, deflate?)
 - [ ] New CGI algorithm and effort to restore POST method
 - [ ] Extend Basic Access Authentication configuration to work with .htaccess files
 - [ ] Rebuild range-based data send
