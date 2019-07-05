@@ -166,19 +166,19 @@ struct LOCAL_INFO {
 
 /* Struktura przechowuje informacje o statusie wysyłki lokalnego zasobu */
 struct SEND_INFO {
-    FILE                *file;                      /* Deskryptor otwartego pliku */
+    FILE*                file;                      /* Deskryptor otwartego pliku */
     long                http_content_size;          /* Rozmiar pliku */
-    long                sent_size;                  /* Ilość danych wysłana do tej pory */
+    size_t              sent_size;                  /* Ilość danych wysłana do tej pory */
     int                 socket_descriptor;          /* Deksryptor podłączonego klienta, który wysłał żądanie */
-    long                total_size;                 /* Przechowuje całkowity rozmiar pliku */
+    size_t              total_size;                 /* Przechowuje całkowity rozmiar pliku */
     short               keep_alive;                 /* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
 };
 
 /* Struktura przechowuje informacje o otwartym pliku */
 struct OPENED_FILE {
     char                filename[ FILENAME_MAX ];   /* Nazwa */
-    FILE*               file;                       /* Deskryptor */
-    long                size;                       /* Rozmiar */
+    FILE*               file;                       /* Deskryptor otwartego pliku */
+    size_t              size;                       /* Rozmiar */
     int                 socket_descriptor;          /* Deskryptor podłączonego klienta, który wysłał żądanie */
     RESOURCE_TYPE       type;                       /* Rodzaj zasobu */
 };
@@ -188,15 +188,12 @@ struct HTTP_SESSION {
     struct sockaddr_in      address;
 #ifdef _WIN32
     SOCKET                  socket;
-#else
-    int                     socket;
-#endif
-    fd_set                  socket_data;
-#ifdef _WIN32
     int                     address_length;
 #else
+    int                     socket;
     socklen_t               address_length;
 #endif
+    fd_set                  socket_data;
     int                     socket_descriptor;
     HTTP_INFO               http_info;
     LOCAL_INFO              local_info;

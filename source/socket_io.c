@@ -17,6 +17,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include "include/shared.h"
 #include "include/log.h"
 #include "include/files_io.h"
+#include <sys/sendfile.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,20 +99,19 @@ static void SOCKET_send_all_data( void ) {
     static char m_buf[ UPLOAD_BUFFER ];
     size_t nwrite;
     size_t nread;
+    size_t tmp_now1, tmp_now2;
+    off_t offset = 0;
 
     for( j = 0; j < MAX_CLIENTS; j++ ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
-            fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-            nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
+            //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
+            //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
+            //nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
+            nwrite = sendfile( send_d[ j ].socket_descriptor, send_d[ j ].file->_fileno, &send_d[ j ].sent_size, BUFSIZ );
 
-            nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
-
-            if( nwrite > 0  && nread == nwrite ) {
-                send_d[ j ].sent_size += nread;
-                send_d[ j ].http_content_size -= nwrite;
-            }
-
-            if( (nwrite == -1 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
+            send_d[ j ].http_content_size -= nwrite;
+            
+            if( (nwrite < 0 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
                 SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
             }
         }
@@ -160,6 +160,12 @@ static void SOCKET_prepare( void ) {
         wsa_result = WSAGetLastError();
         LOG_print( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
         printf( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
+    }
+
+    if( setsockopt( socket_server, IPPROTO_TCP, TCP_CORK, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
+        wsa_result = WSAGetLastError();
+        LOG_print( "setsockopt( TCP_CORK ) error: %d.\n", wsa_result );
+        printf( "setsockopt( TCP_CORK ) error: %d.\n", wsa_result );
     }
 
     /* Ustawienie na non-blocking socket */

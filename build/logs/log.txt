@@ -1,18 +1,17 @@
 Starting server_validate_paths()...
-Creating path: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/...
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/.
+Creating path: /home/marcin/webdev/battery-http-server/build/logs/...
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
 NEW SERVER SESSION.
-LOG_filename: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/log.txt.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
 server_validate_paths() done.
 Application start path:
-/mnt/c/MARCIN/Programowanie/battery-http-server/build/
-Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/battery.conf )...
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
 	- file opened successfully...
 	- variable loaded: ip_proto_ver = 4.
 	- variable loaded: active_port = 9090.
 	- document root path: /var/www/html
-	- access to "/var/www/html/index.html" with login "battery_username", password "secret_password" ( YmF0dGVyeV91c2VybmFtZTpzZWNyZXRfcGFzc3dvcmQ= ).
 	- new site index: index.html.
 	- new site index: index.htm.
 	- mime type ".htm" assigned to "text/html".
@@ -44,33 +43,19 @@ Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/bui
 	- mime type ".js" assigned to "application/javascript".
 	- mime type ".zip" assigned to "application/zip".
 Configuration file loaded successfully.
-Waiting for socket server initialization...ok.
-Socket server is running:
-- Port: 9090.
-Communication Interface ready...
-Thu, 04 Jul 2019 22:09:54 GMT 192.168.0.103 GET "/mjpeg.html" HTTP/1.1 304
-Thu, 04 Jul 2019 22:09:54 GMT 192.168.0.103 GET "/mjpeg.js" HTTP/1.1 304
-Thu, 04 Jul 2019 22:09:55 GMT 192.168.0.103 GET "/favicon.ico" HTTP/1.1 404
-Server is being closed...
-SOCKET_stop( 5 ):
-	- shutdown( 3 )...ok.
-	- close( 0 )...ok.
-	- close( 3 )...ok.
-Server closed.
 Starting server_validate_paths()...
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/.
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
 NEW SERVER SESSION.
-LOG_filename: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/log.txt.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
 server_validate_paths() done.
 Application start path:
-/mnt/c/MARCIN/Programowanie/battery-http-server/build/
-Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/battery.conf )...
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
 	- file opened successfully...
 	- variable loaded: ip_proto_ver = 4.
 	- variable loaded: active_port = 9090.
 	- document root path: /var/www/html
-	- access to "/var/www/html/index.html" with login "battery_username", password "secret_password" ( YmF0dGVyeV91c2VybmFtZTpzZWNyZXRfcGFzc3dvcmQ= ).
 	- new site index: index.html.
 	- new site index: index.htm.
 	- mime type ".htm" assigned to "text/html".
@@ -102,32 +87,19 @@ Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/bui
 	- mime type ".js" assigned to "application/javascript".
 	- mime type ".zip" assigned to "application/zip".
 Configuration file loaded successfully.
-Waiting for socket server initialization...ok.
-Socket server is running:
-- Port: 9090.
-Communication Interface ready...
-Thu, 04 Jul 2019 22:17:36 GMT 192.168.0.103 GET "/mjpeg.js" HTTP/1.1 304
-Thu, 04 Jul 2019 22:18:10 GMT 192.168.0.103 GET "/mjpeg.js" HTTP/1.1 304
-Server is being closed...
-SOCKET_stop( 5 ):
-	- shutdown( 3 )...ok.
-	- close( 0 )...ok.
-	- close( 3 )...ok.
-Server closed.
 Starting server_validate_paths()...
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/.
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
 NEW SERVER SESSION.
-LOG_filename: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/log.txt.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
 server_validate_paths() done.
 Application start path:
-/mnt/c/MARCIN/Programowanie/battery-http-server/build/
-Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/battery.conf )...
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
 	- file opened successfully...
 	- variable loaded: ip_proto_ver = 4.
 	- variable loaded: active_port = 9090.
 	- document root path: /var/www/html
-	- access to "/var/www/html/index.html" with login "battery_username", password "secret_password" ( YmF0dGVyeV91c2VybmFtZTpzZWNyZXRfcGFzc3dvcmQ= ).
 	- new site index: index.html.
 	- new site index: index.htm.
 	- mime type ".htm" assigned to "text/html".
@@ -163,11 +135,11 @@ Waiting for socket server initialization...ok.
 Socket server is running:
 - Port: 9090.
 Communication Interface ready...
-Thu, 04 Jul 2019 22:21:18 GMT 192.168.0.103 GET "/mjpeg.js" HTTP/1.1 304
-Thu, 04 Jul 2019 22:21:18 GMT 192.168.0.103 GET "/mjpeg.js" HTTP/1.1 304
-Thu, 04 Jul 2019 22:28:42 GMT 192.168.0.103 GET "/mjpeg.js" HTTP/1.1 304
+Fri, 05 Jul 2019 14:07:34 GMT 127.0.0.1 GET "/KI.zip" HTTP/1.1 206
+Fri, 05 Jul 2019 14:07:40 GMT (null)  "(null)" (null) 414
+Fri, 05 Jul 2019 14:07:59 GMT 127.0.0.1 GET "/KI.zip" HTTP/1.1 200
 Server is being closed...
-SOCKET_stop( 5 ):
+SOCKET_stop( 4 ):
 	- shutdown( 3 )...ok.
 	- close( 0 )...ok.
 	- close( 3 )...ok.
