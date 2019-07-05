@@ -326,7 +326,7 @@ void SESSION_prepare( HTTP_SESSION *http_session ) {
         http_session->http_info.method_name = POST;
     } else {
         /* Metoda nieobsługiwana - papa... */
-        RESPONSE_error( http_session, HTTP_501_NOT_SUPPORTED, HTTP_ERR_501_MSG, NULL );
+        RESPONSE_error( http_session, HTTP_501_NOT_IMPLEMENTED, HTTP_ERR_501_MSG, NULL );
         SOCKET_disconnect_client( http_session );
         SESSION_release( http_session );
         if( temp_http_method_name ) {

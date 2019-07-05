@@ -92,7 +92,7 @@ static void SOCKET_initialization( void ) {
 
 /*
 SOCKET_send_all_data( void )
-- funkcja weryfikuje, czy są do wysłania dane z którego kolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
+- funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
     int j;
     static char m_buf[ UPLOAD_BUFFER ];

@@ -30,7 +30,7 @@ Fast and portable HTTP server.
 * 500 Server Error
 * 501 Not Implemented
 * 503 Service Unavailable
-* 504 Not Supported
+* 504 Not Implemented
 
 ### Other features
 * High performance (tested with Apache Benchmark - http://pastebin.com/zBG7nHbL)
