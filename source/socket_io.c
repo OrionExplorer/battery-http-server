@@ -67,7 +67,7 @@ SOCKET_initialization( void )
 - inicjalizacja WinSock
 - inicjalizacja socketa */
 static void SOCKET_initialization( void ) {
-    LOG_print( "Waiting for socket server initialization..." );
+    LOG_print( "Socket server initialization...\n" );
 
 #ifdef _WIN32
     /* Inicjalizacja WinSock */
@@ -210,7 +210,7 @@ static void SOCKET_prepare( void ) {
         exit( EXIT_FAILURE );
     }
 
-    LOG_print( "ok.\nSocket server is running:\n" );
+    LOG_print( "Socket server is running:\n" );
     LOG_print( "- Port: %d.\n", active_port );
     LOG_print( "Communication Interface ready...\n" );
     /* Teraz czekamy na połączenia i dane */
@@ -251,11 +251,15 @@ void SOCKET_run( void ) {
                     newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &http_session_.address_length );
 
                     if( newfd == -1 ) {
+                        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                            continue;
+                        }
                         LOG_print( "Socket error: accept().\n" );
                     } else {
                         SESSION_add_new_send_struct( newfd );
 
                         FD_SET( newfd, &master );
+
                         if( newfd > fdmax ) {
                             fdmax = newfd;
                         }
@@ -263,7 +267,6 @@ void SOCKET_run( void ) {
                         if( ssl_on ) {
                             http_session_.ssl = SSL_new( SSL_context );
                             if( http_session_.ssl ) {
-                                SSL_set_accept_state( http_session_.ssl );
                                 LOG_save();
                                 SSL_set_fd( http_session_.ssl, newfd );
                                 LOG_save();
@@ -271,21 +274,21 @@ void SOCKET_run( void ) {
                                 int ret = SSL_accept( http_session_.ssl );
                                 if ( ret <= 0 ) {
                                     int err_SSL_get_error = SSL_get_error( http_session_.ssl, ret );
-                                    int err_ERR_get_error = ERR_get_error();
+                                    unsigned long err_ERR_get_error = ERR_peek_last_error();
                                     LOG_print("[SSL] SSL_accept() : Failed with return %d\n", ret );
-                                    LOG_print("[SSL]     SSL_get_error() returned : %d\n", err_SSL_get_error);
-                                    LOG_print("[SSL]     Error string : %s\n", ERR_error_string( err_ERR_get_error, NULL ) );
-                                    LOG_print("[SSL]     ERR_get_error() returned : %d\n", err_ERR_get_error );
+                                    LOG_print("[SSL]\tSSL_get_error() returned : %d\n", err_SSL_get_error);
+                                    LOG_print("[SSL]\tError string : %s\n", ERR_error_string( err_ERR_get_error, NULL ) );
+                                    LOG_print("[SSL]\tERR_get_error() returned : %ld\n", err_ERR_get_error );
                                 } else {
-                                    LOG_print( "[SSL] Client connection accepted.\n" );
+                                    LOG_print( "[SSL] Client connection accepted using %s.\n", SSL_get_cipher( http_session_.ssl ) );
                                     char buf[1024];
                                     size_t bytes;
                                     char *reply = "HTTP/1.1 200 OK\r\nServer:a\r\nContent-Length: 17\r\n\r\nSimple SSL reply.";
-                                    bytes = SSL_read( http_session_.ssl, buf, sizeof(buf)); /* get request */
+                                    bytes = SSL_read( http_session_.ssl, buf, sizeof( buf ) );
                                     if ( bytes > 0 ) {
-                                        buf[bytes] = 0;
-                                        printf("%s\n", buf);
-                                        SSL_write(http_session_.ssl, reply, strlen(reply)); /* send reply */
+                                        buf[ bytes ] = 0;
+                                        printf( "%s\n", buf );
+                                        SSL_write( http_session_.ssl, reply, strlen( reply ) );
                                     }
                                 }
                             }

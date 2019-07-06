@@ -45,23 +45,23 @@ Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/bui
 	- mime type ".js" assigned to "application/javascript".
 	- mime type ".zip" assigned to "application/zip".
 Configuration file loaded successfully.
-Waiting for socket server initialization...Certificate /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.crt loaded successfuly.
+Socket server initialization...
+Certificate /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.crt loaded successfuly.
 Private key /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.crt loaded successfuly.
 Certificate and private key verification succeeded.
-ok.
 Socket server is running:
 - Port: 443.
 Communication Interface ready...
 [SSL] SSL_accept() : Failed with return -1
-[SSL]     SSL_get_error() returned : 1
-[SSL]     Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]     ERR_get_error() returned : 336151574
+[SSL]	SSL_get_error() returned : 1
+[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
+[SSL]	ERR_get_error() returned : 336151574
 [SSL] SSL_accept() : Failed with return -1
-[SSL]     SSL_get_error() returned : 1
-[SSL]     Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]     ERR_get_error() returned : 336151574
-[SSL] Client connection accepted.
-Sat, 06 Jul 2019 13:06:36 GMT 192.168.0.103  "(null)" (null) 501
+[SSL]	SSL_get_error() returned : 1
+[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
+[SSL]	ERR_get_error() returned : 336151574
+[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
+Sat, 06 Jul 2019 22:20:11 GMT 192.168.0.103  "(null)" (null) 501
 Server is being closed...
 SOCKET_stop( 6 ):
 	- shutdown( 3 )...ok.
