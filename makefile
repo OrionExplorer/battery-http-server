@@ -6,13 +6,13 @@ INSTALL_DIR=/opt/battery
 all: battery
 
 battery: battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o ssl.o
+	@ rm build -rf
 	@ mkdir build/configuration -p
 	@ cp source/configuration/battery.conf build/configuration/battery.conf
-	@ cp certificate.pem build/configuration/certificate.pem
-	@ cp private.key build/configuration/private.key
+	@ cp server.crt build/configuration/server.crt
+	@ cp server.key build/configuration/server.key
 	gcc battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o ssl.o -o build/battery $(CLIBS)
 	@ rm *.o
-	@ rm build/logs -rf
 
 battery.o: source/battery.c
 	gcc -c source/battery.c

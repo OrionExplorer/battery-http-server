@@ -19,6 +19,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include "include/log.h"
 #include "include/files_io.h"
 #include <sys/sendfile.h>
+#include <openssl/bio.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,8 +94,11 @@ static void SOCKET_initialization( void ) {
     /* Jeśli wybrany port to 443, inicjujemy SSL */
     if( active_port == 443 && ssl_cert_file && ssl_key_file && ssl_on == 1 ) {
         SSL_init();
+        LOG_save();
         SSL_context = SSL_create_context();
+        LOG_save();
         SSL_configure_context( SSL_context, ssl_cert_file, ssl_key_file );
+        LOG_save();
     }
 
     memset( &server_address, 0, sizeof( server_address ) );
@@ -250,9 +254,41 @@ void SOCKET_run( void ) {
                         LOG_print( "Socket error: accept().\n" );
                     } else {
                         SESSION_add_new_send_struct( newfd );
+
                         FD_SET( newfd, &master );
                         if( newfd > fdmax ) {
                             fdmax = newfd;
+                        }
+
+                        if( ssl_on ) {
+                            http_session_.ssl = SSL_new( SSL_context );
+                            if( http_session_.ssl ) {
+                                SSL_set_accept_state( http_session_.ssl );
+                                LOG_save();
+                                SSL_set_fd( http_session_.ssl, newfd );
+                                LOG_save();
+
+                                int ret = SSL_accept( http_session_.ssl );
+                                if ( ret <= 0 ) {
+                                    int err_SSL_get_error = SSL_get_error( http_session_.ssl, ret );
+                                    int err_ERR_get_error = ERR_get_error();
+                                    LOG_print("[SSL] SSL_accept() : Failed with return %d\n", ret );
+                                    LOG_print("[SSL]     SSL_get_error() returned : %d\n", err_SSL_get_error);
+                                    LOG_print("[SSL]     Error string : %s\n", ERR_error_string( err_ERR_get_error, NULL ) );
+                                    LOG_print("[SSL]     ERR_get_error() returned : %d\n", err_ERR_get_error );
+                                } else {
+                                    LOG_print( "[SSL] Client connection accepted.\n" );
+                                    char buf[1024];
+                                    size_t bytes;
+                                    char *reply = "HTTP/1.1 200 OK\r\nServer:a\r\nContent-Length: 17\r\n\r\nSimple SSL reply.";
+                                    bytes = SSL_read( http_session_.ssl, buf, sizeof(buf)); /* get request */
+                                    if ( bytes > 0 ) {
+                                        buf[bytes] = 0;
+                                        printf("%s\n", buf);
+                                        SSL_write(http_session_.ssl, reply, strlen(reply)); /* send reply */
+                                    }
+                                }
+                            }
                         }
                     }
                 } else {
@@ -283,12 +319,7 @@ static void SOCKET_process( int socket_fd ) {
     session->address = http_session_.address;
     session->socket_descriptor = socket_fd;
     session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
-
-    /* Jeśli aktywna obsługa SSL */
-    if( ssl_on ) {
-        session->ssl = SSL_new( SSL_context );
-        SSL_set_fd( session->ssl, socket_fd );
-    }
+    session->ssl = http_session_.ssl;
 
     if( session->address_length < MAX_URI_LENGTH ) {
         if( errno > 1) {

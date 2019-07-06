@@ -190,11 +190,12 @@ short CORE_load_configuration( void ) {
         /* Reset zmiennych */
         ip_proto_ver = -1;
         active_port = -1;
+        ssl_cert_file = NULL,
+        ssl_key_file = NULL;
 
         LOG_print( "\n\t- file opened successfully...\n" );
 
         while( fgets( buf, STD_BUFF_SIZE, cfg_file ) != NULL ) {
-
             if( sscanf( buf, "%256s %256s", option, value ) == 2 ) {
 
                 if( strncmp( option, "ip_ver", STD_BUFF_SIZE) == 0 ) {
@@ -213,10 +214,10 @@ short CORE_load_configuration( void ) {
 
                 else if( strncmp( option, "document_root", STD_BUFF_SIZE ) == 0 ) {
                     /* Alokacja pamięci */
-                    document_root = malloc( MAX_PATH_LENGTH );
+                    document_root = malloc( STD_BUFF_SIZE );
                     mem_allocated( document_root, 9 );
 
-                    strncpy( document_root, value, MAX_PATH_LENGTH );
+                    strncpy( document_root, value, STD_BUFF_SIZE );
                     if( directory_exists( document_root ) == 0 ) { /* Podany zasób nie istnieje */
                         LOG_print( "\t- Error: document root path is invalid.\n" );
                         printf( "Error: document root path is invalid: \"%s\"\n", document_root );
@@ -232,11 +233,13 @@ short CORE_load_configuration( void ) {
                         LOG_print("\t- SSL certificate: %s.\n", value );
                         LOG_save();
                         /* Istnieje - alokacja pamięci */
-                        ssl_cert_file = malloc( MAX_PATH_LENGTH );
+                        ssl_cert_file = malloc( STD_BUFF_SIZE );
                         mem_allocated( ssl_cert_file, 91 );
-                        strncpy( ssl_cert_file, value, MAX_PATH_LENGTH );
+                        strncpy( ssl_cert_file, value, STD_BUFF_SIZE );
                     } else {
                         /* Nie istnieje */
+                        LOG_print("\t- Error: SSL certificate file does not exist: %s.\n", value );
+                        LOG_save();
                         ssl_cert_file = NULL;
                     }
                 }
@@ -248,10 +251,12 @@ short CORE_load_configuration( void ) {
                         LOG_save();
                         /* Istnieje - alokacja pamięci */
                         ssl_key_file = malloc( MAX_PATH_LENGTH );
-                        mem_allocated( ssl_key_file, 91 );
+                        mem_allocated( ssl_key_file, 92 );
                         strncpy( ssl_key_file, value, MAX_PATH_LENGTH );
                     } else {
                         /* Nie istnieje */
+                        LOG_print("\t- Error: SSL private key file does not exist: %s.\n", value );
+                        LOG_save();
                         ssl_key_file = NULL;
                     }
                 }
