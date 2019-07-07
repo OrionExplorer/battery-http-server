@@ -323,21 +323,12 @@ void SOCKET_run( void ) {
 
                                             case SSL_ERROR_WANT_X509_LOOKUP:
                                                 printf("SSL_ERROR_WANT_X509_LOOKUP\n");
-                                            break;
-
-                                            case SSL_ERROR_WANT_ASYNC:
-                                                printf("SSL_ERROR_WANT_ASYNC\n");
-                                            break;
-
-                                            case SSL_ERROR_WANT_ASYNC_JOB:
-                                                printf("SSL_ERROR_WANT_ASYNC_JOB\n");
-                                            break;
+                                            break; 
 
                                             case SSL_ERROR_SSL:
                                                 printf("SSL_ERROR_SSL\n");
                                             break;
-                                            default: 
-                                                printf("CO JEST: %d\n", ssl_error);
+                                            default:
                                             break;
                                                 //some other error, clean up
                                         }
