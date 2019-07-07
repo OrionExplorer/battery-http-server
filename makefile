@@ -11,50 +11,50 @@ battery: battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htac
 	@ cp source/configuration/battery.conf build/configuration/battery.conf
 	@ cp server.crt build/configuration/server.crt
 	@ cp server.key build/configuration/server.key
-	gcc battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o ssl.o -o build/battery $(CLIBS)
+	$(CC) $(CFLAGS) battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o ssl.o -o build/battery $(CLIBS)
 	@ rm *.o
 
 battery.o: source/battery.c
-	gcc -c source/battery.c
+	$(CC) $(CFLAGS) -c source/battery.c
 
 session.o: source/session.c
-	gcc -c source/session.c
+	$(CC) $(CFLAGS) -c source/session.c
 
 mem_manager.o: source/mem_manager.c
-	gcc -c source/mem_manager.c
+	$(CC) $(CFLAGS) -c source/mem_manager.c
 
 files_io.o: source/files_io.c
-	gcc -c source/files_io.c
+	$(CC) $(CFLAGS) -c source/files_io.c
 
 mime_types.o: source/mime_types.c
-	gcc -c source/mime_types.c
+	$(CC) $(CFLAGS) -c source/mime_types.c
 
 base64.o: source/base64.c
-	gcc -c source/base64.c
+	$(CC) $(CFLAGS) -c source/base64.c
 
 htaccess_manager.o: source/htaccess_manager.c
-	gcc -c source/htaccess_manager.c
+	$(CC) $(CFLAGS) -c source/htaccess_manager.c
 
 socket_io.o: source/socket_io.c
-	gcc -c source/socket_io.c
+	$(CC) $(CFLAGS) -c source/socket_io.c
 
 http_protocol.o: source/http_protocol.c
-	gcc -c source/http_protocol.c
+	$(CC) $(CFLAGS) -c source/http_protocol.c
 
 string_utils.o: source/string_utils.c
-	gcc -c source/string_utils.c
+	$(CC) $(CFLAGS) -c source/string_utils.c
 
 core.o: source/core.c
-	gcc -c source/core.c
+	$(CC) $(CFLAGS) -c source/core.c
 
 log.o: source/log.c
-	gcc -c source/log.c
+	$(CC) $(CFLAGS) -c source/log.c
 
 time_utils.o: source/time_utils.c
-	gcc -c source/time_utils.c
+	$(CC) $(CFLAGS) -c source/time_utils.c
 
 ssl.o: source/ssl.c
-	gcc -c source/ssl.c
+	$(CC) $(CFLAGS) -c source/ssl.c
 
 clean:
 	rm *.o
