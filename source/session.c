@@ -448,7 +448,6 @@ SESSION_init( HTTP_SESSION *http_session )
 - zeruje elementy struktury */
 void SESSION_init( HTTP_SESSION *http_session ) {
 
-    http_session->ssl = NULL;
     http_session->http_info.content_data = NULL;
     http_session->http_info.http_local_path = NULL;
     http_session->http_info.protocol_ver = NULL;
@@ -477,11 +476,6 @@ SESSION_release( HTTP_SESSION *http_session )
 @http_session - wskaźnik do podłączonego klienta
 - sprawdza, czy elementy struktury HTTP_SESSION zajmują pamięć i w razie potrzeby zwalnia ją */
 void SESSION_release( HTTP_SESSION *http_session ) {
-
-    if( http_session->ssl != NULL ) {
-        SSL_free( http_session->ssl );
-        http_session->ssl = NULL;
-    }
 
     if( http_session->http_info.content_data != NULL ) {
         free( http_session->http_info.content_data );

@@ -15,8 +15,6 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include "mem_manager.h"
 #include <stdio.h>
 #include <time.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 
 #ifndef FD_SETSIZE
     #define FD_SETSIZE                      1024
@@ -202,8 +200,6 @@ struct HTTP_SESSION {
     HTTP_INFO               http_info;
     LOCAL_INFO              local_info;
     SEND_INFO               response_data;
-    SSL                     *ssl;
-
 };
 
 #ifdef _WIN32
@@ -212,10 +208,6 @@ struct HTTP_SESSION {
 #else
     extern int              socket_server;
 #endif
-extern int                  ssl_on;                     /* Informuje, czy obsługa SSL jest aktywna */
-extern SSL_CTX*             SSL_context;                /* Główny kontekst SSL */
-extern char*                ssl_cert_file;              /* Plik certyfikatu SSL */
-extern char*                ssl_key_file;               /* Plik klucza prywatnego SSL */
 extern int                  addr_size;
 extern int                  active_port;
 extern struct sockaddr_in   server_address;
