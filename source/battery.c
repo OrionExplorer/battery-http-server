@@ -33,7 +33,7 @@ int main( void ) {
 
 static void app_terminate( void ) {
     LOG_print( "Server is being closed...\n" );
-    SOCKET_stop();
+    SOCKET_free();
     LOG_print( "Server closed.\n" );
     LOG_save();
 }

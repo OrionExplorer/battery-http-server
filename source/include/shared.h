@@ -170,8 +170,9 @@ struct LOCAL_INFO {
 
 /* Struktura przechowuje informacje o statusie wysyłki lokalnego zasobu */
 struct SEND_INFO {
-    FILE*                file;                      /* Deskryptor otwartego pliku */
+    FILE*               file;                       /* Deskryptor otwartego pliku */
     long                http_content_size;          /* Rozmiar pliku */
+    SSL                 *ssl;                       /* Wskaźnik na sesję SSL */
     size_t              sent_size;                  /* Ilość danych wysłana do tej pory */
     int                 socket_descriptor;          /* Deksryptor podłączonego klienta, który wysłał żądanie */
     size_t              total_size;                 /* Przechowuje całkowity rozmiar pliku */

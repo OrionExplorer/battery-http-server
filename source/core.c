@@ -330,7 +330,7 @@ void CORE_initialize( void ) {
     /* Zapisanie informacji o serwerze do log.txt */
     LOG_save();
 
-    atexit( SOCKET_stop );
+    atexit( SOCKET_free );
 
     /* Przełączenie się na folder, z którego będa udostępniane zasoby */
     strncpy( app_path, document_root, MAX_PATH_LENGTH );

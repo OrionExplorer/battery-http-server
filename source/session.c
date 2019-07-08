@@ -448,7 +448,6 @@ SESSION_init( HTTP_SESSION *http_session )
 - zeruje elementy struktury */
 void SESSION_init( HTTP_SESSION *http_session ) {
 
-    http_session->ssl = NULL;
     http_session->http_info.content_data = NULL;
     http_session->http_info.http_local_path = NULL;
     http_session->http_info.protocol_ver = NULL;
@@ -477,11 +476,6 @@ SESSION_release( HTTP_SESSION *http_session )
 @http_session - wskaźnik do podłączonego klienta
 - sprawdza, czy elementy struktury HTTP_SESSION zajmują pamięć i w razie potrzeby zwalnia ją */
 void SESSION_release( HTTP_SESSION *http_session ) {
-
-    if( http_session->ssl != NULL ) {
-        SSL_free( http_session->ssl );
-        http_session->ssl = NULL;
-    }
 
     if( http_session->http_info.content_data != NULL ) {
         free( http_session->http_info.content_data );
@@ -615,6 +609,7 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
             send_d[ i ].http_content_size = 0;
             send_d[ i ].total_size = 0;
             send_d[ i ].keep_alive = 0;
+            send_d[ i ].ssl = NULL;
             return;
         }
     }
@@ -630,7 +625,7 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
     for( i = 0; i <= MAX_CLIENTS-1; i++ ){
         if( send_d[ i ].socket_descriptor == socket_descriptor ) {
             if( send_d[ i ].keep_alive <= 0 ) {
-                SOCKET_close( send_d[ i ].socket_descriptor );
+                SOCKET_close_fd( send_d[ i ].socket_descriptor );
             }
 
             battery_fclose( send_d[ i ].file, socket_descriptor );
@@ -639,7 +634,7 @@ void SESSION_delete_send_struct( int socket_descriptor ) {
             send_d[ i ].http_content_size = 0;
             send_d[ i ].keep_alive = 0;
             send_d[ i ].total_size = 0;
-
+            SSL_free( send_d[ i ].ssl );
             return;
         }
     }

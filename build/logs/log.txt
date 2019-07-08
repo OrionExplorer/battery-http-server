@@ -1,18 +1,18 @@
 Starting server_validate_paths()...
-Creating path: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/...
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/
-	- verified: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/.
+Creating path: /home/marcin/webdev/battery-http-server/build/logs/...
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
 NEW SERVER SESSION.
-LOG_filename: /mnt/c/MARCIN/Programowanie/battery-http-server/build/logs/log.txt.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
 server_validate_paths() done.
 Application start path:
-/mnt/c/MARCIN/Programowanie/battery-http-server/build/
-Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/battery.conf )...
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
 	- file opened successfully...
 	- variable loaded: ip_proto_ver = 4.
 	- variable loaded: active_port = 443.
-	- SSL certificate: /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.crt.
-	- SSL private key: /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.key.
+	- SSL certificate: /home/marcin/webdev/battery-http-server/build/configuration/server.crt.
+	- SSL private key: /home/marcin/webdev/battery-http-server/build/configuration/server.key.
 	- document root path: /var/www/html
 	- new site index: index.html.
 	- new site index: index.htm.
@@ -46,97 +46,234 @@ Loading configuration file ( /mnt/c/MARCIN/Programowanie/battery-http-server/bui
 	- mime type ".zip" assigned to "application/zip".
 Configuration file loaded successfully.
 Socket server initialization...
-Certificate /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.crt loaded successfuly.
-Private key /mnt/c/MARCIN/Programowanie/battery-http-server/build/configuration/server.crt loaded successfuly.
+Certificate /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Private key /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Certificate and private key verification succeeded.
+ioctlsocket() error: 22.
+SOCKET_free( 0 ):
+	- shutdown( 3 )...ok.
+	- close( 0 )...ok.
+	- close( 3 )...ok.
+	- SSL context...ok.
+	- SSL object...ok.
+Starting server_validate_paths()...
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
+NEW SERVER SESSION.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
+server_validate_paths() done.
+Application start path:
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
+	- file opened successfully...
+	- variable loaded: ip_proto_ver = 4.
+	- variable loaded: active_port = 443.
+	- SSL certificate: /home/marcin/webdev/battery-http-server/build/configuration/server.crt.
+	- SSL private key: /home/marcin/webdev/battery-http-server/build/configuration/server.key.
+	- document root path: /var/www/html
+	- new site index: index.html.
+	- new site index: index.htm.
+	- mime type ".htm" assigned to "text/html".
+	- mime type ".html" assigned to "text/html".
+	- mime type ".css" assigned to "text/css".
+	- mime type ".jpg" assigned to "image/jpeg".
+	- mime type ".jpeg" assigned to "image/jpeg".
+	- mime type ".bmp" assigned to "image/bmp".
+	- mime type ".gif" assigned to "image/gif".
+	- mime type ".png" assigned to "image/png".
+	- mime type ".tiff" assigned to "image/tiff".
+	- mime type ".ico" assigned to "image/vnd.microsoft.icon".
+	- mime type ".au" assigned to "audio/basic".
+	- mime type ".wav" assigned to "audio/x-wav".
+	- mime type ".mp3" assigned to "audio/mpeg".
+	- mime type ".ogg" assigned to "application/ogg".
+	- mime type ".wma" assigned to "audio/x-ms-wma".
+	- mime type ".ra" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ram" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ac3" assigned to "audio/ac3".
+	- mime type ".mpa" assigned to "audio/MPA".
+	- mime type ".avi" assigned to "video/x-msvideo".
+	- mime type ".mpeg" assigned to "video/mpeg".
+	- mime type ".mpg" assigned to "video/mpeg".
+	- mime type ".mp4" assigned to "video/mp4".
+	- mime type ".mov" assigned to "video/quicktime".
+	- mime type ".qt" assigned to "video/quicktime".
+	- mime type ".wmv" assigned to "video/x-ms-wmv".
+	- mime type ".js" assigned to "application/javascript".
+	- mime type ".zip" assigned to "application/zip".
+Configuration file loaded successfully.
+Socket server initialization...
+Certificate /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Private key /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Certificate and private key verification succeeded.
+ioctlsocket() error: 22.
+SOCKET_free( 0 ):
+	- shutdown( 3 )...ok.
+	- close( 0 )...ok.
+	- close( 3 )...ok.
+	- SSL context...ok.
+	- SSL object...ok.
+Starting server_validate_paths()...
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
+NEW SERVER SESSION.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
+server_validate_paths() done.
+Application start path:
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
+	- file opened successfully...
+	- variable loaded: ip_proto_ver = 4.
+	- variable loaded: active_port = 443.
+	- SSL certificate: /home/marcin/webdev/battery-http-server/build/configuration/server.crt.
+	- SSL private key: /home/marcin/webdev/battery-http-server/build/configuration/server.key.
+	- document root path: /var/www/html
+	- new site index: index.html.
+	- new site index: index.htm.
+	- mime type ".htm" assigned to "text/html".
+	- mime type ".html" assigned to "text/html".
+	- mime type ".css" assigned to "text/css".
+	- mime type ".jpg" assigned to "image/jpeg".
+	- mime type ".jpeg" assigned to "image/jpeg".
+	- mime type ".bmp" assigned to "image/bmp".
+	- mime type ".gif" assigned to "image/gif".
+	- mime type ".png" assigned to "image/png".
+	- mime type ".tiff" assigned to "image/tiff".
+	- mime type ".ico" assigned to "image/vnd.microsoft.icon".
+	- mime type ".au" assigned to "audio/basic".
+	- mime type ".wav" assigned to "audio/x-wav".
+	- mime type ".mp3" assigned to "audio/mpeg".
+	- mime type ".ogg" assigned to "application/ogg".
+	- mime type ".wma" assigned to "audio/x-ms-wma".
+	- mime type ".ra" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ram" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ac3" assigned to "audio/ac3".
+	- mime type ".mpa" assigned to "audio/MPA".
+	- mime type ".avi" assigned to "video/x-msvideo".
+	- mime type ".mpeg" assigned to "video/mpeg".
+	- mime type ".mpg" assigned to "video/mpeg".
+	- mime type ".mp4" assigned to "video/mp4".
+	- mime type ".mov" assigned to "video/quicktime".
+	- mime type ".qt" assigned to "video/quicktime".
+	- mime type ".wmv" assigned to "video/x-ms-wmv".
+	- mime type ".js" assigned to "application/javascript".
+	- mime type ".zip" assigned to "application/zip".
+Configuration file loaded successfully.
+Socket server initialization...
+Certificate /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Private key /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Certificate and private key verification succeeded.
+ioctlsocket() error: 22.
+SOCKET_free( 0 ):
+	- shutdown( 3 )...ok.
+	- close( 0 )...ok.
+	- close( 3 )...ok.
+	- SSL context...ok.
+	- SSL object...ok.
+Starting server_validate_paths()...
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
+NEW SERVER SESSION.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
+server_validate_paths() done.
+Application start path:
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
+	- file opened successfully...
+	- variable loaded: ip_proto_ver = 4.
+	- variable loaded: active_port = 443.
+	- SSL certificate: /home/marcin/webdev/battery-http-server/build/configuration/server.crt.
+	- SSL private key: /home/marcin/webdev/battery-http-server/build/configuration/server.key.
+	- document root path: /var/www/html
+	- new site index: index.html.
+	- new site index: index.htm.
+	- mime type ".htm" assigned to "text/html".
+	- mime type ".html" assigned to "text/html".
+	- mime type ".css" assigned to "text/css".
+	- mime type ".jpg" assigned to "image/jpeg".
+	- mime type ".jpeg" assigned to "image/jpeg".
+	- mime type ".bmp" assigned to "image/bmp".
+	- mime type ".gif" assigned to "image/gif".
+	- mime type ".png" assigned to "image/png".
+	- mime type ".tiff" assigned to "image/tiff".
+	- mime type ".ico" assigned to "image/vnd.microsoft.icon".
+	- mime type ".au" assigned to "audio/basic".
+	- mime type ".wav" assigned to "audio/x-wav".
+	- mime type ".mp3" assigned to "audio/mpeg".
+	- mime type ".ogg" assigned to "application/ogg".
+	- mime type ".wma" assigned to "audio/x-ms-wma".
+	- mime type ".ra" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ram" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ac3" assigned to "audio/ac3".
+	- mime type ".mpa" assigned to "audio/MPA".
+	- mime type ".avi" assigned to "video/x-msvideo".
+	- mime type ".mpeg" assigned to "video/mpeg".
+	- mime type ".mpg" assigned to "video/mpeg".
+	- mime type ".mp4" assigned to "video/mp4".
+	- mime type ".mov" assigned to "video/quicktime".
+	- mime type ".qt" assigned to "video/quicktime".
+	- mime type ".wmv" assigned to "video/x-ms-wmv".
+	- mime type ".js" assigned to "application/javascript".
+	- mime type ".zip" assigned to "application/zip".
+Configuration file loaded successfully.
+Socket server initialization...
+Certificate /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Private key /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
 Certificate and private key verification succeeded.
 Socket server is running:
 - Port: 443.
 Communication Interface ready...
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] Client connection accepted using ECDHE-RSA-AES128-GCM-SHA256.
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
-[SSL] SSL_accept() : Failed with return -1
-[SSL]	SSL_get_error() returned : 1
-[SSL]	Error string : error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown
-[SSL]	ERR_get_error() returned : 336151574
+Mon, 08 Jul 2019 17:51:37 GMT 127.0.0.1 GET "/index.html" HTTP/1.1 200
+Starting server_validate_paths()...
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/
+	- verified: /home/marcin/webdev/battery-http-server/build/logs/.
+NEW SERVER SESSION.
+LOG_filename: /home/marcin/webdev/battery-http-server/build/logs/log.txt.
+server_validate_paths() done.
+Application start path:
+/home/marcin/webdev/battery-http-server/build/
+Loading configuration file ( /home/marcin/webdev/battery-http-server/build/configuration/battery.conf )...
+	- file opened successfully...
+	- variable loaded: ip_proto_ver = 4.
+	- variable loaded: active_port = 443.
+	- SSL certificate: /home/marcin/webdev/battery-http-server/build/configuration/server.crt.
+	- SSL private key: /home/marcin/webdev/battery-http-server/build/configuration/server.key.
+	- document root path: /var/www/html
+	- new site index: index.html.
+	- new site index: index.htm.
+	- mime type ".htm" assigned to "text/html".
+	- mime type ".html" assigned to "text/html".
+	- mime type ".css" assigned to "text/css".
+	- mime type ".jpg" assigned to "image/jpeg".
+	- mime type ".jpeg" assigned to "image/jpeg".
+	- mime type ".bmp" assigned to "image/bmp".
+	- mime type ".gif" assigned to "image/gif".
+	- mime type ".png" assigned to "image/png".
+	- mime type ".tiff" assigned to "image/tiff".
+	- mime type ".ico" assigned to "image/vnd.microsoft.icon".
+	- mime type ".au" assigned to "audio/basic".
+	- mime type ".wav" assigned to "audio/x-wav".
+	- mime type ".mp3" assigned to "audio/mpeg".
+	- mime type ".ogg" assigned to "application/ogg".
+	- mime type ".wma" assigned to "audio/x-ms-wma".
+	- mime type ".ra" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ram" assigned to "audio/vnd.rn-realaudio".
+	- mime type ".ac3" assigned to "audio/ac3".
+	- mime type ".mpa" assigned to "audio/MPA".
+	- mime type ".avi" assigned to "video/x-msvideo".
+	- mime type ".mpeg" assigned to "video/mpeg".
+	- mime type ".mpg" assigned to "video/mpeg".
+	- mime type ".mp4" assigned to "video/mp4".
+	- mime type ".mov" assigned to "video/quicktime".
+	- mime type ".qt" assigned to "video/quicktime".
+	- mime type ".wmv" assigned to "video/x-ms-wmv".
+	- mime type ".js" assigned to "application/javascript".
+	- mime type ".zip" assigned to "application/zip".
+Configuration file loaded successfully.
+Socket server initialization...
+Certificate /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Private key /home/marcin/webdev/battery-http-server/build/configuration/server.crt loaded successfuly.
+Certificate and private key verification succeeded.
+Socket server is running:
+- Port: 443.
+Communication Interface ready...
