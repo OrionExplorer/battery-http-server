@@ -289,7 +289,8 @@ void SOCKET_run( void ) {
                                     printf("[SSL][%d]\tERR_get_error() returned : %ld\n", newfd, err_ERR_get_error );
                                 } else {
                                     printf( "[SSL][%d] Client connection accepted using %s.\n", newfd, SSL_get_cipher( cclient->ssl ) );
-                                    char buf[1024];
+                                    SOCKET_process( newfd );
+                                    /*char buf[1024];
                                     size_t bytes;
                                     char *reply = "HTTP/1.1 200 OK\r\nServer:a\r\nContent-Length: 17\r\n\r\nSimple SSL reply.";
                                     bytes = SSL_read( cclient->ssl, buf, sizeof( buf ) );
@@ -297,7 +298,7 @@ void SOCKET_run( void ) {
                                         buf[ bytes ] = 0;
                                         printf( "%s\n", buf );
                                         SSL_write( cclient->ssl, reply, strlen( reply ) );
-                                    }
+                                    }*/
                                 }
                             }
                         }
