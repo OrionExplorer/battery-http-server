@@ -99,16 +99,16 @@ static void SOCKET_send_all_data( void ) {
     size_t nwrite;
 
     for( j = 0; j < MAX_CLIENTS; j++ ) {
-        if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
+        if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd > 0 ) {
             //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
             //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-            //nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
-            nwrite = sendfile( send_d[ j ].socket_descriptor, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, BUFSIZ );
+            //nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
+            nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, BUFSIZ );
 
             send_d[ j ].http_content_size -= nwrite;
             
             if( (nwrite < 0 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
-                SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
+                SESSION_delete_send_struct( send_d[ j ].socket_fd );
             }
         }
     }
@@ -268,18 +268,18 @@ static void SOCKET_process( int socket_fd ) {
     errno = 0;
     session->http_info.received_all = http_session_.http_info.received_all;
     session->address = http_session_.address;
-    session->socket_descriptor = socket_fd;
+    session->socket_fd = socket_fd;
     session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
 
     if( session->address_length < MAX_URI_LENGTH ) {
         if( errno > 1) {
             SESSION_delete_send_struct( socket_fd );
-            SOCKET_close( socket_fd );
+            SOCKET_close_fd( socket_fd );
         } else {
             if ( session->address_length <= 0 ) {
                 /* ...ale to jednak było rozłączenie */
                 SESSION_delete_send_struct( socket_fd );
-                SOCKET_close( socket_fd );
+                SOCKET_close_fd( socket_fd );
             } else if (session->address_length > 0 ) {
                 /* Nie zostały wcześniej odebrane wszystkie dane - metoda POST.
                 Teraz trzeba je dokleić do http_info.content_data */
@@ -321,10 +321,10 @@ void SOCKET_modify_clients_count( int mod ) {
     }
 }
 
-void SOCKET_close( int socket_descriptor ) {
-    FD_CLR( socket_descriptor, &master );
-    shutdown( socket_descriptor, SHUT_RDWR );
-    close( socket_descriptor );
+void SOCKET_close_fd( int socket_fd ) {
+    FD_CLR( socket_fd, &master );
+    shutdown( socket_fd, SHUT_RDWR );
+    close( socket_fd );
     /* Zmniejszensie licznika podłączonych klientów */
     SOCKET_modify_clients_count( -1 );
 }
@@ -355,23 +355,15 @@ void SOCKET_stop( void ) {
 }
 
 /*
-SOCKET_release( HTTP_SESSION *http_session )
-@http_session - wskaźnik do podłączonego klienta
-- funkcja resetuje zmienne informujące o podłączonym sockecie. */
-void SOCKET_release( HTTP_SESSION *http_session ) {
-    http_session->socket_descriptor = -1;
-    http_session->address_length = -1;
-    http_session->http_info.keep_alive = -1;
-}
-
-/*
 SOCKET_disconnect_client( HTTP_SESSION *http_session )
 - rozłącza klienta podanego jako struktura http_session */
 void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
-    if( http_session->socket_descriptor != SOCKET_ERROR ) {
-        SOCKET_close( http_session->socket_descriptor );
+    if( http_session->socket_fd != SOCKET_ERROR ) {
+        SOCKET_close_fd( http_session->socket_fd );
     } else {
-        SOCKET_release( http_session );
+        http_session->socket_fd = -1;
+        http_session->address_length = -1;
+        http_session->http_info.keep_alive = -1;
     }
 }
 
@@ -379,7 +371,7 @@ void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
 SOCKET_send( HTTP_SESSION *http_session, char *buf, int http_content_size )
 - wysyła pakiet danych ( buf ) do danego klienta ( http_session ) */
 void SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size, int *res ) {
-    if( ( http_session->address_length = send( http_session->socket_descriptor, buf, http_content_size, 0 ) ) <= 0 ) {
+    if( ( http_session->address_length = send( http_session->socket_fd, buf, http_content_size, 0 ) ) <= 0 ) {
         SOCKET_disconnect_client( http_session );
     }
     

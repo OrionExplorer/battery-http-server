@@ -106,7 +106,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
         return 0;
     }
 
-    tmp_socket = ( http_session ? http_session->socket_descriptor : -133 );
+    tmp_socket = ( http_session ? http_session->socket_fd : -133 );
     /* Sprawdza, czy udało się otworzyć plik */
     resource = battery_fopen( filename, READ_BINARY, 1, tmp_socket, STD_FILE );
 
@@ -182,13 +182,13 @@ void file_extract_path(char *full_filename, char delim)
 }
 
 /*
-battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor )
+battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_fd )
 @filename - nazwa pliku do otwarcia
 @mode - tryb czytania pliku
 @add_to_list - definiuje, czy plik ma zostać dodany do listy otwartych przez serwer plików
-@socket_descriptor - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
+@socket_fd - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
 - funkcja weryfikuje, czy żądany plik jest już otwarty przez serwer */
-FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_descriptor, RESOURCE_TYPE type ) {
+FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_fd, RESOURCE_TYPE type ) {
     int i = FOPEN_MAX;
     FILE *tmp = NULL;
 
@@ -216,7 +216,7 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
                 /* Dodanie informacji o otwartym pliku w pierwszym wolnym elemencie */
                 if( opened_files[ i ].file == NULL ) {
                     opened_files[ i ] .file = tmp;
-                    opened_files[ i ] .socket_descriptor = socket_descriptor;
+                    opened_files[ i ] .socket_fd = socket_fd;
                     strncpy( opened_files[ i ].filename, filename, FILENAME_MAX );
                     opened_files[ i ].size = ftell( tmp );
                     opened_files[ i ].type = type;
@@ -264,11 +264,11 @@ char* battery_get_filename( FILE *file ) {
 }
 
 /*
-battery_fclose( FILE *file, int socket_descriptor )
+battery_fclose( FILE *file, int socket_fd )
 @file - wskaźnik do otwartego pliku
-@socket_descriptor - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
+@socket_fd - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
 - funkcja weryfikuje, czy żądany plik może zostać zamknięty na podstawie ilości korzystających z niego klientów */
-void battery_fclose( FILE *file, int socket_descriptor ) {
+void battery_fclose( FILE *file, int socket_fd ) {
     int i = FOPEN_MAX;
     int clients_count = 0;
     short file_found = 0;
@@ -282,8 +282,8 @@ void battery_fclose( FILE *file, int socket_descriptor ) {
         /* Znaleziony element przechowujący informację o otwartym pliku */
         if( file && opened_files[ i ].file == file ) {
             /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
-            if( opened_files[ i ].socket_descriptor == socket_descriptor ) {
-                opened_files[ i ].socket_descriptor = 0;
+            if( opened_files[ i ].socket_fd == socket_fd ) {
+                opened_files[ i ].socket_fd = 0;
                 opened_files[ i ].file = NULL;
                 opened_files[ i ].size = 0;
                 type = opened_files[ i ].type;

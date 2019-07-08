@@ -228,7 +228,7 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
         http_session->http_info.keep_alive = 0;
     }
 
-    send_struct = SESSION_find_response_struct_by_id( http_session->socket_descriptor );
+    send_struct = SESSION_find_response_struct_by_id( http_session->socket_fd );
     if( send_struct ) {
         send_struct->keep_alive = http_session->http_info.keep_alive;
     }
@@ -569,7 +569,7 @@ SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int
 int SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int http_content_size ) {
     int result = 0;
 
-    if( ( http_content_size <= 0 ) || ( http_session->socket_descriptor == SOCKET_ERROR ) ) {
+    if( ( http_content_size <= 0 ) || ( http_session->socket_fd == SOCKET_ERROR ) ) {
         return 0;
     }
 
@@ -587,7 +587,7 @@ SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
     int i;
 
     for( i = 0; i <= MAX_CLIENTS; i++ ) {
-        if( send_d[ i ].socket_descriptor == socket ) {
+        if( send_d[ i ].socket_fd == socket ) {
             return &send_d[ i ];
         }
     }
@@ -596,15 +596,15 @@ SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
 }
 
 /*
-SESSION_add_new_send_struct( int socket_descriptor )
-@socket_descriptor - identyfikator gniazda
+SESSION_add_new_send_struct( int socket_fd )
+@socket_fd - identyfikator gniazda
 - funkcja znajduje pustą strukturę w tablicy SEND_INFO i przydziela jej identyfikator gniazda w celu umożliwienia późniejszej wysyłki danych */
-void SESSION_add_new_send_struct( int socket_descriptor ) {
+void SESSION_add_new_send_struct( int socket_fd ) {
     int i;
 
     for( i = 0; i <= MAX_CLIENTS-1; i++ ){
-        if( send_d[ i ].socket_descriptor == 0 ) {
-            send_d[ i ].socket_descriptor = socket_descriptor;
+        if( send_d[ i ].socket_fd == 0 ) {
+            send_d[ i ].socket_fd = socket_fd;
             send_d[ i ].sent_size = 0;
             send_d[ i ].http_content_size = 0;
             send_d[ i ].total_size = 0;
@@ -615,20 +615,20 @@ void SESSION_add_new_send_struct( int socket_descriptor ) {
 }
 
 /*
-SESSION_add_new_send_struct( int socket_descriptor )
-@socket_descriptor - identyfikator gniazda
+SESSION_add_new_send_struct( int socket_fd )
+@socket_fd - identyfikator gniazda
 - funkcja usuwa strukturę SEND_INFO, ponieważ wysłanie contentu zakończyło się lub klient się rozłączy  */
-void SESSION_delete_send_struct( int socket_descriptor ) {
+void SESSION_delete_send_struct( int socket_fd ) {
     int i;
 
     for( i = 0; i <= MAX_CLIENTS-1; i++ ){
-        if( send_d[ i ].socket_descriptor == socket_descriptor ) {
+        if( send_d[ i ].socket_fd == socket_fd ) {
             if( send_d[ i ].keep_alive <= 0 ) {
-                SOCKET_close( send_d[ i ].socket_descriptor );
+                SOCKET_close_fd( send_d[ i ].socket_fd );
             }
 
-            battery_fclose( send_d[ i ].file, socket_descriptor );
-            send_d[ i ].socket_descriptor = 0;
+            battery_fclose( send_d[ i ].file, socket_fd );
+            send_d[ i ].socket_fd = 0;
             send_d[ i ].sent_size = 0;
             send_d[ i ].http_content_size = 0;
             send_d[ i ].keep_alive = 0;

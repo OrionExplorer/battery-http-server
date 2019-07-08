@@ -171,7 +171,7 @@ struct SEND_INFO {
     FILE*                file;                      /* Deskryptor otwartego pliku */
     long                http_content_size;          /* Rozmiar pliku */
     size_t              sent_size;                  /* Ilość danych wysłana do tej pory */
-    int                 socket_descriptor;          /* Deksryptor podłączonego klienta, który wysłał żądanie */
+    int                 socket_fd;          /* Deksryptor podłączonego klienta, który wysłał żądanie */
     size_t              total_size;                 /* Przechowuje całkowity rozmiar pliku */
     short               keep_alive;                 /* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
 };
@@ -181,7 +181,7 @@ struct OPENED_FILE {
     char                filename[ FILENAME_MAX ];   /* Nazwa */
     FILE*               file;                       /* Deskryptor otwartego pliku */
     size_t              size;                       /* Rozmiar */
-    int                 socket_descriptor;          /* Deskryptor podłączonego klienta, który wysłał żądanie */
+    int                 socket_fd;          /* Deskryptor podłączonego klienta, który wysłał żądanie */
     RESOURCE_TYPE       type;                       /* Rodzaj zasobu */
 };
 
@@ -196,7 +196,7 @@ struct HTTP_SESSION {
     socklen_t               address_length;
 #endif
     fd_set                  socket_data;
-    int                     socket_descriptor;
+    int                     socket_fd;
     HTTP_INFO               http_info;
     LOCAL_INFO              local_info;
     SEND_INFO               response_data;

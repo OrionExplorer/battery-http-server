@@ -16,8 +16,8 @@ void            SESSION_release( HTTP_SESSION *http_session );
 int             SESSION_send_response( HTTP_SESSION *http_session, const char *content_data, int http_content_size );
 SEND_INFO*      SESSION_find_response_struct_by_id( int socket );
 HTTP_SESSION*   SESSION_find_by_id( int socket );
-void            SESSION_add_new_send_struct( int socket_descriptor );
-void            SESSION_delete_send_struct( int socket_descriptor );
+void            SESSION_add_new_send_struct( int socket_fd );
+void            SESSION_delete_send_struct( int socket_fd );
 void            SESSION_init( HTTP_SESSION *http_session );
 
 #endif
