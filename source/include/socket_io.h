@@ -13,7 +13,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 
 void    SOCKET_main( void );
 void    SOCKET_run( void );
-void    SOCKET_stop( void );
+void    SOCKET_free( void );
 
 void    SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size, int *res );
 void    SOCKET_disconnect_client( HTTP_SESSION *http_session );

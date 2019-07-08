@@ -53,7 +53,7 @@ static void     SOCKET_initialization( void );
 static void     SOCKET_prepare( void );
 static void     SOCKET_process( int socket_fd );
 static void     SOCKET_send_all_data( void );
-void            SOCKET_stop( void );
+void            SOCKET_free( void );
 
 /*
 SOCKET_initialization( void )
@@ -77,7 +77,7 @@ static void SOCKET_initialization( void ) {
     if ( socket_server == SOCKET_ERROR ) {
         LOG_print( "Error creating socket.\n" );
         printf( "Error creating socket.\n" );
-        SOCKET_stop();
+        SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
@@ -169,7 +169,7 @@ static void SOCKET_prepare( void ) {
         wsa_result = WSAGetLastError();
         LOG_print( "ioctlsocket() error: %d.\n", wsa_result );
         printf( "ioctlsocket() error: %d.\n", wsa_result );
-        SOCKET_stop();
+        SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
@@ -177,7 +177,7 @@ static void SOCKET_prepare( void ) {
         wsa_result = WSAGetLastError();
         LOG_print( "bind() error: %d.\n", wsa_result );
         printf( "bind() error: %d.\n", wsa_result );
-        SOCKET_stop();
+        SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
@@ -186,7 +186,7 @@ static void SOCKET_prepare( void ) {
         wsa_result = WSAGetLastError();
         LOG_print( "listen() error: %d.\n", wsa_result );
         printf( "listen() error: %d.\n", wsa_result );
-        SOCKET_stop();
+        SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
@@ -216,7 +216,7 @@ void SOCKET_run( void ) {
     for( ;"elvis presley lives"; ) {
         read_fds = master;
         if( select( fdmax+1, &read_fds, NULL, NULL, &tv ) == -1 ) {
-            SOCKET_stop();
+            SOCKET_free();
             exit( EXIT_FAILURE );
         }
 
@@ -330,11 +330,11 @@ void SOCKET_close_fd( int socket_fd ) {
 }
 
 /*
-SOCKET_stop( void )
+SOCKET_free( void )
 - zwolnienie WinSock
 - zwolnienie socketa */
-void SOCKET_stop( void ) {
-    LOG_print( "SOCKET_stop( %d ):\n", fdmax );
+void SOCKET_free( void ) {
+    LOG_print( "SOCKET_free( %d ):\n", fdmax );
     LOG_print( "\t- shutdown( %d )...", socket_server );
     shutdown( socket_server, SHUT_RDWR );
     LOG_print( "ok.\n" );
@@ -407,5 +407,5 @@ void SOCKET_main( void ) {
     ( void )SOCKET_initialization();
     ( void )SOCKET_prepare();
     ( void )SOCKET_run();
-    ( void )SOCKET_stop();
+    ( void )SOCKET_free();
 }
