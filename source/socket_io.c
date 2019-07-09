@@ -18,6 +18,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include "include/ssl.h"
 #include "include/log.h"
 #include "include/files_io.h"
+#include <openssl/bio.h>
 #include <sys/sendfile.h>
 #include <assert.h>
 #include <stdio.h>
@@ -42,6 +43,7 @@ char                *ssl_cert_file;
 char                *ssl_key_file;
 int                 ssl_on;
 SSL_CTX             *SSL_context;
+BIO                 *sbio;
 HTTP_SESSION        http_session_;
 int                 i_sac;
 fd_set              master;
@@ -271,22 +273,64 @@ void SOCKET_run( void ) {
 
                         if( ssl_on ) {
                             SEND_INFO *cclient = SESSION_find_response_struct_by_id( newfd );
+                            sbio = BIO_new_socket( newfd, BIO_NOCLOSE );
                             cclient->ssl = SSL_new( SSL_context );
                             if( cclient->ssl ) {
+                                SSL_set_bio( cclient->ssl, sbio, sbio );
                                 printf("SSL_new: %d\n", cclient->socket_descriptor);
                                 http_session_.ssl = cclient->ssl;
                                 LOG_save();
                                 SSL_set_fd( cclient->ssl, newfd );
                                 LOG_save();
+                                SSL_set_accept_state( cclient->ssl );
 
                                 int ret = SSL_accept( cclient->ssl );
                                 if ( ret <= 0 ) {
-                                    int err_SSL_get_error = ret;
+                                    int status = 0;
+                                    int err_SSL_get_error = 0;
+                                    do {
+                                        status = SSL_accept( cclient->ssl );
+                                        err_SSL_get_error = SSL_get_error( cclient->ssl, ret);
+                                        switch( err_SSL_get_error ) {
+                                            case SSL_ERROR_NONE: break;
+                                            
+                                            case SSL_ERROR_WANT_WRITE:
+                                                FD_SET( newfd, &master );
+                                                status = 1;
+                                            break;
+
+                                            case SSL_ERROR_WANT_READ:
+                                                FD_SET( newfd, &read_fds );
+                                                status = 1;
+                                                break;
+
+                                            default: break;
+                                        }
+
+                                        if (status == 1) {
+                                            // Must have at least one handle to wait for at this point.
+                                            status = select(fdmax + 1, &read_fds, NULL, NULL, &tv);
+
+                                            // 0 is timeout, so we're done.
+                                            // -1 is error, so we're done.
+                                            // Could be both handles set (same handle in both masks) so
+                                            // set to 1.
+                                            if (status >= 1) {
+                                                status = 1;
+                                            } else {// Timeout or failure
+                                                printf("SSL handshake - peer timeout or failure\n");
+                                                status = -1;
+                                            }
+                                        }
+
+                                    } while( status == 1 && !SSL_is_init_finished( cclient->ssl ) );
+
                                     unsigned long err_ERR_get_error = ERR_peek_last_error();
-                                    printf("[SSL][%d] SSL_accept() : Failed with return %d\n", newfd, ret );
+                                    printf("[SSL][%d] SSL_do_handshake() : Failed with return %d\n", newfd, ret );
                                     printf("[SSL][%d]\tSSL_get_error() returned : %d\n", newfd, err_SSL_get_error);
                                     printf("[SSL][%d]\tError string : %s\n", newfd, ERR_error_string( err_ERR_get_error, NULL) );
                                     printf("[SSL][%d]\tERR_get_error() returned : %ld\n", newfd, err_ERR_get_error );
+                                    printf("[SSL][%d]\terrno = %d\n", newfd, errno );
                                 } else {
                                     printf( "[SSL][%d] Client connection accepted using %s.\n", newfd, SSL_get_cipher( cclient->ssl ) );
                                     SOCKET_process( newfd );
@@ -332,12 +376,13 @@ static void SOCKET_process( int socket_fd ) {
     session->socket_descriptor = socket_fd;
     session->ssl = http_session_.ssl;
     session->address_length = ssl_on ? SSL_read( session->ssl, tmp_buf, MAX_BUFFER ) : recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
+
     if( ssl_on ) {
         printf("[SSL][%d]=========================\n%s\n", socket_fd, tmp_buf);
     }
-
     
-    if( session->address_length <= 0 || errno > 1) {
+    if( session->address_length <= 0 || errno > 1 ) {
+        printf("SOCKET_process: errno = %d\n", errno );
         SESSION_delete_send_struct( socket_fd );
         SOCKET_close_fd( socket_fd );
     } else {
