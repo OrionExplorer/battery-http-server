@@ -36,4 +36,5 @@ static void app_terminate( void ) {
     SOCKET_free();
     LOG_print( "Server closed.\n" );
     LOG_save();
+    exit( EXIT_SUCCESS );
 }

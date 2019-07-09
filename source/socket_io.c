@@ -115,25 +115,27 @@ static void SOCKET_send_all_data( void ) {
     int j;
     size_t nwrite;
     size_t nread;
-    static char m_buf[ UPLOAD_BUFFER ];
+    char m_buf[ UPLOAD_BUFFER ];
 
     for( j = 0; j < MAX_CLIENTS; j++ ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_descriptor > 0 ) {
 
             if( ssl_on ) {
-                printf("SOCKET_send_all_data[ %d ]: #1\n", send_d[ j ].socket_descriptor );
                 fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-                printf("SOCKET_send_all_data: #2\n");
                 nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-                printf("SOCKET_send_all_data: nread = %ld\n", nread);
-                //nwrite = send( send_d[ j ].socket_descriptor, m_buf, nread, 0 );
                 nwrite = SSL_write( send_d[ j ].ssl, m_buf, nread );
-                printf("SOCKET_send_all_data: #4\n");
             } else {
                 nwrite = sendfile( send_d[ j ].socket_descriptor, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, BUFSIZ );
             }
 
-            send_d[ j ].http_content_size -= nwrite;
+            if( nwrite > 0 ) {
+                send_d[ j ].sent_size += nwrite;
+                send_d[ j ].http_content_size -= nwrite;
+                //printf("Sent: %ld of %ld.\n", send_d[ j ].sent_size, send_d[ j ].total_size );
+            } else {
+                printf("ERROR: %ld\n", nwrite);
+            }
+            //printf( "LEFT: %ld\n", send_d[ j ].http_content_size );
             
             if( (nwrite < 0 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
                 SESSION_delete_send_struct( send_d[ j ].socket_descriptor );
@@ -228,7 +230,7 @@ static void SOCKET_prepare( void ) {
 SOCKET_run( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda. */
 void SOCKET_run( void ) {
-    register int i = 0;
+    int i = 0;
     struct timeval tv;
 
     /* Reset zmiennej informującej o częściowym odbiorze przychodzącej treści */
@@ -293,7 +295,7 @@ void SOCKET_run( void ) {
                                         err_SSL_get_error = SSL_get_error( cclient->ssl, ret);
                                         switch( err_SSL_get_error ) {
                                             case SSL_ERROR_NONE: break;
-                                            
+
                                             case SSL_ERROR_WANT_WRITE:
                                                 FD_SET( newfd, &master );
                                                 status = 1;
@@ -302,14 +304,25 @@ void SOCKET_run( void ) {
                                             case SSL_ERROR_WANT_READ:
                                                 FD_SET( newfd, &read_fds );
                                                 status = 1;
-                                                break;
+                                            break;
 
-                                            default: break;
+                                            case SSL_ERROR_ZERO_RETURN:
+                                                printf("SSL_ERROR_ZERO_RETURN\n");
+                                                SOCKET_close_fd( newfd );
+                                                status = 1;
+                                            break;
+
+
+                                            default:
+                                                printf("UNKNOWN\n");
+                                                //SOCKET_close_fd( newfd );
+                                                status = 1;
+                                            break;
                                         }
 
                                         if (status == 1) {
                                             // Must have at least one handle to wait for at this point.
-                                            status = select(fdmax + 1, &read_fds, NULL, NULL, &tv);
+                                            status = select( fdmax + 1, &read_fds, NULL, NULL, &tv );
 
                                             // 0 is timeout, so we're done.
                                             // -1 is error, so we're done.
@@ -320,13 +333,14 @@ void SOCKET_run( void ) {
                                             } else {// Timeout or failure
                                                 printf("SSL handshake - peer timeout or failure\n");
                                                 status = -1;
+                                                SOCKET_close_fd( newfd );
                                             }
                                         }
 
                                     } while( status == 1 && !SSL_is_init_finished( cclient->ssl ) );
 
                                     unsigned long err_ERR_get_error = ERR_peek_last_error();
-                                    printf("[SSL][%d] SSL_do_handshake() : Failed with return %d\n", newfd, ret );
+                                    printf("[SSL][%d] SSL_accept() : Failed with return %d\n", newfd, ret );
                                     printf("[SSL][%d]\tSSL_get_error() returned : %d\n", newfd, err_SSL_get_error);
                                     printf("[SSL][%d]\tError string : %s\n", newfd, ERR_error_string( err_ERR_get_error, NULL) );
                                     printf("[SSL][%d]\tERR_get_error() returned : %ld\n", newfd, err_ERR_get_error );
@@ -334,15 +348,6 @@ void SOCKET_run( void ) {
                                 } else {
                                     printf( "[SSL][%d] Client connection accepted using %s.\n", newfd, SSL_get_cipher( cclient->ssl ) );
                                     SOCKET_process( newfd );
-                                    /*char buf[1024];
-                                    size_t bytes;
-                                    char *reply = "HTTP/1.1 200 OK\r\nServer:a\r\nContent-Length: 17\r\n\r\nSimple SSL reply.";
-                                    bytes = SSL_read( cclient->ssl, buf, sizeof( buf ) );
-                                    if ( bytes > 0 ) {
-                                        buf[ bytes ] = 0;
-                                        printf( "%s\n", buf );
-                                        SSL_write( cclient->ssl, reply, strlen( reply ) );
-                                    }*/
                                 }
                             }
                         }
@@ -431,6 +436,12 @@ void SOCKET_modify_clients_count( int mod ) {
 }
 
 void SOCKET_close_fd( int socket_descriptor ) {
+    if( ssl_on ) {
+        SEND_INFO *cclient = SESSION_find_response_struct_by_id( socket_descriptor );
+        if( cclient && cclient->ssl ) {
+            SSL_shutdown( cclient->ssl );
+        }
+    }
     FD_CLR( socket_descriptor, &master );
     shutdown( socket_descriptor, SHUT_RDWR );
     close( socket_descriptor );
@@ -443,7 +454,19 @@ SOCKET_free( void )
 - zwolnienie WinSock
 - zwolnienie socketa */
 void SOCKET_free( void ) {
+
     LOG_print( "SOCKET_free( %d ):\n", fdmax );
+    /* Zamknięcie SSL */
+    if( ssl_on == 1 ) {
+        LOG_print( "\t- SSL context..." );
+        SSL_CTX_free( SSL_context );
+        LOG_print( "ok.\n" );
+
+        LOG_print( "\t- SSL object..." );
+        SSL_destroy();
+        LOG_print( "ok.\n" );
+    }
+
     LOG_print( "\t- shutdown( %d )...", socket_server );
     shutdown( socket_server, SHUT_RDWR );
     LOG_print( "ok.\n" );
@@ -455,17 +478,6 @@ void SOCKET_free( void ) {
     LOG_print( "\t- close( %d )...", socket_server );
     close( socket_server );
     LOG_print( "ok.\n" );
-
-    /* Zamkniecie SSL */
-    if( ssl_on == 1 ) {
-        LOG_print( "\t- SSL context..." );
-        SSL_CTX_free( SSL_context );
-        LOG_print( "ok.\n" );
-
-        LOG_print( "\t- SSL object..." );
-        SSL_destroy();
-        LOG_print( "ok.\n" );
-    }
 
 #ifdef _WIN32
     LOG_print( "\t- WSACleanup()..." );
@@ -497,9 +509,6 @@ void SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_
             SOCKET_disconnect_client( http_session );
         }    
     } else {
-        if( http_session->ssl ) {
-            printf("SOCKET_send: http_session->ssl is NOT NLL. Respone:\n%s\n", buf );
-        }
         if( ( http_session->address_length = SSL_write( http_session->ssl, buf, http_content_size ) ) <= 0 ) {
             SOCKET_disconnect_client( http_session );
         }

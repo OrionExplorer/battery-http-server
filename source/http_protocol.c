@@ -401,7 +401,6 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
                     send_struct->http_content_size = filesize;
                     send_struct->total_size = filesize;
                     send_struct->sent_size = 0;
-                    printf("Found send_struct. ssl = %s\n", send_struct->ssl ? "TAK" : "NIE" );
                 }
             } else {
                 /* Wysyłka wybranego fragmentu pliku */
