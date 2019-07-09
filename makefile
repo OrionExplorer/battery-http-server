@@ -9,8 +9,6 @@ battery: battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htac
 	@ rm build -rf
 	@ mkdir build/configuration -p
 	@ cp source/configuration/battery.conf build/configuration/battery.conf
-	@ cp server.crt build/configuration/server.crt
-	@ cp server.key build/configuration/server.key
 	$(CC) $(CFLAGS) battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o -o build/battery $(CLIBS)
 	@ rm *.o
 
