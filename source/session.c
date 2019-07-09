@@ -109,7 +109,7 @@ SESSION_get_http_header( HTTP_SESSION *http_session )
 static void SESSION_get_http_header( HTTP_SESSION *http_session ) {
     http_session->http_info.header = malloc( BIG_BUFF_SIZE_CHAR );
     mem_allocated( http_session->http_info.header, 11 );
-    strncpy( http_session->http_info.header, REQUEST_get_message_header( http_session->http_info.content_data, http_session->address_length ), BIG_BUFF_SIZE );
+    strncpy( http_session->http_info.header, REQUEST_get_message_header( http_session->http_info.content_data, http_session->recv_data_len ), BIG_BUFF_SIZE );
 }
 
 /*

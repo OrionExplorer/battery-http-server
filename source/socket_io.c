@@ -226,8 +226,8 @@ void SOCKET_run( void ) {
                 if( i == socket_server ) {
                     /* Podłączył się nowy klient */
                     SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
-                    http_session_.address_length = sizeof( struct sockaddr );
-                    newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &http_session_.address_length );
+                    http_session_.recv_data_len = sizeof( struct sockaddr );
+                    newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &http_session_.recv_data_len );
 
                     if( newfd == -1 ) {
                         if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -269,40 +269,30 @@ static void SOCKET_process( int socket_fd ) {
     session->http_info.received_all = http_session_.http_info.received_all;
     session->address = http_session_.address;
     session->socket_fd = socket_fd;
-    session->address_length = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
+    session->recv_data_len = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
 
-    if( session->address_length < MAX_URI_LENGTH ) {
-        if( errno > 1) {
-            SESSION_delete_send_struct( socket_fd );
-            SOCKET_close_fd( socket_fd );
-        } else {
-            if ( session->address_length <= 0 ) {
-                /* ...ale to jednak było rozłączenie */
-                SESSION_delete_send_struct( socket_fd );
-                SOCKET_close_fd( socket_fd );
-            } else if (session->address_length > 0 ) {
-                /* Nie zostały wcześniej odebrane wszystkie dane - metoda POST.
-                Teraz trzeba je dokleić do http_info.content_data */
-                if( session->http_info.received_all == 0 ) {
-                    /* Obiekt jest już stworzony, nie trzeba przydzielać pamięci */
-                    session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->address_length+1 );
-                    /* TODO: BINARY DATA!!! */
-                    strncat( session->http_info.content_data, tmp_buf, session->address_length );
-                    session->http_info.received_all = 1;
-                } else if( session->http_info.received_all == -1 ) {
-                    /* Dla metod GET i HEAD */
-                    session->http_info.content_data = malloc( (session->address_length+1)*sizeof( char ) );
-                    mem_allocated( session->http_info.content_data, 25 );
-                    strncpy( session->http_info.content_data, tmp_buf, session->address_length );
-                }
-                /* "Przerobienie" zapytania */
-                SESSION_prepare( session );
-            }
-        }
+    if( session->recv_data_len <= 0 || errno > 1 ) {
+        SESSION_delete_send_struct( socket_fd );
+        SOCKET_close_fd( socket_fd );
     } else {
-        RESPONSE_error( session, HTTP_414_REQUEST_URI_TOO_LONG, HTTP_ERR_414_MSG, NULL );
-        SOCKET_disconnect_client( session );
-        SESSION_release( session );
+        if (session->recv_data_len > 0 ) {
+            /* Nie zostały wcześniej odebrane wszystkie dane - metoda POST.
+            Teraz trzeba je dokleić do http_info.content_data */
+            if( session->http_info.received_all == 0 ) {
+                /* Obiekt jest już stworzony, nie trzeba przydzielać pamięci */
+                session->http_info.content_data = ( char* )realloc( session->http_info.content_data, strlen( session->http_info.content_data )+session->recv_data_len+1 );
+                /* TODO: BINARY DATA!!! */
+                strncat( session->http_info.content_data, tmp_buf, session->recv_data_len );
+                session->http_info.received_all = 1;
+            } else if( session->http_info.received_all == -1 ) {
+                /* Dla metod GET i HEAD */
+                session->http_info.content_data = malloc( (session->recv_data_len+1)*sizeof( char ) );
+                mem_allocated( session->http_info.content_data, 25 );
+                strncpy( session->http_info.content_data, tmp_buf, session->recv_data_len );
+            }
+            /* "Przerobienie" zapytania */
+            SESSION_prepare( session );
+        }
     }
 
     if( session ) {
@@ -362,7 +352,7 @@ void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
         SOCKET_close_fd( http_session->socket_fd );
     } else {
         http_session->socket_fd = -1;
-        http_session->address_length = -1;
+        http_session->recv_data_len = -1;
         http_session->http_info.keep_alive = -1;
     }
 }
@@ -371,11 +361,11 @@ void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
 SOCKET_send( HTTP_SESSION *http_session, char *buf, int http_content_size )
 - wysyła pakiet danych ( buf ) do danego klienta ( http_session ) */
 void SOCKET_send( HTTP_SESSION *http_session, const char *buf, int http_content_size, int *res ) {
-    if( ( http_session->address_length = send( http_session->socket_fd, buf, http_content_size, 0 ) ) <= 0 ) {
+    if( ( http_session->recv_data_len = send( http_session->socket_fd, buf, http_content_size, 0 ) ) <= 0 ) {
         SOCKET_disconnect_client( http_session );
     }
     
-    *res = http_session->address_length;
+    *res = http_session->recv_data_len;
 }
 
 /*

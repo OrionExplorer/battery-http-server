@@ -190,10 +190,10 @@ struct HTTP_SESSION {
     struct sockaddr_in      address;
 #ifdef _WIN32
     SOCKET                  socket;
-    int                     address_length;
+    int                     recv_data_len;
 #else
     int                     socket;
-    socklen_t               address_length;
+    socklen_t               recv_data_len;
 #endif
     fd_set                  socket_data;
     int                     socket_fd;
