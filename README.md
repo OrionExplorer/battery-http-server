@@ -41,6 +41,9 @@ Fast and portable HTTP server.
 * Event log
 
 ### TODO
+- [ ] Higher performance
+  - [ ] epoll
+  - [ ] cache
 - [ ] Add HTTPS support
 - [ ] Add Accept-Encoding/Content-Encoding header support (gzip, deflate?)
 - [ ] New CGI algorithm and effort to restore POST method
@@ -50,7 +53,6 @@ Fast and portable HTTP server.
 - [ ] Add method DELETE
 - [ ] Add HTTP Proxy support
 - [ ] Add IPv6 support
-- [ ] Higher performance!
 
 
 
