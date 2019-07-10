@@ -272,7 +272,6 @@ static void SOCKET_process( int socket_fd ) {
     if( session->recv_data_len <= 0 ) {
         SESSION_delete_send_struct( socket_fd );
         SOCKET_close_fd( socket_fd );
-        FD_CLR( socket_fd, &master );
     } else {
         if (session->recv_data_len > 0 ) {
             /* Nie zostały wcześniej odebrane wszystkie dane - metoda POST.
@@ -311,9 +310,9 @@ void SOCKET_modify_clients_count( int mod ) {
 }
 
 void SOCKET_close_fd( int socket_fd ) {
-    FD_CLR( socket_fd, &master );
     shutdown( socket_fd, SHUT_RDWR );
     close( socket_fd );
+    FD_CLR( socket_fd, &master );
     /* Zmniejszensie licznika podłączonych klientów */
     SOCKET_modify_clients_count( -1 );
 }
