@@ -201,15 +201,12 @@ SOCKET_run( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda. */
 void SOCKET_run( void ) {
     register int i = 0;
-    struct timeval tv;
+    struct timeval tv = {5, 500000};
 
     /* Reset zmiennej informującej o częściowym odbiorze przychodzącej treści */
     http_session_.http_info.received_all = -1;
 
     FD_SET( socket_server, &master );
-
-    tv.tv_sec = 5;
-    tv.tv_usec = 500000;
 
     fdmax = socket_server;
 
@@ -245,6 +242,7 @@ void SOCKET_run( void ) {
                 } else {
                     /* Podłączony klient przesłał dane... */
                     SOCKET_process( i );
+                    SOCKET_send_all_data();
                 }
             } /* nowe połączenie */
             SOCKET_send_all_data();
@@ -271,9 +269,10 @@ static void SOCKET_process( int socket_fd ) {
     session->socket_fd = socket_fd;
     session->recv_data_len = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
 
-    if( session->recv_data_len <= 0 || errno > 1 ) {
+    if( session->recv_data_len <= 0 ) {
         SESSION_delete_send_struct( socket_fd );
         SOCKET_close_fd( socket_fd );
+        FD_CLR( socket_fd, &master );
     } else {
         if (session->recv_data_len > 0 ) {
             /* Nie zostały wcześniej odebrane wszystkie dane - metoda POST.
