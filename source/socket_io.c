@@ -25,6 +25,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include <signal.h>
 #include <fcntl.h>
 
+
 /*Sockety */
 #ifdef _WIN32
 /*Inicjalizacja WinSock */
@@ -123,8 +124,8 @@ static void SOCKET_prepare( void ) {
     int wsa_result = 0;
     struct timeval tv = {0, 0};
 
-    tv.tv_sec = 0;
-    tv.tv_usec = 20000;
+    tv.tv_sec = 10;
+    tv.tv_usec = 0;
 
     FD_ZERO( &master );
     FD_ZERO( &read_fds );
@@ -200,8 +201,8 @@ static void SOCKET_prepare( void ) {
 SOCKET_run( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda. */
 void SOCKET_run( void ) {
-    register int i = 0;
-    struct timeval tv = {5, 500000};
+    int i = 0;
+    struct timeval tv = {1, 500000};
 
     /* Reset zmiennej informującej o częściowym odbiorze przychodzącej treści */
     http_session_.http_info.received_all = -1;
@@ -270,6 +271,7 @@ static void SOCKET_process( int socket_fd ) {
     session->recv_data_len = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
 
     if( session->recv_data_len <= 0 ) {
+        /* Klient się rozłączył */
         SESSION_delete_send_struct( socket_fd );
         SOCKET_close_fd( socket_fd );
     } else {
