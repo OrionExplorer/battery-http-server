@@ -193,7 +193,7 @@ struct HTTP_SESSION {
     int                     recv_data_len;
 #else
     int                     socket;
-    socklen_t               recv_data_len;
+    ssize_t                 recv_data_len;
 #endif
     fd_set                  socket_data;
     int                     socket_fd;

@@ -110,6 +110,7 @@ static void SOCKET_send_all_data( void ) {
             
             if( (nwrite < 0 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
                 SESSION_delete_send_struct( send_d[ j ].socket_fd );
+                SOCKET_close_fd( send_d[ j ].socket_fd );
             }
         }
     }
@@ -203,6 +204,7 @@ SOCKET_run( void )
 void SOCKET_run( void ) {
     int i = 0;
     struct timeval tv = {1, 500000};
+    socklen_t addrlen;
 
     /* Reset zmiennej informującej o częściowym odbiorze przychodzącej treści */
     http_session_.http_info.received_all = -1;
@@ -225,7 +227,7 @@ void SOCKET_run( void ) {
                     /* Podłączył się nowy klient */
                     SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                     http_session_.recv_data_len = sizeof( struct sockaddr );
-                    newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &http_session_.recv_data_len );
+                    newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &addrlen );
 
                     if( newfd == -1 ) {
                         if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -263,13 +265,11 @@ static void SOCKET_process( int socket_fd ) {
     extern int errno;
 
     SESSION_init( session );
-
     errno = 0;
     session->http_info.received_all = http_session_.http_info.received_all;
     session->address = http_session_.address;
     session->socket_fd = socket_fd;
     session->recv_data_len = recv( ( int )socket_fd, tmp_buf, MAX_BUFFER, 0 );
-
     if( session->recv_data_len <= 0 ) {
         /* Klient się rozłączył */
         SESSION_delete_send_struct( socket_fd );
