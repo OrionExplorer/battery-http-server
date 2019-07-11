@@ -84,7 +84,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #define EXT_LEN                             16
 #define EXT_LEN_CHAR                        16*sizeof( char )
 
-#define MAX_THREADS                         64
+#define MAX_EVENTS                          10240
 
 #define MAX_PATH_LENGTH                     1024
 #define MAX_PATH_LENGTH_CHAR                1024*sizeof( char )
@@ -107,6 +107,7 @@ typedef struct HTTP_SESSION     HTTP_SESSION;
 typedef struct SEND_INFO        SEND_INFO;
 typedef struct OPENED_FILE      OPENED_FILE;
 typedef struct OTHER_SCRIPTS    OTHER_SCRIPTS;
+typedef enum CONN_PROC          CONN_PROC;
 
 /* Obsługiwane metody protokołu HTTP */
 enum http_m {
@@ -233,8 +234,15 @@ enum IP_VER {
     IPv6 = 6
 };
 
+/* Metoda przetwarzania połączeń */
+enum CONN_PROC {
+    CP_EPOLL,
+    CP_SELECT
+};
+extern CONN_PROC            connection_processor;
+
 /* Lista możliwych plików typu index */
-char        *index_file_list[ MICRO_BUFF_SIZE ];
-extern int  index_file_count;
+char                        *index_file_list[ MICRO_BUFF_SIZE ];
+extern int                     index_file_count;
 
 #endif

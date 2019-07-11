@@ -28,28 +28,31 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 extern char app_path[];
 
 /* Katalog roboczy - udostępnione klientom zasoby */
-char    *document_root;
+char        *document_root;
 
 /* Informuje, czy obsługa SSL jest aktywna */
-int     ssl_on;
+int         ssl_on;
 
 /* Plik certyfikatu SSL */
-char    *ssl_cert_file;
+char        *ssl_cert_file;
 
 /* Plik klucza prywatnego SSL */
-char    *ssl_key_file;
+char        *ssl_key_file;
 
 /*Pełna nazwa pliku (ścieżka dostępu ) "log.txt" */
-char    LOG_filename[ MAX_PATH_LENGTH ];
+char        LOG_filename[ MAX_PATH_LENGTH ];
 
 /*Przechowuje informację o typach adresów IP: IPv4 lub IPv6 */
-int     ip_proto_ver = -1;
+int         ip_proto_ver = -1;
 
 /* Przechowuje informację o liczbie wczytanych rozszerzeń dla innych typów plików */
-int     cgi_other_count = 0;
+int         cgi_other_count = 0;
 
 /* Przechowuje informację o liczbie wczytanych nazw plikóww index */
-int     index_file_count = 0;
+int         index_file_count = 0;
+
+/* Przechowuje informację o metodzie przetwarzania połączeń */
+CONN_PROC   connection_processor;
 
 static void     server_log_prepare( void );
 static void     server_validate_paths( void );
@@ -242,6 +245,21 @@ short CORE_load_configuration( void ) {
                         LOG_save();
                         ssl_cert_file = NULL;
                     }
+                }
+
+                else if( strncmp( option, "connection_processor", STD_BUFF_SIZE ) == 0 ) {
+                    /* Wybrana metoda przetwarzania połączeń - epoll */
+                    LOG_print( "\t- connection processor: " );
+                    if( strncmp( value, "epoll", STD_BUFF_SIZE ) == 0 ) {
+                        connection_processor = CP_EPOLL;
+                        LOG_print( value );
+                    } else if( strncmp( value, "select", STD_BUFF_SIZE ) == 0 ) {
+                        connection_processor = CP_SELECT;
+                        LOG_print( value );
+                    } else {
+                        LOG_print( "select(). \"%s\" is not supported." );
+                    }
+                    LOG_print( "\n" );
                 }
 
                 else if( strncmp( option, "ssl_key_file", STD_BUFF_SIZE ) == 0 ) {

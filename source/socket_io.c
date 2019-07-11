@@ -17,33 +17,30 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include "include/shared.h"
 #include "include/log.h"
 #include "include/files_io.h"
-#include <sys/sendfile.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
+#ifndef _WIN32
+    #include <sys/sendfile.h>
+    #include <sys/epoll.h>
+#endif
 
 
 /*Sockety */
 #ifdef _WIN32
-/*Inicjalizacja WinSock */
-WSADATA             wsk;
-SOCKET              socket_server;
+    /*Inicjalizacja WinSock */
+    WSADATA             wsk;
+    SOCKET              socket_server;
 #else
-int                 socket_server;
+    int                 socket_server;
 #endif
 
-int                 addr_size;
 int                 active_port;
 struct sockaddr_in  server_address;
 HTTP_SESSION        http_session_;
-int                 i_sac;
-fd_set              master;
-fd_set              read_fds;
-int                 fdmax;
-int                 newfd;
 struct hostent      *host;
 struct in_addr      addr;
 
@@ -54,7 +51,20 @@ static void     SOCKET_initialization( void );
 static void     SOCKET_prepare( void );
 static void     SOCKET_process( int socket_fd );
 static void     SOCKET_send_all_data( void );
-void            SOCKET_free( void );
+static int      _SOCKET_set_nonblock( int socket_fd );
+
+/* Przechowuje informację o metodzie przetwarzania połączeń */
+CONN_PROC   connection_processor;
+
+/* select() */
+static void     _SOCKET_run_select( void );
+fd_set          master;
+fd_set          read_fds;
+int             fdmax;
+
+/* epoll() */
+static void     _SOCKET_run_epoll( void );
+
 
 /*
 SOCKET_initialization( void )
@@ -198,13 +208,33 @@ static void SOCKET_prepare( void ) {
     /* Teraz czekamy na połączenia i dane */
 }
 
+static int _SOCKET_set_nonblock( int socket_fd ) {
+    int flags, ret;
+
+    flags = fcntl( socket_fd, F_GETFL, 0 );
+    if( flags == -1 ) {
+        LOG_print( "Error: unable to get flags from socket %d.\n", socket_fd );
+        return -1;
+    }
+
+    flags |= O_NONBLOCK;
+    ret = fcntl( socket_fd, F_SETFL, flags );
+    if (ret == -1) {
+        LOG_print( "Error: unable to set non-bocking socket: %d.\n", socket_fd );
+        return -1;
+    }
+
+    return 0;
+}
+
 /*
-SOCKET_run( void )
-- funkcja zarządza połączeniami przychodzącymi do gniazda. */
-void SOCKET_run( void ) {
+_SOCKET_run_select( void )
+- funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
+static void _SOCKET_run_select( void ) {
     int i = 0;
     struct timeval tv = {1, 500000};
     socklen_t addrlen;
+    int newfd;
 
     /* Reset zmiennej informującej o częściowym odbiorze przychodzącej treści */
     http_session_.http_info.received_all = -1;
@@ -225,16 +255,16 @@ void SOCKET_run( void ) {
             if( FD_ISSET( i, &read_fds ) ) { /* Coś się dzieje na sockecie... */
                 if( i == socket_server ) {
                     /* Podłączył się nowy klient */
-                    SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
-                    http_session_.recv_data_len = sizeof( struct sockaddr );
+                    addrlen = sizeof( struct sockaddr );
                     newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &addrlen );
 
                     if( newfd == -1 ) {
-                        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                        if ( errno == EAGAIN || errno == EWOULDBLOCK ) {
                             continue;
                         }
                         LOG_print( "Socket error: accept().\n" );
                     } else {
+                        SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                         SESSION_add_new_send_struct( newfd );
 
                         FD_SET( newfd, &master );
@@ -253,6 +283,111 @@ void SOCKET_run( void ) {
         SOCKET_send_all_data();
         Sleep(1);
     } /* for( ;; ) */
+}
+
+
+/*
+_SOCKET_run_epoll( void )
+- funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
+static void _SOCKET_run_epoll( void ) {
+    int epoll_fd, e_ret;
+    int i, fds, newfd;
+    socklen_t addrlen;
+    struct epoll_event  server_event;
+    struct epoll_event  *events;
+
+    epoll_fd = epoll_create1( 0 );
+    if( epoll_fd == -1 ) {
+        LOG_print( "Error: epoll_create returned -1.\n" );
+        SOCKET_free();
+        exit( EXIT_FAILURE );
+    }
+
+    server_event.data.fd = socket_server;
+    server_event.events = EPOLLIN;
+    e_ret = epoll_ctl( epoll_fd, EPOLL_CTL_ADD, socket_server, &server_event );
+    if( e_ret == -1 ) {
+        LOG_print( "Error: epoll_ctl with EPOLL_CTL_ADD returned -1.\n" );
+        SOCKET_free();
+        exit( EXIT_FAILURE );
+    }
+
+    events = calloc( MAX_EVENTS, sizeof( server_event ) );
+
+    if( events == NULL ) {
+        LOG_print( "Error: unable to allocate memory for epoll_events.\n" );
+        SOCKET_free();
+        exit( EXIT_FAILURE );
+    }
+
+    for( ;"pigs won't fly"; ) {
+        fds = epoll_wait( epoll_fd, events, MAX_EVENTS, -1 );
+
+        for( i = 0; i < fds; i++ ) {
+            if( events[ i ].events & EPOLLERR || events[ i ].events & EPOLLHUP || !events[ i ].events & EPOLLIN) {
+                LOG_print( "Error: epoll at socket %d.\n", events[i].data.fd );
+                SOCKET_close_fd( events[ i ].data.fd );
+                continue;
+            }
+
+            if ( socket_server == events[ i ].data.fd ) {
+                /* Podłączył się nowy klient */
+
+                for( ;; ) {
+                    addrlen = sizeof( struct sockaddr );
+                    newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &addrlen );
+                    if( newfd == -1 ) {
+                        if ( errno == EAGAIN || errno == EWOULDBLOCK ) {
+                            continue;
+                        }
+                        LOG_print( "Socket error: accept().\n" );
+                    } else {
+                        SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
+                        SESSION_add_new_send_struct( newfd );
+
+                        e_ret = _SOCKET_set_nonblock( newfd );
+                        if( e_ret == -1 ) {
+                            SOCKET_free();
+                            exit( EXIT_FAILURE );
+                        }
+
+                        struct epoll_event event = {0};
+                        event.data.fd = newfd;
+                        event.events = EPOLLIN | EPOLLET;
+
+                        e_ret = epoll_ctl( epoll_fd, EPOLL_CTL_ADD, newfd, &event);
+                        if( e_ret == -1 ) {
+                            LOG_print( "Error: epoll_ctl returned -1 at socket %d.\n", newfd );
+                            SOCKET_free();
+                            exit( EXIT_FAILURE );
+                        }
+                    }
+                } // for( ;; )
+
+            } else {
+                if( events[ i ].events & EPOLLIN ) {
+                    int e_socket_fd = events[ i ].data.fd;
+                    struct epoll_event event = {0};
+                    event.data.fd = e_socket_fd;
+
+                    if(event.events == 0) {
+                        LOG_print( "Socket %d closing.\n", e_socket_fd );
+                        if( epoll_ctl( epoll_fd, EPOLL_CTL_DEL, e_socket_fd, NULL ) < 0 ) {
+                            LOG_print( "Error: epoll_ctl EPOLL_CTL_DEL.\n" );
+                            SOCKET_free();
+                            exit( EXIT_FAILURE );
+                        }
+                        SOCKET_close_fd( e_socket_fd );
+                    } else if( epoll_ctl( epoll_fd, EPOLL_CTL_MOD, e_socket_fd, &event ) < 0 ) {
+                        LOG_print( "Error: epoll_ctl EPOLL_CTL_MOD.\n" );
+                        SOCKET_free();
+                        exit( EXIT_FAILURE );
+                    }
+
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -396,6 +531,12 @@ SOCKET_main( void )
 void SOCKET_main( void ) {
     ( void )SOCKET_initialization();
     ( void )SOCKET_prepare();
-    ( void )SOCKET_run();
+
+    switch( connection_processor ) {
+        case CP_SELECT  :   ( void )_SOCKET_run_select(); break;
+        case CP_EPOLL   :   ( void )_SOCKET_run_epoll(); break;
+        default:            ( void )_SOCKET_run_select(); break;
+    }
+    
     ( void )SOCKET_free();
 }
