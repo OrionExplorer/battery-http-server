@@ -453,7 +453,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
     char *local_file_path;      /* Lokalna ścieżka do żądanego pliku */
     char *file_ext;             /* Rozszerzenie żądanego pliku */
     char *add_hdr;              /* Opcjonalne nagłówki */
-    char *ht_access_pwd;        /* Hasło do żądanego zasobu z funkcji file_params*/
+    char *ht_access_pwd = NULL; /* Hasło do żądanego zasobu z funkcji file_params*/
     int len_loc;                /* Długość żądanej ścieżki */
     int file_params_val = 0;    /* Przechowuje wynik działania funkcji file_params */
 
