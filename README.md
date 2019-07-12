@@ -34,18 +34,24 @@ Fast and portable HTTP server.
 
 ### Other features
 * High performance (tested with Apache Benchmark - http://pastebin.com/zBG7nHbL)
-* Multiplatform (Windows/Linux/MacOS X)
+  * Make use of [epoll()](http://man7.org/linux/man-pages/man7/epoll.7.html) or [select()](http://man7.org/linux/man-pages/man2/select.2.html)
+  * Optional: make use of [sendfile()](http://man7.org/linux/man-pages/man2/sendfile.2.html)
+  * Advanced control over opened files
+  * Simple internal cache mechanism
+* Multiplatform (Windows/Linux)
 * Basic Access Authentication
 * Simple configuration
 * Single-threaded
-* Event log
+* Buffered event log
 
 ### TODO
 - [ ] Higher performance
-  - [ ] epoll
-  - [ ] cache
-- [ ] Add HTTPS support
+  - [x] epoll
+  - [x] cache 1.0 - based on current requests
+  - [ ] cache 2.0 - time-based
+- [ ] Rebuild event log
 - [ ] Add Accept-Encoding/Content-Encoding header support (gzip, deflate?)
+- [ ] Add HTTPS support
 - [ ] New CGI algorithm and effort to restore POST method
 - [ ] Extend Basic Access Authentication configuration to work with .htaccess files
 - [ ] Rebuild range-based data send
