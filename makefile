@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -O2
-CLIBS=-lws2_32
+CLIBS=#-lws2_32
 INSTALL_DIR=/opt/battery
 
 # ifeq ($(OS),Windows_NT)
