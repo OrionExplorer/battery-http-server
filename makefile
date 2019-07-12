@@ -5,11 +5,11 @@ INSTALL_DIR=/opt/battery
 
 all: battery
 
-battery: battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o
+battery: battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o cache.o
 	@ rm build -rf
 	@ mkdir build/configuration -p
 	@ cp source/configuration/battery.conf build/configuration/battery.conf
-	$(CC) $(CFLAGS) battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o -o build/battery $(CLIBS)
+	$(CC) $(CFLAGS) battery.o session.o mem_manager.o files_io.o mime_types.o base64.o htaccess_manager.o socket_io.o http_protocol.o string_utils.o core.o log.o time_utils.o cache.o -o build/battery $(CLIBS)
 	@ rm *.o
 
 battery.o: source/battery.c
@@ -50,6 +50,9 @@ log.o: source/log.c
 
 time_utils.o: source/time_utils.c
 	$(CC) $(CFLAGS) -c source/time_utils.c
+
+cache.o: source/cache.c
+	$(CC) $(CFLAGS) -c source/cache.c
 
 clean:
 	rm *.o

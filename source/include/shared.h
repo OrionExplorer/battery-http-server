@@ -88,6 +88,7 @@ typedef struct LOCAL_INFO       LOCAL_INFO;
 typedef struct HTTP_SESSION     HTTP_SESSION;
 typedef struct SEND_INFO        SEND_INFO;
 typedef struct OPENED_FILE      OPENED_FILE;
+typedef struct FILE_CACHE       FILE_CACHE;
 typedef struct OTHER_SCRIPTS    OTHER_SCRIPTS;
 typedef enum CONN_PROC          CONN_PROC;
 
@@ -166,11 +167,11 @@ struct OPENED_FILE {
     size_t              size;                       /* Rozmiar */
     int                 socket_fd;                  /* Deskryptor podłączonego klienta, który wysłał żądanie */
     RESOURCE_TYPE       type;                       /* Rodzaj zasobu */
-    char*               content;                    /* Zawartość pliku - cache */
 };
 
 /* Struktura przechowuje treść otwartego pliku */
 struct FILE_CACHE {
+    char                filename [ FILENAME_MAX ];  /* Nazwa */
     FILE*               file;                       /* Deskryptor otwartego pliku */
     char*               content;                    /* Zawartość pliku - cache */
 };
@@ -195,6 +196,7 @@ extern int                  ip_proto_ver;
 extern HTTP_SESSION         http_session_;
 extern SEND_INFO            send_d[ MAX_CLIENTS ];
 extern OPENED_FILE          opened_files[ FOPEN_MAX ];
+extern FILE_CACHE           cached_files[ FOPEN_MAX ];
 extern fd_set               master;
 extern int                  http_conn_count;
 char*                       server_get_remote_hostname( HTTP_SESSION *http_session );
@@ -223,8 +225,11 @@ enum CONN_PROC {
 };
 extern CONN_PROC            connection_processor;
 
+/* Deskryptor dla epoll() */
+extern int                  epoll_fd;
+
 /* Lista możliwych plików typu index */
 char                        *index_file_list[ MICRO_BUFF_SIZE ];
-extern int                     index_file_count;
+extern int                  index_file_count;
 
 #endif

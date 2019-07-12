@@ -9,6 +9,7 @@ Zbiór funkcji przeznaczonych do obsługi plików i katalogów
 Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 *******************************************************************/
 #include "include/files_io.h"
+#include "include/cache.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -222,20 +223,8 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
                     strncpy( opened_files[ i ].filename, filename, FILENAME_MAX );
                     opened_files[ i ].size = ftell( tmp );
                     opened_files[ i ].type = type;
-                    opened_files[ i ].content = NULL;
 
-                    opened_files[ i ].content = calloc( opened_files[ i ].size+1, sizeof( char ) );
-                    if( opened_files[ i ].content == NULL ) {
-                        printf( "Error: unable to create cache for file %s.\n", filename );
-                    } else {
-                        rewind( tmp );
-                        if( fread( opened_files[ i ].content, opened_files[ i ].size, 1, tmp ) == 1 ) {
-                            opened_files[ i ].content[ opened_files[ i ].size ] = '\0';
-                            printf("[CACHE] File %s loaded to memory.\n", filename );
-                        } else {
-                            printf( "Error: unable load file %s to memory.\n", filename );
-                        }
-                    }
+                    CACHE_add( tmp, filename, opened_files[ i ].size );
                     break;
                 }
             }
@@ -281,21 +270,30 @@ char* battery_get_filename( FILE *file ) {
 
 
 size_t battery_fread( FILE *file, char *dst, size_t s_pos, size_t size ) {
-    int i, j, k;
+    int i, j, k, l;
+    size_t read = 0;
 
     if( file == NULL ) {
         return -1;
     }
 
-    for( i = 0; i < FOPEN_MAX; i++ ) {
+    for( i = FOPEN_MAX-1; i >= 0; i-- ) {
         if( file && opened_files[ i ].file == file ) {
+
             if( s_pos + size > opened_files[ i ].size ) {
-                s_pos = opened_files[ i ].size - size;
+                size = opened_files[ i ].size - s_pos;
             }
-            for( k = 0, j = s_pos; j < s_pos + size; j++, k++ ) {
-                *dst++ = opened_files[ i ].content[j];
+
+            for( l = FOPEN_MAX-1; l >= 0; l-- ) {
+                if( cached_files[ l ].file == file ) {
+                    for( k = 0, j = s_pos; j < s_pos + size; j++, k++ ) {
+                        *dst++ = cached_files[ l ].content[ j ];
+                        read++;
+                    }
+                    break;
+                }
             }
-            return size;
+            return read;
         }
     }
     return -1;
@@ -316,10 +314,21 @@ void battery_fclose( FILE *file, int socket_fd ) {
         return;
     }
 
+    /* Z pliku korzystał jeden lub mniej klientów */
+    if( clients_count == 2 && file_found > 0 ) {
+        if( file ) {
+            CACHE_delete( opened_files[ i ].filename );
+            if( type == STD_FILE ) {
+                fclose( file );
+            } else if( type == SCRIPT ) {
+                pclose( file );
+            }
+        }
+    }
+
     for( i = 0; i <= FOPEN_MAX-1; i++ ) {
         /* Znaleziony element przechowujący informację o otwartym pliku */
         if( file && opened_files[ i ].file == file ) {
-            //printf("battery_fclose\n");
             /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
             if( opened_files[ i ].socket_fd == socket_fd ) {
                 opened_files[ i ].socket_fd = 0;
@@ -327,28 +336,13 @@ void battery_fclose( FILE *file, int socket_fd ) {
                 opened_files[ i ].size = 0;
                 type = opened_files[ i ].type;
                 opened_files[ i ].type = NONE;
-                if( opened_files[ i ].content ) {
-                    printf("[CACHE] File %s removed.\n", opened_files[ i ].filename );
-                    free( opened_files[ i ].content );
-                    opened_files[ i ].content = NULL;
-                }
+
                 memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
                 file_found++;
 
             }
             /* Zliczenie ilości klientów korzystających z pliku */
             clients_count++;
-        }
-    }
-
-    /* Z pliku korzystał jeden lub mniej klientów */
-    if( clients_count == 2 && file_found > 0 ) {
-        if( file ) {
-            if( type == STD_FILE ) {
-                fclose( file );
-            } else if( type == SCRIPT ) {
-                pclose( file );
-            }
         }
     }
 }

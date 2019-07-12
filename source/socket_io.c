@@ -103,8 +103,9 @@ static void SOCKET_send_all_data( void ) {
             if( use_sendfile == 1 ) {
                 nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
             } else {
-                fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-                nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
+                //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
+                //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
+                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 //nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
@@ -143,7 +144,7 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
             } else {
                 //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
                 //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
-                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, 10 );
+                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
                 if( nwrite > 0 ) {
@@ -152,7 +153,6 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
             }
 
             send_d[ j ].http_content_size -= nwrite;
-            //printf("http_content_size: %ld\n", send_d[ j ].http_content_size);
             
             if( (nwrite < 0 && errno != EWOULDBLOCK ) || ( send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0 ) ) {
                 SESSION_delete_send_struct( send_d[ j ].socket_fd );
@@ -176,8 +176,9 @@ static void SOCKET_prepare( void ) {
     FD_ZERO( &master );
     FD_ZERO( &read_fds );
 
-    setuid( 0 );
-    setgid( 0 );
+    if( setreuid(geteuid(), getuid()) ) {
+        LOG_print( "Error: unable to setreuid: %d.\n", errno );
+    }
 
     if( setsockopt( socket_server, SOL_SOCKET, SO_REUSEADDR, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
         LOG_print( "setsockopt( SO_REUSEADDR ) error: %d.\n", errno );
@@ -335,8 +336,6 @@ static void _SOCKET_run_epoll( void ) {
         printf( "Error: epoll_ctl with EPOLL_CTL_ADD returned -1.\n" );
         SOCKET_free();
         exit( EXIT_FAILURE );
-    } else {
-        printf("Server socket %d added to epoll.\n", socket_server);
     }
 
     events = calloc( MAX_EVENTS, sizeof( server_event ) );
@@ -489,10 +488,12 @@ SOCKET_free( void )
 - zwolnienie WinSock
 - zwolnienie socketa */
 void SOCKET_free( void ) {
-    if( connection_processor == CP_EPOLL ) {
-        close( epoll_fd );
-    }
     LOG_print( "SOCKET_free( %d ):\n", fdmax );
+    if( connection_processor == CP_EPOLL ) {
+        LOG_print( "\t- epoll( %d )...", epoll_fd );
+        close( epoll_fd );
+        LOG_print( "ok.\n" );
+    }
     LOG_print( "\t- shutdown( %d )...", socket_server );
     shutdown( socket_server, SHUT_RDWR );
     LOG_print( "ok.\n" );
