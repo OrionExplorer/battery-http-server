@@ -54,6 +54,9 @@ int         index_file_count = 0;
 /* Przechowuje informację o metodzie przetwarzania połączeń */
 CONN_PROC   connection_processor;
 
+/* Przechowuje informację o wykorzystaniu (lub nie) metody sendfile do wysyłki plików */
+int         use_sendfile = 0;
+
 static void     server_log_prepare( void );
 static void     server_validate_paths( void );
 
@@ -195,6 +198,7 @@ short CORE_load_configuration( void ) {
         active_port = -1;
         ssl_cert_file = NULL,
         ssl_key_file = NULL;
+        use_sendfile = 1;
 
         LOG_print( "\n\t- file opened successfully...\n" );
 
@@ -260,6 +264,18 @@ short CORE_load_configuration( void ) {
                         LOG_print( "select(). \"%s\" is not supported." );
                     }
                     LOG_print( "\n" );
+                }
+
+                else if( strncmp( option, "use_sendfile", STD_BUFF_SIZE ) == 0 ) {
+                    /* Opcjonalne wykorzystanie metody sendfile do wysyłki plików */
+                    LOG_print( "\t- use sendfile: " );
+                    if( strncmp( value, "true", STD_BUFF_SIZE ) == 0 ) {
+                        use_sendfile = 1;
+                    } else{
+                        use_sendfile = 0;
+                    }
+
+                    LOG_print( "%s.\n", value );
                 }
 
                 else if( strncmp( option, "ssl_key_file", STD_BUFF_SIZE ) == 0 ) {

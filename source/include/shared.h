@@ -20,34 +20,16 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
     #define FD_SETSIZE                      1024
 #endif
 
-/* Poniższe definicje są konieczne z powodu "FIXME" w implementacji biblioteki Ws2tcpip.h w MinGW */
-#ifdef _WIN32
-    #ifndef _WIN32_WINNT
-        #define _WIN32_WINNT                0x0501
-    #endif
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-#endif
-
-#ifdef _MSC_VER
-#pragma comment( lib, "WS2_32.lib" )
-#endif
-
-#ifndef _MSC_VER
-    #include <sys/types.h>
-    #include <fcntl.h>
-    #include <unistd.h>
-#endif
-
-#ifndef _WIN32
-    #include <sys/socket.h>
-    #include <netdb.h>
-    #include <netinet/in.h>
-    #include <netinet/tcp.h>
-    #include <arpa/inet.h>
-    #include <sys/ioctl.h>
-    #include <errno.h>
-#endif
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <errno.h>
 
 #define APP_NAME                            "battery"
 #define APP_VER                             "1.0.0"
@@ -84,7 +66,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #define EXT_LEN                             16
 #define EXT_LEN_CHAR                        16*sizeof( char )
 
-#define MAX_EVENTS                          10240
+#define MAX_EVENTS                          10240*64
 
 #define MAX_PATH_LENGTH                     1024
 #define MAX_PATH_LENGTH_CHAR                1024*sizeof( char )
@@ -169,10 +151,10 @@ struct LOCAL_INFO {
 
 /* Struktura przechowuje informacje o statusie wysyłki lokalnego zasobu */
 struct SEND_INFO {
-    FILE*                file;                      /* Deskryptor otwartego pliku */
+    FILE*               file;                       /* Deskryptor otwartego pliku */
     long                http_content_size;          /* Rozmiar pliku */
     size_t              sent_size;                  /* Ilość danych wysłana do tej pory */
-    int                 socket_fd;          /* Deksryptor podłączonego klienta, który wysłał żądanie */
+    int                 socket_fd;                  /* Deksryptor podłączonego klienta, który wysłał żądanie */
     size_t              total_size;                 /* Przechowuje całkowity rozmiar pliku */
     short               keep_alive;                 /* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
 };
@@ -182,20 +164,22 @@ struct OPENED_FILE {
     char                filename[ FILENAME_MAX ];   /* Nazwa */
     FILE*               file;                       /* Deskryptor otwartego pliku */
     size_t              size;                       /* Rozmiar */
-    int                 socket_fd;          /* Deskryptor podłączonego klienta, który wysłał żądanie */
+    int                 socket_fd;                  /* Deskryptor podłączonego klienta, który wysłał żądanie */
     RESOURCE_TYPE       type;                       /* Rodzaj zasobu */
+    char*               content;                    /* Zawartość pliku - cache */
+};
+
+/* Struktura przechowuje treść otwartego pliku */
+struct FILE_CACHE {
+    FILE*               file;                       /* Deskryptor otwartego pliku */
+    char*               content;                    /* Zawartość pliku - cache */
 };
 
 /* Główna struktura, która będzie przechowywała wszystkie informacje o połączonym kliencie */
 struct HTTP_SESSION {
     struct sockaddr_in      address;
-#ifdef _WIN32
-    SOCKET                  socket;
-    int                     recv_data_len;
-#else
     int                     socket;
     ssize_t                 recv_data_len;
-#endif
     fd_set                  socket_data;
     int                     socket_fd;
     HTTP_INFO               http_info;
@@ -203,12 +187,7 @@ struct HTTP_SESSION {
     SEND_INFO               response_data;
 };
 
-#ifdef _WIN32
-    extern WSADATA          wsk;
-    extern SOCKET           socket_server;
-#else
-    extern int              socket_server;
-#endif
+extern int                  socket_server;
 extern int                  addr_size;
 extern int                  active_port;
 extern struct sockaddr_in   server_address;
@@ -233,6 +212,9 @@ enum IP_VER {
     IPv4 = 4,
     IPv6 = 6
 };
+
+/* Opcjonalne wykorzystanie funkcji sendfile dla "zero-copy". */
+extern int                  use_sendfile;
 
 /* Metoda przetwarzania połączeń */
 enum CONN_PROC {

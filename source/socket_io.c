@@ -23,21 +23,12 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-#ifndef _WIN32
-    #include <sys/sendfile.h>
-    #include <sys/epoll.h>
-#endif
+#include <sys/sendfile.h>
+#include <sys/epoll.h>
 
 
 /*Sockety */
-#ifdef _WIN32
-    /*Inicjalizacja WinSock */
-    WSADATA             wsk;
-    SOCKET              socket_server;
-#else
-    int                 socket_server;
-#endif
-
+int                 socket_server;
 int                 active_port;
 struct sockaddr_in  server_address;
 HTTP_SESSION        http_session_;
@@ -46,24 +37,27 @@ struct in_addr      addr;
 
 int                 http_conn_count = 0;
 SEND_INFO           send_d[ MAX_CLIENTS ];
+int                 use_sendfile;
 
-static void     SOCKET_initialization( void );
-static void     SOCKET_prepare( void );
-static void     SOCKET_process( int socket_fd );
-static void     SOCKET_send_all_data( void );
-static int      _SOCKET_set_nonblock( int socket_fd );
+static void         SOCKET_initialization( void );
+static void         SOCKET_prepare( void );
+static void         SOCKET_process( int socket_fd );
+static void         SOCKET_send_all_data( void );
+static void         SOCKET_send_all_data_fd( int socket_fd );
+static int          _SOCKET_set_nonblock( int socket_fd );
 
 /* Przechowuje informację o metodzie przetwarzania połączeń */
-CONN_PROC   connection_processor;
+CONN_PROC           connection_processor;
 
 /* select() */
-static void     _SOCKET_run_select( void );
-fd_set          master;
-fd_set          read_fds;
-int             fdmax;
+static void         _SOCKET_run_select( void );
+fd_set              master;
+fd_set              read_fds;
+int                 fdmax;
 
 /* epoll() */
-static void     _SOCKET_run_epoll( void );
+static void         _SOCKET_run_epoll( void );
+int                 epoll_fd;
 
 
 /*
@@ -74,15 +68,6 @@ SOCKET_initialization( void )
 static void SOCKET_initialization( void ) {
     LOG_print( "Socket server initialization...\n" );
 
-#ifdef _WIN32
-    /* Inicjalizacja WinSock */
-    if ( WSAStartup( MAKEWORD( 2, 2 ), &wsk ) != 0 ) {
-        LOG_print( "\nError creating Winsock.\n" );
-        printf( "Error creating Winsock.\n" );
-        system( "pause" );
-        exit( EXIT_FAILURE );
-    }
-#endif
     /* Utworzenie socketa nasłuchującego */
     socket_server = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
     if ( socket_server == SOCKET_ERROR ) {
@@ -108,17 +93,68 @@ SOCKET_send_all_data( void )
 static void SOCKET_send_all_data( void ) {
     int j;
     size_t nwrite;
+    /* Zmienne dla standardowej wysyłki fread-send */
+    size_t nread;
+    static char m_buf[ UPLOAD_BUFFER_CHAR ];
 
     for( j = 0; j < MAX_CLIENTS; j++ ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd > 0 ) {
-            //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-            //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER, send_d[ j ].file );
-            //nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
-            nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, BUFSIZ );
+
+            if( use_sendfile == 1 ) {
+                nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+            } else {
+                fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
+                nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
+                //nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
+
+                if( nwrite > 0 ) {
+                    send_d[ j ].sent_size += nwrite;
+                }
+            }
 
             send_d[ j ].http_content_size -= nwrite;
+            //printf("http_content_size: %ld\n", send_d[ j ].http_content_size);
             
-            if( (nwrite < 0 && GetLastError() != EWOULDBLOCK ) || (send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0)) {
+            if( (nwrite < 0 && errno != EWOULDBLOCK ) || ( send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0 ) ) {
+                SESSION_delete_send_struct( send_d[ j ].socket_fd );
+                SOCKET_close_fd( send_d[ j ].socket_fd );
+            }
+        }
+    }
+}
+
+
+/*
+SOCKET_send_all_data( void )
+- funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
+static void SOCKET_send_all_data_fd( int socket_fd ) {
+    int j;
+    size_t nwrite;
+    /* Zmienne dla standardowej wysyłki fread-send */
+    size_t nread;
+    static char m_buf[ UPLOAD_BUFFER_CHAR ];
+
+    for( j = 0; j < MAX_CLIENTS; j++ ) {
+        if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd == socket_fd ) {
+
+            if( use_sendfile == 1 ) {
+                nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+            } else {
+                //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
+                //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
+                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, 10 );
+                nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
+
+                if( nwrite > 0 ) {
+                    send_d[ j ].sent_size += nwrite;
+                }
+            }
+
+            send_d[ j ].http_content_size -= nwrite;
+            //printf("http_content_size: %ld\n", send_d[ j ].http_content_size);
+            
+            if( (nwrite < 0 && errno != EWOULDBLOCK ) || ( send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0 ) ) {
                 SESSION_delete_send_struct( send_d[ j ].socket_fd );
                 SOCKET_close_fd( send_d[ j ].socket_fd );
             }
@@ -132,7 +168,6 @@ SOCKET_prepare( void )
 static void SOCKET_prepare( void ) {
     unsigned long b = 0;
     int i = 1;
-    int wsa_result = 0;
     struct timeval tv = {0, 0};
 
     tv.tv_sec = 10;
@@ -141,63 +176,53 @@ static void SOCKET_prepare( void ) {
     FD_ZERO( &master );
     FD_ZERO( &read_fds );
 
-#ifndef _WIN32
     setuid( 0 );
     setgid( 0 );
-#endif
 
     if( setsockopt( socket_server, SOL_SOCKET, SO_REUSEADDR, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "setsockopt( SO_REUSEADDR ) error: %d.\n", wsa_result );
-        printf( "setsockopt( SO_REUSEADDR ) error: %d.\n", wsa_result );
+        LOG_print( "setsockopt( SO_REUSEADDR ) error: %d.\n", errno );
+        printf( "setsockopt( SO_REUSEADDR ) error: %d.\n", errno );
     }
 
     if( setsockopt( socket_server, SOL_SOCKET, SO_RCVTIMEO, ( char* )&tv, sizeof( struct timeval ) ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "setsockopt( SO_RCVTIMEO ) error: %d.\n", wsa_result );
-        printf( "setsockopt( SO_RCVTIMEO ) error: %d.\n", wsa_result );
+        LOG_print( "setsockopt( SO_RCVTIMEO ) error: %d.\n", errno );
+        printf( "setsockopt( SO_RCVTIMEO ) error: %d.\n", errno );
     }
 
     if( setsockopt( socket_server, SOL_SOCKET, SO_SNDTIMEO, ( char* )&tv, sizeof( struct timeval ) ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "setsockopt( SO_SNDTIMEO ) error: %d.\n", wsa_result );
-        printf( "setsockopt( SO_SNDTIMEO ) error: %d.\n", wsa_result );
+        LOG_print( "setsockopt( SO_SNDTIMEO ) error: %d.\n", errno );
+        printf( "setsockopt( SO_SNDTIMEO ) error: %d.\n", errno );
     }
 
     if( setsockopt( socket_server, IPPROTO_TCP, TCP_NODELAY, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
-        printf( "setsockopt( TCP_NODELAY ) error: %d.\n", wsa_result );
+        LOG_print( "setsockopt( TCP_NODELAY ) error: %d.\n", errno );
+        printf( "setsockopt( TCP_NODELAY ) error: %d.\n", errno );
     }
 
     if( setsockopt( socket_server, IPPROTO_TCP, TCP_CORK, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "setsockopt( TCP_CORK ) error: %d.\n", wsa_result );
-        printf( "setsockopt( TCP_CORK ) error: %d.\n", wsa_result );
+        LOG_print( "setsockopt( TCP_CORK ) error: %d.\n", errno );
+        printf( "setsockopt( TCP_CORK ) error: %d.\n", errno );
     }
 
     /* Ustawienie na non-blocking socket */
     if( fcntl( socket_server, F_SETFL, &b ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "ioctlsocket() error: %d.\n", wsa_result );
-        printf( "ioctlsocket() error: %d.\n", wsa_result );
+        LOG_print( "ioctlsocket() error: %d.\n", errno );
+        printf( "ioctlsocket() error: %d.\n", errno );
         SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
     if ( bind( socket_server, ( struct sockaddr* )&server_address, sizeof( server_address ) ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "bind() error: %d.\n", wsa_result );
-        printf( "bind() error: %d.\n", wsa_result );
+        LOG_print( "bind() error: %d.\n", errno );
+        printf( "bind() error: %d.\n", errno );
         SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
     /* Rozpoczęcie nasłuchiwania */
     if( listen( socket_server, MAX_CLIENTS ) == SOCKET_ERROR ) {
-        wsa_result = WSAGetLastError();
-        LOG_print( "listen() error: %d.\n", wsa_result );
-        printf( "listen() error: %d.\n", wsa_result );
+        LOG_print( "listen() error: %d.\n", errno );
+        printf( "listen() error: %d.\n", errno );
         SOCKET_free();
         exit( EXIT_FAILURE );
     }
@@ -266,7 +291,7 @@ static void _SOCKET_run_select( void ) {
                     } else {
                         SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                         SESSION_add_new_send_struct( newfd );
-
+                        //_SOCKET_set_nonblock( newfd );
                         FD_SET( newfd, &master );
                         if( newfd > fdmax ) {
                             fdmax = newfd;
@@ -290,15 +315,15 @@ static void _SOCKET_run_select( void ) {
 _SOCKET_run_epoll( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
 static void _SOCKET_run_epoll( void ) {
-    int epoll_fd, e_ret;
+    int e_ret;
     int i, fds, newfd;
     socklen_t addrlen;
     struct epoll_event  server_event;
     struct epoll_event  *events;
 
-    epoll_fd = epoll_create1( 0 );
+    epoll_fd = epoll_create1( EPOLL_CLOEXEC );
     if( epoll_fd == -1 ) {
-        LOG_print( "Error: epoll_create returned -1.\n" );
+        printf( "Error: epoll_create returned -1.\n" );
         SOCKET_free();
         exit( EXIT_FAILURE );
     }
@@ -307,33 +332,37 @@ static void _SOCKET_run_epoll( void ) {
     server_event.events = EPOLLIN;
     e_ret = epoll_ctl( epoll_fd, EPOLL_CTL_ADD, socket_server, &server_event );
     if( e_ret == -1 ) {
-        LOG_print( "Error: epoll_ctl with EPOLL_CTL_ADD returned -1.\n" );
+        printf( "Error: epoll_ctl with EPOLL_CTL_ADD returned -1.\n" );
         SOCKET_free();
         exit( EXIT_FAILURE );
+    } else {
+        printf("Server socket %d added to epoll.\n", socket_server);
     }
 
     events = calloc( MAX_EVENTS, sizeof( server_event ) );
 
     if( events == NULL ) {
-        LOG_print( "Error: unable to allocate memory for epoll_events.\n" );
+        printf( "Error: unable to allocate memory for epoll_events.\n" );
         SOCKET_free();
         exit( EXIT_FAILURE );
     }
 
+    /* Reset zmiennej informującej o częściowym odbiorze przychodzącej treści */
+    http_session_.http_info.received_all = -1;
+
     for( ;"pigs won't fly"; ) {
         fds = epoll_wait( epoll_fd, events, MAX_EVENTS, -1 );
-
-        for( i = 0; i < fds; i++ ) {
-            if( events[ i ].events & EPOLLERR || events[ i ].events & EPOLLHUP || !events[ i ].events & EPOLLIN) {
+        i = fds;
+        while( i-- > 0 ) {
+            if( events[ i ].events & EPOLLERR || events[ i ].events & EPOLLHUP || !events[ i ].events & EPOLLIN ) {
                 LOG_print( "Error: epoll at socket %d.\n", events[i].data.fd );
                 SOCKET_close_fd( events[ i ].data.fd );
                 continue;
             }
 
-            if ( socket_server == events[ i ].data.fd ) {
-                /* Podłączył się nowy klient */
-
-                for( ;; ) {
+            if( events[ i ].events & EPOLLIN ) {
+                if ( socket_server == events[ i ].data.fd ) {
+                    /* Podłączył się nowy klient */
                     addrlen = sizeof( struct sockaddr );
                     newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &addrlen );
                     if( newfd == -1 ) {
@@ -353,41 +382,29 @@ static void _SOCKET_run_epoll( void ) {
 
                         struct epoll_event event = {0};
                         event.data.fd = newfd;
-                        event.events = EPOLLIN | EPOLLET;
+                        event.events = EPOLLIN | EPOLLOUT;
 
                         e_ret = epoll_ctl( epoll_fd, EPOLL_CTL_ADD, newfd, &event);
                         if( e_ret == -1 ) {
-                            LOG_print( "Error: epoll_ctl returned -1 at socket %d.\n", newfd );
+                            LOG_print( "Error: epoll_ctl EPOLL_CTL_ADD returned -1 at socket %d.\n", newfd );
                             SOCKET_free();
                             exit( EXIT_FAILURE );
                         }
                     }
-                } // for( ;; )
 
+                } else {
+                    // Podłączony klient przesłał dane 
+                    SOCKET_process( events[ i ].data.fd );
+                }
             } else {
-                if( events[ i ].events & EPOLLIN ) {
-                    int e_socket_fd = events[ i ].data.fd;
-                    struct epoll_event event = {0};
-                    event.data.fd = e_socket_fd;
-
-                    if(event.events == 0) {
-                        LOG_print( "Socket %d closing.\n", e_socket_fd );
-                        if( epoll_ctl( epoll_fd, EPOLL_CTL_DEL, e_socket_fd, NULL ) < 0 ) {
-                            LOG_print( "Error: epoll_ctl EPOLL_CTL_DEL.\n" );
-                            SOCKET_free();
-                            exit( EXIT_FAILURE );
-                        }
-                        SOCKET_close_fd( e_socket_fd );
-                    } else if( epoll_ctl( epoll_fd, EPOLL_CTL_MOD, e_socket_fd, &event ) < 0 ) {
-                        LOG_print( "Error: epoll_ctl EPOLL_CTL_MOD.\n" );
-                        SOCKET_free();
-                        exit( EXIT_FAILURE );
-                    }
-
+                if( events[ i ].events & EPOLLOUT ) {
+                    SOCKET_send_all_data_fd( events[ i ].data.fd );
                 }
             }
         }
     }
+
+    close( epoll_fd );
 }
 
 /*
@@ -410,7 +427,7 @@ static void SOCKET_process( int socket_fd ) {
         SESSION_delete_send_struct( socket_fd );
         SOCKET_close_fd( socket_fd );
     } else {
-        if (session->recv_data_len > 0 ) {
+        if ( session->recv_data_len > 0 ) {
             /* Nie zostały wcześniej odebrane wszystkie dane - metoda POST.
             Teraz trzeba je dokleić do http_info.content_data */
             if( session->http_info.received_all == 0 ) {
@@ -447,9 +464,22 @@ void SOCKET_modify_clients_count( int mod ) {
 }
 
 void SOCKET_close_fd( int socket_fd ) {
+
+    switch( connection_processor ) {
+        case CP_SELECT:
+            FD_CLR( socket_fd, &master );
+        break;
+
+        case CP_EPOLL:
+            if( epoll_ctl( epoll_fd, EPOLL_CTL_DEL, socket_fd, NULL ) < 0 ) {
+                LOG_print( "Error: epoll_ctl EPOLL_CTL_DEL. errno = %d.\n", errno );
+            }
+        break;
+        default: break;
+    }
+
     shutdown( socket_fd, SHUT_RDWR );
     close( socket_fd );
-    FD_CLR( socket_fd, &master );
     /* Zmniejszensie licznika podłączonych klientów */
     SOCKET_modify_clients_count( -1 );
 }
@@ -459,6 +489,9 @@ SOCKET_free( void )
 - zwolnienie WinSock
 - zwolnienie socketa */
 void SOCKET_free( void ) {
+    if( connection_processor == CP_EPOLL ) {
+        close( epoll_fd );
+    }
     LOG_print( "SOCKET_free( %d ):\n", fdmax );
     LOG_print( "\t- shutdown( %d )...", socket_server );
     shutdown( socket_server, SHUT_RDWR );
@@ -471,12 +504,7 @@ void SOCKET_free( void ) {
     LOG_print( "\t- close( %d )...", socket_server );
     close( socket_server );
     LOG_print( "ok.\n" );
-
-#ifdef _WIN32
-    LOG_print( "\t- WSACleanup()..." );
-    WSACleanup();
-    LOG_print( "ok.\n" );
-#endif
+    LOG_save();
 }
 
 /*

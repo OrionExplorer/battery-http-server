@@ -623,7 +623,7 @@ void SESSION_delete_send_struct( int socket_fd ) {
 
     for( i = 0; i <= MAX_CLIENTS-1; i++ ){
         if( send_d[ i ].socket_fd == socket_fd ) {
-            battery_fclose( send_d[ i ].file, socket_fd );
+            //battery_fclose( send_d[ i ].file, socket_fd );
 
             /*if( send_d[ i ].keep_alive <= 0 ) {
                 SOCKET_close_fd( send_d[ i ].socket_fd );

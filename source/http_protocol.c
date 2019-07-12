@@ -553,7 +553,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
 
     if( ht_access_count > 0) {
         /* Zwolnienie pamięci dla hasła zasobu */
-        if( ht_access_pwd ) {
+        if( ht_access_pwd != NULL ) {
             free( ht_access_pwd );
             ht_access_pwd = NULL;
         }

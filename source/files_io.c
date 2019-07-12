@@ -108,7 +108,7 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
 
     tmp_socket = ( http_session ? http_session->socket_fd : -133 );
     /* Sprawdza, czy udało się otworzyć plik */
-    resource = battery_fopen( filename, READ_BINARY, 1, tmp_socket, STD_FILE );
+    resource = battery_fopen( filename, READ_BINARY, 0, tmp_socket, STD_FILE );
 
     if( !resource ) {
         return 0;
@@ -189,19 +189,22 @@ battery_fopen( const char *filename, const char *mode, short add_to_list, int so
 @socket_fd - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
 - funkcja weryfikuje, czy żądany plik jest już otwarty przez serwer */
 FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_fd, RESOURCE_TYPE type ) {
-    int i = FOPEN_MAX;
+    int i;
     FILE *tmp = NULL;
 
     /* Weryfikacja, czy plik jest już otwarty przez serwer */
-    for( i = 0; i <= FOPEN_MAX-1; i++ ) {
-        if( strcmp( opened_files[ i ].filename, filename ) == 0 && type == opened_files[ i ].type ) {
-            tmp = opened_files[ i ].file;
-            break;
+    for( i = 0; i < FOPEN_MAX; i++ ) {
+        if( strlen( opened_files[ i ].filename ) ) {
+            if( strcmp( opened_files[ i ].filename, filename ) == 0 && type == opened_files[ i ].type ) {
+                tmp = opened_files[ i ].file;
+                break;
+            }
         }
     }
 
     /* Jeżeli nie jest - otwórz */
     if( tmp == NULL ) {
+
         tmp = ( type == STD_FILE ? fopen( filename, mode ) : popen( filename, mode ) );
     }
 
@@ -210,16 +213,29 @@ FILE *battery_fopen( const char *filename, const char *mode, short add_to_list, 
             return tmp;
         } else {
             fseek( tmp, 0, SEEK_END );
-            i = FOPEN_MAX;
 
-            for(i = 0; i <= FOPEN_MAX-1; i++ ) {
+            for(i = 0; i < FOPEN_MAX; i++ ) {
                 /* Dodanie informacji o otwartym pliku w pierwszym wolnym elemencie */
                 if( opened_files[ i ].file == NULL ) {
-                    opened_files[ i ] .file = tmp;
-                    opened_files[ i ] .socket_fd = socket_fd;
+                    opened_files[ i ].file = tmp;
+                    opened_files[ i ].socket_fd = socket_fd;
                     strncpy( opened_files[ i ].filename, filename, FILENAME_MAX );
                     opened_files[ i ].size = ftell( tmp );
                     opened_files[ i ].type = type;
+                    opened_files[ i ].content = NULL;
+
+                    opened_files[ i ].content = calloc( opened_files[ i ].size+1, sizeof( char ) );
+                    if( opened_files[ i ].content == NULL ) {
+                        printf( "Error: unable to create cache for file %s.\n", filename );
+                    } else {
+                        rewind( tmp );
+                        if( fread( opened_files[ i ].content, opened_files[ i ].size, 1, tmp ) == 1 ) {
+                            opened_files[ i ].content[ opened_files[ i ].size ] = '\0';
+                            printf("[CACHE] File %s loaded to memory.\n", filename );
+                        } else {
+                            printf( "Error: unable load file %s to memory.\n", filename );
+                        }
+                    }
                     break;
                 }
             }
@@ -263,13 +279,35 @@ char* battery_get_filename( FILE *file ) {
     return NULL;
 }
 
+
+size_t battery_fread( FILE *file, char *dst, size_t s_pos, size_t size ) {
+    int i, j, k;
+
+    if( file == NULL ) {
+        return -1;
+    }
+
+    for( i = 0; i < FOPEN_MAX; i++ ) {
+        if( file && opened_files[ i ].file == file ) {
+            if( s_pos + size > opened_files[ i ].size ) {
+                s_pos = opened_files[ i ].size - size;
+            }
+            for( k = 0, j = s_pos; j < s_pos + size; j++, k++ ) {
+                *dst++ = opened_files[ i ].content[j];
+            }
+            return size;
+        }
+    }
+    return -1;
+}
+
 /*
 battery_fclose( FILE *file, int socket_fd )
 @file - wskaźnik do otwartego pliku
 @socket_fd - powiązanie otwieranego pliku (tworzonej struktury) z podłączonym klientem
 - funkcja weryfikuje, czy żądany plik może zostać zamknięty na podstawie ilości korzystających z niego klientów */
 void battery_fclose( FILE *file, int socket_fd ) {
-    int i = FOPEN_MAX;
+    int i = 0;
     int clients_count = 0;
     short file_found = 0;
     RESOURCE_TYPE type = NONE;
@@ -281,6 +319,7 @@ void battery_fclose( FILE *file, int socket_fd ) {
     for( i = 0; i <= FOPEN_MAX-1; i++ ) {
         /* Znaleziony element przechowujący informację o otwartym pliku */
         if( file && opened_files[ i ].file == file ) {
+            //printf("battery_fclose\n");
             /* Usunięcie elementu przechowującego informacje dla żądanego klienta */
             if( opened_files[ i ].socket_fd == socket_fd ) {
                 opened_files[ i ].socket_fd = 0;
@@ -288,8 +327,12 @@ void battery_fclose( FILE *file, int socket_fd ) {
                 opened_files[ i ].size = 0;
                 type = opened_files[ i ].type;
                 opened_files[ i ].type = NONE;
+                if( opened_files[ i ].content ) {
+                    printf("[CACHE] File %s removed.\n", opened_files[ i ].filename );
+                    free( opened_files[ i ].content );
+                    opened_files[ i ].content = NULL;
+                }
                 memset( opened_files[ i ].filename, '\0', FILENAME_MAX );
-
                 file_found++;
 
             }
