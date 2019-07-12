@@ -207,7 +207,15 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
 }
 
 static void CGI_set_env( const char *var, const char *val ) {
+#ifdef _WIN32
+    char env_var[ MAX_BUFFER ];
+    sprintf( env_var, "%s=%s", var, val );
+    putenv( env_var );
+#endif
+
+#ifdef __linux__
     ( val == NULL ) ?   unsetenv( var ) : setenv( var, val, 1 );
+#endif
 }
 
 /*

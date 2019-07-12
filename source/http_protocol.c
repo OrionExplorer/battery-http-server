@@ -530,7 +530,7 @@ void REQUEST_process( HTTP_SESSION *http_session ) {
             if( http_session->http_info.method_name != POST ) {
                 RESPONSE_file( http_session, local_file_path ); /* Zapytanie HEAD jest weryfikowane w funkcji RESPONSE_header */
             }
-        } else if( file_params_val == 2 ) {/* Plik istnieje, ale dost�p jest zabroniony */
+        } else if( file_params_val == 2 ) {/* Plik istnieje, ale dostęp jest zabroniony */
             RESPONSE_error( http_session, HTTP_403_FORBIDDEN, HTTP_ERR_403_MSG, NULL );
         } else if( file_params_val == 3 ) {/* Plik istnieje, ale wymaga autoryzacji */
             if( http_session->http_info.authorization ) {

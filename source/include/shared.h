@@ -20,19 +20,45 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
     #define FD_SETSIZE                      1024
 #endif
 
-#include <sys/types.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/ioctl.h>
-#include <errno.h>
+/* Poniższe definicje są konieczne z powodu "FIXME" w implementacji biblioteki Ws2tcpip.h w MinGW */
+#ifdef _WIN32
+
+    #ifndef _WIN32_WINNT
+        #define _WIN32_WINNT                0x0501
+    #endif
+
+    #include <WinSock2.h>
+    #include <WS2tcpip.h>
+#endif
+
+#ifdef _MSC_VER
+    #pragma comment( lib, "WS2_32.lib" )
+#endif
+
+#ifndef _MSC_VER
+    #include <sys/types.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+#endif
+
+#ifdef __linux__
+    #include <sys/socket.h>
+    #include <netdb.h>
+    #include <netinet/in.h>
+    #include <netinet/tcp.h>
+    #include <arpa/inet.h>
+    #include <sys/ioctl.h>
+    #include <errno.h>
+#endif
+
+#ifdef __linux__
+    #define APP_PLATFORM                    "linux"
+#elif _WIN32
+    #define APP_PLATFORM                    "windows"
+#endif
 
 #define APP_NAME                            "battery"
-#define APP_VER                             "1.0.0"
+#define APP_VER                             APP_PLATFORM"-1.0.0"
 #define SERVER_NAME                         APP_NAME"/"APP_VER
 
 #define LOGS_PATH                           "logs"SLASH
@@ -179,7 +205,11 @@ struct FILE_CACHE {
 /* Główna struktura, która będzie przechowywała wszystkie informacje o połączonym kliencie */
 struct HTTP_SESSION {
     struct sockaddr_in      address;
+#ifdef __linux__
     int                     socket;
+#elif _WIN32
+    SOCKET                  socket;
+#endif
     ssize_t                 recv_data_len;
     fd_set                  socket_data;
     int                     socket_fd;
@@ -188,7 +218,12 @@ struct HTTP_SESSION {
     SEND_INFO               response_data;
 };
 
-extern int                  socket_server;
+#ifdef _WIN32
+    extern WSADATA          wsk;
+    extern SOCKET           socket_server;
+#elif __linux__
+    extern int              socket_server;
+#endif
 extern int                  addr_size;
 extern int                  active_port;
 extern struct sockaddr_in   server_address;

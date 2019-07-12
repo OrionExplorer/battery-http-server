@@ -24,13 +24,13 @@ HTACCESS_load_configuration( const char *filename )
 @filename - nazwa pliku konfiguracyjnego
 - zwraca int, gdzie 1 = konfiguracja wczytana poprawnie. */
 short HTACCESS_load_configuration( FILE *cfg_file ) {
-    char buf[ STD_BUFF_SIZE ];              /* Zmienna pomocnicza */
-    char option[ STD_BUFF_SIZE ];           /* Wczytany typ danych */
-    char res_filename[ MAX_PATH_LENGTH ];   /* Przechowuje nazwę zasobu */
-    char res_login[ SMALL_BUFF_SIZE ];      /* Przechowuje login do zasobu */
-    char res_pwd[ SMALL_BUFF_SIZE ];        /* Przechowuje hasło do zasobu */
-    char res_auth_u[ STD_BUFF_SIZE ];       /* Przechowuje niezaszyfrowane, sformatowane dane */
-    char res_auth_f[ STD_BUFF_SIZE ];       /* Przechowuje zaszyfrowane dane */
+    char buf[ STD_BUFF_SIZE+1 ];              /* Zmienna pomocnicza */
+    char option[ STD_BUFF_SIZE+1 ];           /* Wczytany typ danych */
+    char res_filename[ MAX_PATH_LENGTH+1 ];   /* Przechowuje nazwę zasobu */
+    char res_login[ SMALL_BUFF_SIZE+1 ];      /* Przechowuje login do zasobu */
+    char res_pwd[ SMALL_BUFF_SIZE+1 ];        /* Przechowuje hasło do zasobu */
+    char res_auth_u[ STD_BUFF_SIZE+1 ];       /* Przechowuje niezaszyfrowane, sformatowane dane */
+    char res_auth_f[ STD_BUFF_SIZE+1 ];       /* Przechowuje zaszyfrowane dane */
 
     if( !cfg_file ) {
         return 0;

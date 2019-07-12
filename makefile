@@ -1,7 +1,11 @@
 CC=gcc
 CFLAGS=-Wall -O2
-CLIBS=
+CLIBS=-lws2_32
 INSTALL_DIR=/opt/battery
+
+# ifeq ($(OS),Windows_NT)
+# CLIBS += -lws2_32
+# endif
 
 all: battery
 
@@ -66,4 +70,3 @@ install:
 	@ cp source/configuration/battery.conf $(INSTALL_DIR)/configuration/battery.conf
 	@ chmod +x $(INSTALL_DIR)/run.sh
 	@ chown pi:pi $(INSTALL_DIR) -R || echo "Unable to chown!"
-

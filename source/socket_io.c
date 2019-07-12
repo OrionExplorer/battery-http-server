@@ -23,12 +23,22 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <sys/sendfile.h>
-#include <sys/epoll.h>
+#include <errno.h>
+#ifdef __linux__
+    #include <sys/sendfile.h>
+    #include <sys/epoll.h>
+#endif
 
 
-/*Sockety */
-int                 socket_server;
+#ifdef _WIN32
+    /*Inicjalizacja WinSock */
+    WSADATA         wsk;
+    SOCKET          socket_server;
+#endif
+
+#ifdef __linux__
+    int             socket_server;
+#endif
 int                 active_port;
 struct sockaddr_in  server_address;
 HTTP_SESSION        http_session_;
@@ -43,7 +53,9 @@ static void         SOCKET_initialization( void );
 static void         SOCKET_prepare( void );
 static void         SOCKET_process( int socket_fd );
 static void         SOCKET_send_all_data( void );
-static void         SOCKET_send_all_data_fd( int socket_fd );
+#ifdef __linux__
+    static void     SOCKET_send_all_data_fd( int socket_fd );
+#endif
 static int          _SOCKET_set_nonblock( int socket_fd );
 
 /* Przechowuje informację o metodzie przetwarzania połączeń */
@@ -56,8 +68,10 @@ fd_set              read_fds;
 int                 fdmax;
 
 /* epoll() */
-static void         _SOCKET_run_epoll( void );
-int                 epoll_fd;
+#ifdef __linux__
+    static void     _SOCKET_run_epoll( void );
+    int             epoll_fd;
+#endif
 
 
 /*
@@ -67,6 +81,15 @@ SOCKET_initialization( void )
 - inicjalizacja socketa */
 static void SOCKET_initialization( void ) {
     LOG_print( "Socket server initialization...\n" );
+
+#ifdef _WIN32
+    /* Inicjalizacja WinSock */
+    if ( WSAStartup( MAKEWORD( 2, 2 ), &wsk ) != 0 ) {
+        LOG_print( "\nError creating Winsock.\n" );
+        printf( "Error creating Winsock.\n" );
+        exit( EXIT_FAILURE );
+    }
+#endif
 
     /* Utworzenie socketa nasłuchującego */
     socket_server = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
@@ -101,12 +124,20 @@ static void SOCKET_send_all_data( void ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd > 0 ) {
 
             if( use_sendfile == 1 ) {
+
+#ifdef __linux__
                 nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
-            } else {
-                //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-                //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
+#else
                 nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
-                //nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
+
+                if( nwrite > 0 ) {
+                    send_d[ j ].sent_size += nwrite;
+                }
+#endif
+
+            } else {
+                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
                 if( nwrite > 0 ) {
@@ -126,6 +157,7 @@ static void SOCKET_send_all_data( void ) {
 }
 
 
+#ifdef __linux__
 /*
 SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
@@ -161,6 +193,7 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
         }
     }
 }
+#endif
 
 /*
 SOCKET_prepare( void )
@@ -176,9 +209,11 @@ static void SOCKET_prepare( void ) {
     FD_ZERO( &master );
     FD_ZERO( &read_fds );
 
+#ifdef __linux
     if( setreuid(geteuid(), getuid()) ) {
         LOG_print( "Error: unable to setreuid: %d.\n", errno );
     }
+#endif
 
     if( setsockopt( socket_server, SOL_SOCKET, SO_REUSEADDR, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
         LOG_print( "setsockopt( SO_REUSEADDR ) error: %d.\n", errno );
@@ -200,10 +235,12 @@ static void SOCKET_prepare( void ) {
         printf( "setsockopt( TCP_NODELAY ) error: %d.\n", errno );
     }
 
+#ifdef __linux__
     if( setsockopt( socket_server, IPPROTO_TCP, TCP_CORK, ( char * )&i, sizeof( i ) ) == SOCKET_ERROR ) {
         LOG_print( "setsockopt( TCP_CORK ) error: %d.\n", errno );
         printf( "setsockopt( TCP_CORK ) error: %d.\n", errno );
     }
+#endif
 
     /* Ustawienie na non-blocking socket */
     if( fcntl( socket_server, F_SETFL, &b ) == SOCKET_ERROR ) {
@@ -235,16 +272,21 @@ static void SOCKET_prepare( void ) {
 }
 
 static int _SOCKET_set_nonblock( int socket_fd ) {
-    int flags, ret;
+    unsigned long flags = 0, ret;
 
+#ifdef __linux__
     flags = fcntl( socket_fd, F_GETFL, 0 );
     if( flags == -1 ) {
         LOG_print( "Error: unable to get flags from socket %d.\n", socket_fd );
         return -1;
     }
-
     flags |= O_NONBLOCK;
     ret = fcntl( socket_fd, F_SETFL, flags );
+#elif _WIN32
+    ret = fcntl( socket_fd, F_SETFL, &flags );
+#endif
+
+
     if (ret == -1) {
         LOG_print( "Error: unable to set non-bocking socket: %d.\n", socket_fd );
         return -1;
@@ -288,11 +330,11 @@ static void _SOCKET_run_select( void ) {
                         if ( errno == EAGAIN || errno == EWOULDBLOCK ) {
                             continue;
                         }
-                        LOG_print( "Socket error: accept().\n" );
+                        LOG_print( "Socket error: accept(): %d.\n", errno );
                     } else {
                         SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                         SESSION_add_new_send_struct( newfd );
-                        //_SOCKET_set_nonblock( newfd );
+                        _SOCKET_set_nonblock( newfd );
                         FD_SET( newfd, &master );
                         if( newfd > fdmax ) {
                             fdmax = newfd;
@@ -312,6 +354,7 @@ static void _SOCKET_run_select( void ) {
 }
 
 
+#ifdef __linux__
 /*
 _SOCKET_run_epoll( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
@@ -368,7 +411,7 @@ static void _SOCKET_run_epoll( void ) {
                         if ( errno == EAGAIN || errno == EWOULDBLOCK ) {
                             continue;
                         }
-                        LOG_print( "Socket error: accept().\n" );
+                        LOG_print( "Socket error: accept(): %d.\n", errno );
                     } else {
                         SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                         SESSION_add_new_send_struct( newfd );
@@ -401,10 +444,12 @@ static void _SOCKET_run_epoll( void ) {
                 }
             }
         }
+        Sleep(1);
     }
 
     close( epoll_fd );
 }
+#endif
 
 /*
 SOCKET_process( int socket_fd )
@@ -470,9 +515,11 @@ void SOCKET_close_fd( int socket_fd ) {
         break;
 
         case CP_EPOLL:
+#ifdef __linux__
             if( epoll_ctl( epoll_fd, EPOLL_CTL_DEL, socket_fd, NULL ) < 0 ) {
                 LOG_print( "Error: epoll_ctl EPOLL_CTL_DEL. errno = %d.\n", errno );
             }
+#endif
         break;
         default: break;
     }
@@ -490,9 +537,11 @@ SOCKET_free( void )
 void SOCKET_free( void ) {
     LOG_print( "SOCKET_free( %d ):\n", fdmax );
     if( connection_processor == CP_EPOLL ) {
+#ifdef __linux__
         LOG_print( "\t- epoll( %d )...", epoll_fd );
         close( epoll_fd );
         LOG_print( "ok.\n" );
+#endif
     }
     LOG_print( "\t- shutdown( %d )...", socket_server );
     shutdown( socket_server, SHUT_RDWR );
@@ -505,6 +554,12 @@ void SOCKET_free( void ) {
     LOG_print( "\t- close( %d )...", socket_server );
     close( socket_server );
     LOG_print( "ok.\n" );
+
+#ifdef _WIN32
+    LOG_print( "\t- WSACleanup()..." );
+    WSACleanup();
+    LOG_print( "ok.\n" );
+#endif
     LOG_save();
 }
 
@@ -563,7 +618,9 @@ void SOCKET_main( void ) {
 
     switch( connection_processor ) {
         case CP_SELECT  :   ( void )_SOCKET_run_select(); break;
+#ifdef __linux__
         case CP_EPOLL   :   ( void )_SOCKET_run_epoll(); break;
+#endif
         default:            ( void )_SOCKET_run_select(); break;
     }
     

@@ -314,18 +314,6 @@ void battery_fclose( FILE *file, int socket_fd ) {
         return;
     }
 
-    /* Z pliku korzystał jeden lub mniej klientów */
-    if( clients_count == 2 && file_found > 0 ) {
-        if( file ) {
-            CACHE_delete( opened_files[ i ].filename );
-            if( type == STD_FILE ) {
-                fclose( file );
-            } else if( type == SCRIPT ) {
-                pclose( file );
-            }
-        }
-    }
-
     for( i = 0; i <= FOPEN_MAX-1; i++ ) {
         /* Znaleziony element przechowujący informację o otwartym pliku */
         if( file && opened_files[ i ].file == file ) {
@@ -343,6 +331,18 @@ void battery_fclose( FILE *file, int socket_fd ) {
             }
             /* Zliczenie ilości klientów korzystających z pliku */
             clients_count++;
+        }
+    }
+
+    /* Z pliku korzystał jeden lub mniej klientów */
+    if( clients_count == 1 && file_found > 0 ) {
+        if( file ) {
+            CACHE_delete( file );
+            if( type == STD_FILE ) {
+                fclose( file );
+            } else if( type == SCRIPT ) {
+                pclose( file );
+            }
         }
     }
 }
