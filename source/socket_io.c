@@ -53,9 +53,7 @@ static void         SOCKET_initialization( void );
 static void         SOCKET_prepare( void );
 static void         SOCKET_process( int socket_fd );
 static void         SOCKET_send_all_data( void );
-#ifdef __linux__
-    static void     SOCKET_send_all_data_fd( int socket_fd );
-#endif
+static void         SOCKET_send_all_data_fd( int socket_fd );
 static int          _SOCKET_set_nonblock( int socket_fd );
 
 /* Przechowuje informację o metodzie przetwarzania połączeń */
@@ -146,7 +144,6 @@ static void SOCKET_send_all_data( void ) {
             }
 
             send_d[ j ].http_content_size -= nwrite;
-            //printf("http_content_size: %ld\n", send_d[ j ].http_content_size);
             
             if( (nwrite < 0 && errno != EWOULDBLOCK ) || ( send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0 ) ) {
                 SESSION_delete_send_struct( send_d[ j ].socket_fd );
@@ -156,15 +153,14 @@ static void SOCKET_send_all_data( void ) {
     }
 }
 
-
-#ifdef __linux__
 /*
-SOCKET_send_all_data( void )
+SOCKET_send_all_data_fd( int socket_fd )
+@socket_fd - identyfikator gniazda
 - funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data_fd( int socket_fd ) {
     int j;
     size_t nwrite;
-    /* Zmienne dla standardowej wysyłki fread-send */
+    /* Zmienne dla standardowej wysyłki read-send */
     size_t nread;
     static char m_buf[ UPLOAD_BUFFER_CHAR ];
 
@@ -172,10 +168,15 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd == socket_fd ) {
 
             if( use_sendfile == 1 ) {
+
+#ifdef __linux__
                 nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+#else 
+                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
+#endif
+
             } else {
-                //fseek( send_d[ j ].file, send_d[ j ].sent_size, SEEK_SET );
-                //nread = fread( m_buf, sizeof( char ), UPLOAD_BUFFER_CHAR, send_d[ j ].file );
                 nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
@@ -193,7 +194,6 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
         }
     }
 }
-#endif
 
 /*
 SOCKET_prepare( void )
@@ -271,6 +271,10 @@ static void SOCKET_prepare( void ) {
     /* Teraz czekamy na połączenia i dane */
 }
 
+/*
+static int _SOCKET_set_nonblock( int socket_fd )
+@socket_fd - identyfikator gniazda 
+- funkcja ustawia wybrane gniazdo na tryb NONBLOCK */
 static int _SOCKET_set_nonblock( int socket_fd ) {
     unsigned long flags = 0, ret;
 
@@ -300,7 +304,7 @@ _SOCKET_run_select( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
 static void _SOCKET_run_select( void ) {
     int i = 0;
-    struct timeval tv = {1, 500000};
+    struct timeval tv = {0, 0};
     socklen_t addrlen;
     int newfd;
 
@@ -344,8 +348,8 @@ static void _SOCKET_run_select( void ) {
                     /* Podłączony klient przesłał dane... */
                     SOCKET_process( i );
                     SOCKET_send_all_data();
-                }
-            } /* nowe połączenie */
+                } /* nowe połączenie/przesłane dane */
+            }
             SOCKET_send_all_data();
         } /* pętla deskryptorów while( --i )*/
         SOCKET_send_all_data();
@@ -357,7 +361,7 @@ static void _SOCKET_run_select( void ) {
 #ifdef __linux__
 /*
 _SOCKET_run_epoll( void )
-- funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
+- funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji epoll() */
 static void _SOCKET_run_epoll( void ) {
     int e_ret;
     int i, fds, newfd;
