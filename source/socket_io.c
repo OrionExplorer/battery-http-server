@@ -105,7 +105,7 @@ static void SOCKET_initialization( void ) {
     memset( &server_address, 0, sizeof( server_address ) );
     server_address.sin_addr.s_addr = htonl( INADDR_ANY );
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons( ( u_short )active_port );
+    server_address.sin_port = htons( active_port );
 }
 
 /*
@@ -554,10 +554,6 @@ void SOCKET_free( void ) {
     }
     LOG_print( "\t- shutdown( %d )...", socket_server );
     shutdown( socket_server, SHUT_RDWR );
-    LOG_print( "ok.\n" );
-
-    LOG_print( "\t- close( %d )...", http_session_.socket );
-    close( http_session_.socket );
     LOG_print( "ok.\n" );
 
     LOG_print( "\t- close( %d )...", socket_server );

@@ -17,6 +17,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include <time.h>
 
 #define MAX_OPEN_FILES                      1024
+
 #ifndef FD_SETSIZE
     #define FD_SETSIZE                      1024
 #endif
@@ -101,55 +102,47 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 
 #define RFC1123FMT                          "%a, %d %b %Y %H:%M:%S GMT"
 
+/* Przechowuje ścieżkę, w której znajduje się plik wykonywalny */
 char                            app_path[ MAX_PATH_LENGTH ];
+
+/* Przechowuje ścieżkę, z której będą serwowane zasoby */
 extern char*                    document_root;
+
 /* Zaimplementowane metody dostępu do zasobów serwera */
 extern const char               *http_method_list[ ];
 
-typedef enum http_m             http_m;
-typedef enum RESOURCE_TYPE      RESOURCE_TYPE;
-typedef struct HT_ACCESS        HT_ACCESS;
-typedef struct HTTP_INFO        HTTP_INFO;
-typedef struct MIME_TYPE        MIME_TYPE;
-typedef struct LOCAL_INFO       LOCAL_INFO;
-typedef struct HTTP_SESSION     HTTP_SESSION;
-typedef struct SEND_INFO        SEND_INFO;
-typedef struct OPENED_FILE      OPENED_FILE;
-typedef struct FILE_CACHE       FILE_CACHE;
-typedef struct OTHER_SCRIPTS    OTHER_SCRIPTS;
-typedef enum CONN_PROC          CONN_PROC;
 
 /* Obsługiwane metody protokołu HTTP */
-enum http_m {
+typedef enum http_m {
     UNKNOWN_HTTP_METHOD,
     GET,
     HEAD,
     POST
-};
+} http_m;
 
 /* Typ żądanego zasobu */
-enum RESOURCE_TYPE {
+typedef enum RESOURCE_TYPE {
     NONE,
     STD_FILE,
     SCRIPT
-};
+} RESOURCE_TYPE;
 
 /* Struktura przechowująca informacje o prawach dostę do danych zasobów */
-struct HT_ACCESS {
+typedef struct HT_ACCESS {
     char res_filename[ MAX_PATH_LENGTH ];           /* Nazwa zasobu */
     char res_login[ SMALL_BUFF_SIZE ];              /* Wymagany login */
     char res_pwd[ SMALL_BUFF_SIZE ];                /* Wymagane hasło */
     char res_auth[ STD_BUFF_SIZE ];
-};
+} HT_ACCESS;
 
 /* Struktura przechowująca informacje o mime-type dla danego rozszerzenia pliku */
-struct MIME_TYPE {
+typedef struct MIME_TYPE {
     char ext[ EXT_LEN ];                            /* Rozszerzenie */
     char mime_type[ SMALL_BUFF_SIZE ];              /* MIME */
-};
+} MIME_TYPE;
 
 /* Struktura przechowująca informacje o żądaniu HTTP */
-struct HTTP_INFO {
+typedef struct HTTP_INFO {
     long                range_st;                   /* Dla nagłówka "Range" */
     long                range_en;                   /* Dla nagłówka "Range" */
     long                content_length;             /* Dla nagłówka "Content-Length" */
@@ -170,72 +163,70 @@ struct HTTP_INFO {
     char*               user_pwd;                   /* Odszyfrowane hasło użytkownika */
     short               keep_alive;                 /* Przechowuje informację o typie połączenia ( Close/Keep-Alive ) */
     short               received_all;               /* Dla żądań typu POST - informuje, czy odebrano całą wiadomość */
-};
+} HTTP_INFO;
 
 /* Struktura przechowuje informacje szczegółowe o lokalnym zasobie */
-struct LOCAL_INFO {
+typedef struct LOCAL_INFO {
     char*               date_res_last_modified;     /* Przechowuje informację kiedy zasób został ostatnio zmodyfikowany */
-};
+} LOCAL_INFO;
 
 /* Struktura przechowuje informacje o statusie wysyłki lokalnego zasobu */
-struct SEND_INFO {
+typedef struct SEND_INFO {
     FILE*               file;                       /* Deskryptor otwartego pliku */
     long                http_content_size;          /* Rozmiar pliku */
     size_t              sent_size;                  /* Ilość danych wysłana do tej pory */
     int                 socket_fd;                  /* Deksryptor podłączonego klienta, który wysłał żądanie */
     size_t              total_size;                 /* Przechowuje całkowity rozmiar pliku */
     short               keep_alive;                 /* Informuje, czy utrzymać połączenie po zrealizowaniu żądania */
-};
+} SEND_INFO;
 
 /* Struktura przechowuje informacje o otwartym pliku */
-struct OPENED_FILE {
+typedef struct OPENED_FILE {
     char                filename[ FILENAME_MAX ];   /* Nazwa */
     FILE*               file;                       /* Deskryptor otwartego pliku */
     size_t              size;                       /* Rozmiar */
     int                 socket_fd;                  /* Deskryptor podłączonego klienta, który wysłał żądanie */
     RESOURCE_TYPE       type;                       /* Rodzaj zasobu */
-};
+} OPENED_FILE;
 
 /* Struktura przechowuje treść otwartego pliku */
-struct FILE_CACHE {
+typedef struct FILE_CACHE {
     char                filename [ FILENAME_MAX ];  /* Nazwa */
     FILE*               file;                       /* Deskryptor otwartego pliku */
     char*               content;                    /* Zawartość pliku - cache */
-};
+} FILE_CACHE;
 
 /* Główna struktura, która będzie przechowywała wszystkie informacje o połączonym kliencie */
-struct HTTP_SESSION {
-    struct sockaddr_in      address;
-#ifdef __linux__
-    int                     socket;
-#elif _WIN32
-    SOCKET                  socket;
-#endif
-    ssize_t                 recv_data_len;
-    fd_set                  socket_data;
-    int                     socket_fd;
-    HTTP_INFO               http_info;
-    LOCAL_INFO              local_info;
-    SEND_INFO               response_data;
-};
+typedef struct HTTP_SESSION {
+    struct sockaddr_in      address;                /* Zmienna pomocnicza */
+    ssize_t                 recv_data_len;          /* Przechowuje długość otrzymanego ciągu znaków*/
+    int                     socket_fd;              /* Deskryptor podłączoego klienta */
+    HTTP_INFO               http_info;              /* Informacje o żądaniu HTTP */
+    LOCAL_INFO              local_info;             /* Informacje o pliku */
+} HTTP_SESSION;
+
 
 #ifdef _WIN32
-    extern WSADATA          wsk;
-    extern SOCKET           socket_server;
+    extern WSADATA          wsk;                                /* [Win32] Inicjalizacja Winsock */
+    extern SOCKET           socket_server;                      /* [Win32] Główny deskryptor gniazda serwera */
 #elif __linux__
-    extern int              socket_server;
+    extern int              socket_server;                      /* Główny deskryptor gniazda serwera*/
 #endif
-extern int                  addr_size;
+
+/* Przechowuje informację o porcie, na ktorym serwer ma działać */
 extern int                  active_port;
-extern struct sockaddr_in   server_address;
-extern int                  ip_proto_ver;
-extern HTTP_SESSION         http_session_;
+
+/* Przechowuje informacje o danych gotowych do wysyłki dla poszczególnych klientów */
 extern SEND_INFO            send_d[ MAX_CLIENTS ];
+
+/* Przechowuje informacje pozwalające do jednorazowego otwarcia pliku żądanego przez więcej niż jednego klienta */
 extern OPENED_FILE          opened_files[ MAX_OPEN_FILES ];
+
+/* Przechowuje treści plików żądanych aktualnie przez klientów */
 extern FILE_CACHE           cached_files[ MAX_OPEN_FILES ];
-extern fd_set               master;
+
+/* Przechowuje liczbę aktualnie podłączonych klientów - w celu obsługi błędu 501 */
 extern int                  http_conn_count;
-char*                       server_get_remote_hostname( HTTP_SESSION *http_session );
 
 /* Przechowuje informacje o dostępach do zasobów */
 HT_ACCESS                   ht_access[ 256 ];
@@ -246,23 +237,20 @@ MIME_TYPE                   mime_types[ STD_BUFF_SIZE ];
 extern int                  mime_types_count;
 
 /* Wersja protokołu */
-enum IP_VER {
+typedef enum IP_VER {
     IPv4 = 4,
     IPv6 = 6
-};
+} IP_VER;
 
-/* Opcjonalne wykorzystanie funkcji sendfile dla "zero-copy". */
+/* Opcjonalne wykorzystanie funkcji sendfile dla osiągnięcia "zero-copy". */
 extern int                  use_sendfile;
 
 /* Metoda przetwarzania połączeń */
-enum CONN_PROC {
-    CP_EPOLL,
-    CP_SELECT
-};
+typedef enum CONN_PROC {
+    CP_EPOLL,               /* epoll() */
+    CP_SELECT               /* select() */
+} CONN_PROC;
 extern CONN_PROC            connection_processor;
-
-/* Deskryptor dla epoll() */
-extern int                  epoll_fd;
 
 /* Lista możliwych plików typu index */
 char                        *index_file_list[ MICRO_BUFF_SIZE ];
