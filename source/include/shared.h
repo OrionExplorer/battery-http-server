@@ -225,7 +225,7 @@ extern OPENED_FILE          opened_files[ MAX_OPEN_FILES ];
 /* Przechowuje treści plików żądanych aktualnie przez klientów */
 extern FILE_CACHE           cached_files[ MAX_OPEN_FILES ];
 
-/* Przechowuje liczbę aktualnie podłączonych klientów - w celu obsługi błędu 501 */
+/* Przechowuje liczbę aktualnie podłączonych klientów - w celu obsługi błędu 503 */
 extern int                  http_conn_count;
 
 /* Przechowuje informacje o dostępach do zasobów */
