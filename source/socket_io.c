@@ -33,7 +33,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #ifdef _WIN32
     /*Inicjalizacja WinSock */
     WSADATA         wsk;
-    SOCKET          socket_server;
+    SOCKET          socket_server = SOCKET_ERROR;
 #endif
 
 #ifdef __linux__
@@ -53,7 +53,12 @@ static void         SOCKET_initialization( void );
 static void         SOCKET_prepare( void );
 static void         SOCKET_process( int socket_fd );
 static void         SOCKET_send_all_data( void );
-static void         SOCKET_send_all_data_fd( int socket_fd );
+
+/* Wysyłka danych przy użyciu epoll() */
+#ifdef __linux__
+    static void     SOCKET_send_all_data_fd( int socket_fd );
+#endif
+
 static int          _SOCKET_set_nonblock( int socket_fd );
 
 /* Przechowuje informację o metodzie przetwarzania połączeń */
@@ -91,7 +96,7 @@ static void SOCKET_initialization( void ) {
 
     /* Utworzenie socketa nasłuchującego */
     socket_server = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-    if ( socket_server == SOCKET_ERROR ) {
+    if ( socket_server == INVALID_SOCKET ) {
         LOG_print( "Error creating socket.\n" );
         printf( "Error creating socket.\n" );
         SOCKET_free();
@@ -155,6 +160,7 @@ static void SOCKET_send_all_data( void ) {
     }
 }
 
+#ifdef __linux
 /*
 SOCKET_send_all_data_fd( int socket_fd )
 @socket_fd - identyfikator gniazda
@@ -170,12 +176,7 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd == socket_fd ) {
             if( use_sendfile == 1 ) {
 
-#ifdef __linux__
                 nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
-#else 
-                nread = battery_fread( send_d[ j ].file, socket_fd, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
-                nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
-#endif
 
             } else {
                 nread = battery_fread( send_d[ j ].file, socket_fd, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
@@ -198,6 +199,7 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
         }
     }
 }
+#endif
 
 /*
 SOCKET_prepare( void )
@@ -280,17 +282,19 @@ static int _SOCKET_set_nonblock( int socket_fd )
 @socket_fd - identyfikator gniazda 
 - funkcja ustawia wybrane gniazdo na tryb NONBLOCK */
 static int _SOCKET_set_nonblock( int socket_fd ) {
-    int flags = 0, ret;
+    int ret;
 
 #ifdef __linux__
+    int flags = 0;
     flags = fcntl( socket_fd, F_GETFL, 0 );
-    if( flags == -1 ) {
+    if( flags == SOCKET_ERROR ) {
         LOG_print( "Error: unable to get flags from socket %d.\n", socket_fd );
         return -1;
     }
     flags |= O_NONBLOCK;
     ret = fcntl( socket_fd, F_SETFL, flags );
 #elif _WIN32
+    unsigned long flags = 0;
     ret = fcntl( socket_fd, F_SETFL, &flags );
 #endif
 
@@ -307,7 +311,11 @@ static int _SOCKET_set_nonblock( int socket_fd ) {
 _SOCKET_run_select( void )
 - funkcja zarządza połączeniami przychodzącymi do gniazda za pomocą funkcji select() */
 static void _SOCKET_run_select( void ) {
+#ifdef __linux__
     int i = 0;
+#else
+    unsigned int i = 0;
+#endif
     struct timeval tv = {0, 0};
     socklen_t addrlen;
     int newfd;
@@ -444,7 +452,7 @@ static void _SOCKET_run_epoll( void ) {
                     }
 
                 } else {
-                    // Podłączony klient przesłał dane 
+                    /* Podłączony klient przesłał dane */
                     SOCKET_process( events[ i ].data.fd );
                 }
             } else {

@@ -48,6 +48,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
     #define C_SLASH             '/'
 /* Dla zachowania kompatybilności z WinSock ( ! )*/
     #define SOCKET_ERROR        ( -1 )
+    #define INVALID_SOCKET      ( -1 )
     #define READ_BINARY         "re"
     #define sighandler          __sighandler_t
     #define Sleep(x)            usleep(x*1000)
