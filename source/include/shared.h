@@ -145,7 +145,7 @@ typedef struct MIME_TYPE {
 typedef struct HTTP_INFO {
     long                range_st;                   /* Dla nagłówka "Range" */
     long                range_en;                   /* Dla nagłówka "Range" */
-    long                content_length;             /* Dla nagłówka "Content-Length" */
+    size_t              content_length;             /* Dla nagłówka "Content-Length" */
     http_m              method_name;                /* Typ żądanej metody ( GET/HEAD/POST ) */
     char*               content_data;               /* Całkowita zawartość żądania */
     char*               header;                     /* Nagłówki z żądania */

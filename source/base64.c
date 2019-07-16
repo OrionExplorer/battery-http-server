@@ -178,7 +178,7 @@ size_t base64_decode( char *source, unsigned char *target, size_t targetlen )
     char *src, *tmpptr;
     char quadruple[ 4 ], tmpresult[ 3 ];
     int i;
-    int tmplen = 3;
+    size_t tmplen = 3;
     size_t converted = 0;
 
     /* concatinate '===' to the source to handle unpadded base64 data */

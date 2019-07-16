@@ -113,7 +113,7 @@ SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
     int j, socket_fd;
-    size_t nwrite;
+    ssize_t nwrite;
     /* Zmienne dla standardowej wysyłki fread-send */
     size_t nread;
     static char m_buf[ UPLOAD_BUFFER_CHAR ];
@@ -161,7 +161,7 @@ SOCKET_send_all_data_fd( int socket_fd )
 - funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data_fd( int socket_fd ) {
     int j;
-    size_t nwrite;
+    ssize_t nwrite;
     /* Zmienne dla standardowej wysyłki read-send */
     size_t nread;
     char m_buf[ UPLOAD_BUFFER_CHAR + 1 ] = {0};
@@ -280,7 +280,7 @@ static int _SOCKET_set_nonblock( int socket_fd )
 @socket_fd - identyfikator gniazda 
 - funkcja ustawia wybrane gniazdo na tryb NONBLOCK */
 static int _SOCKET_set_nonblock( int socket_fd ) {
-    unsigned long flags = 0, ret;
+    int flags = 0, ret;
 
 #ifdef __linux__
     flags = fcntl( socket_fd, F_GETFL, 0 );

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -O2 -pedantic
+CFLAGS=-Wall -O2 -pedantic -Wextra
 CLIBS=#-lws2_32
 INSTALL_DIR=/opt/battery
 

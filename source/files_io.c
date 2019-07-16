@@ -282,8 +282,8 @@ char* battery_get_filename( FILE *file ) {
 
 
 size_t battery_fread( FILE *file, int socket_fd, char *dst, size_t s_pos, size_t size ) {
-    int i, j, k, l;
-    size_t read = 0;
+    int i, k, l;
+    size_t j, read = 0;
 
     int socket_found = 0, file_found = 0;
 
