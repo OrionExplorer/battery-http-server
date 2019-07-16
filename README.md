@@ -50,6 +50,8 @@ Fast and portable HTTP server.
   - [x] cache 1.0 - based on current requests
   - [ ] cache 2.0 - time-based
 - [ ] Rebuild event log
+  - [ ] Mark standard access and error entries
+  - [ ] Move LOG_BUFFER definition to battery.conf
 - [ ] Add Accept-Encoding/Content-Encoding header support (gzip, deflate?)
 - [ ] Add HTTPS support
 - [ ] New CGI algorithm and effort to restore POST method
