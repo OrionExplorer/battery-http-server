@@ -352,7 +352,7 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
     long total = 0;         /* Całkowity rozmiar wysyłanych danych */
     char *buf;
     char *add_hdr;          /* Opcjonalne nagłówki */
-    SEND_INFO *send_struct;
+    int send_struct_index;
 
     /* Otwarcie pliku. Weryfikacja poprawności jego nazwy nastąpiła poprzez funkcję
     file_params w nadrzędnej funkcji REQUEST_process */
@@ -394,13 +394,14 @@ void RESPONSE_file( HTTP_SESSION *http_session, const char *filename ) {
                 /* Wysyłka z kodem 200 - wszystko ok */
                 RESPONSE_header( http_session, HTTP_200_OK, REQUEST_get_mime_type( filename ), filesize, NULL, NULL );
 
-                send_struct = SESSION_find_response_struct_by_id( http_session->socket_fd );
+                send_struct_index = SESSION_find_response_struct_by_id( http_session->socket_fd );
 
-                if( send_struct ) {
-                    send_struct->file = file;
-                    send_struct->http_content_size = filesize;
-                    send_struct->total_size = filesize;
-                    send_struct->sent_size = 0;
+                if( send_struct_index > -1 ) {
+                    send_d[ send_struct_index].file = file;
+                    send_d[ send_struct_index].http_content_size = filesize;
+                    send_d[ send_struct_index].total_size = filesize;
+                    send_d[ send_struct_index].sent_size = 0;
+                    send_d[ send_struct_index].keep_alive = http_session->http_info.keep_alive;
                 }
             } else {
                 /* Wysyłka wybranego fragmentu pliku */

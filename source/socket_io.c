@@ -112,7 +112,7 @@ static void SOCKET_initialization( void ) {
 SOCKET_send_all_data( void )
 - funkcja weryfikuje, czy są do wysłania dane z któregokolwiek elementu tablicy SEND_INFO. Jeżeli tak, to następuje wysyłka kolejnego fragmentu pliku. */
 static void SOCKET_send_all_data( void ) {
-    int j;
+    int j, socket_fd;
     size_t nwrite;
     /* Zmienne dla standardowej wysyłki fread-send */
     size_t nread;
@@ -120,13 +120,13 @@ static void SOCKET_send_all_data( void ) {
 
     for( j = 0; j < MAX_CLIENTS; j++ ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd > 0 ) {
-
+            socket_fd = send_d[ j ].socket_fd;
             if( use_sendfile == 1 ) {
 
 #ifdef __linux__
                 nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
 #else
-                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nread = battery_fread( send_d[ j ].file, socket_fd, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
                 if( nwrite > 0 ) {
@@ -135,7 +135,7 @@ static void SOCKET_send_all_data( void ) {
 #endif
 
             } else {
-                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nread = battery_fread( send_d[ j ].file, socket_fd, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
                 if( nwrite > 0 ) {
@@ -143,11 +143,13 @@ static void SOCKET_send_all_data( void ) {
                 }
             }
 
-            send_d[ j ].http_content_size -= nwrite;
+            if( nwrite > 0 ) {
+                send_d[ j ].http_content_size -= nwrite;
+            }
             
             if( (nwrite < 0 && errno != EWOULDBLOCK ) || ( send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0 ) ) {
-                SESSION_delete_send_struct( send_d[ j ].socket_fd );
-                SOCKET_close_fd( send_d[ j ].socket_fd );
+                SESSION_delete_send_struct( socket_fd );
+                SOCKET_close_fd( socket_fd );
             }
         }
     }
@@ -162,22 +164,21 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
     size_t nwrite;
     /* Zmienne dla standardowej wysyłki read-send */
     size_t nread;
-    static char m_buf[ UPLOAD_BUFFER_CHAR ];
+    char m_buf[ UPLOAD_BUFFER_CHAR + 1 ] = {0};
 
     for( j = 0; j < MAX_CLIENTS; j++ ) {
         if( send_d[ j ].http_content_size > 0 && send_d[ j ].socket_fd == socket_fd ) {
-
             if( use_sendfile == 1 ) {
 
 #ifdef __linux__
                 nwrite = sendfile( send_d[ j ].socket_fd, send_d[ j ].file->_fileno, ( long int* )&send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
 #else 
-                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nread = battery_fread( send_d[ j ].file, socket_fd, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 #endif
 
             } else {
-                nread = battery_fread( send_d[ j ].file, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
+                nread = battery_fread( send_d[ j ].file, socket_fd, m_buf, send_d[ j ].sent_size, UPLOAD_BUFFER_CHAR );
                 nwrite = send( send_d[ j ].socket_fd, m_buf, nread, 0 );
 
                 if( nwrite > 0 ) {
@@ -185,12 +186,15 @@ static void SOCKET_send_all_data_fd( int socket_fd ) {
                 }
             }
 
-            send_d[ j ].http_content_size -= nwrite;
+            if( nwrite > 0 ) {
+                send_d[ j ].http_content_size -= nwrite;
+            }
             
             if( (nwrite < 0 && errno != EWOULDBLOCK ) || ( send_d[ j ].http_content_size <= 0 && send_d[ j ].keep_alive == 0 ) ) {
-                SESSION_delete_send_struct( send_d[ j ].socket_fd );
-                SOCKET_close_fd( send_d[ j ].socket_fd );
+                SESSION_delete_send_struct( socket_fd );
+                SOCKET_close_fd( socket_fd );
             }
+            return;
         }
     }
 }
@@ -366,6 +370,7 @@ static void _SOCKET_run_epoll( void ) {
     int e_ret;
     int i, fds, newfd;
     socklen_t addrlen;
+    struct sockaddr_in client_address;
     struct epoll_event  server_event;
     struct epoll_event  *events;
 
@@ -409,17 +414,17 @@ static void _SOCKET_run_epoll( void ) {
             if( events[ i ].events & EPOLLIN ) {
                 if ( socket_server == events[ i ].data.fd ) {
                     /* Podłączył się nowy klient */
-                    addrlen = sizeof( struct sockaddr );
-                    newfd = accept( socket_server, ( struct sockaddr* )&http_session_.address, &addrlen );
+                    addrlen = sizeof( client_address );
+                    newfd = accept( socket_server, ( struct sockaddr* )&client_address, &addrlen );
                     if( newfd == -1 ) {
                         if ( errno == EAGAIN || errno == EWOULDBLOCK ) {
                             continue;
                         }
                         LOG_print( "Socket error: accept(): %d.\n", errno );
                     } else {
+
                         SOCKET_modify_clients_count( 1 ); /* Kolejny klient - zliczanie do obsługi błędu 503 */
                         SESSION_add_new_send_struct( newfd );
-
                         e_ret = _SOCKET_set_nonblock( newfd );
                         if( e_ret == -1 ) {
                             SOCKET_free();
@@ -572,6 +577,7 @@ SOCKET_disconnect_client( HTTP_SESSION *http_session )
 - rozłącza klienta podanego jako struktura http_session */
 void SOCKET_disconnect_client( HTTP_SESSION *http_session ) {
     if( http_session->socket_fd != SOCKET_ERROR ) {
+        SESSION_delete_send_struct( http_session->socket_fd );
         SOCKET_close_fd( http_session->socket_fd );
     } else {
         http_session->socket_fd = -1;

@@ -16,6 +16,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include <stdio.h>
 #include <time.h>
 
+#define MAX_OPEN_FILES                      1024
 #ifndef FD_SETSIZE
     #define FD_SETSIZE                      1024
 #endif
@@ -92,11 +93,11 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #define EXT_LEN                             16
 #define EXT_LEN_CHAR                        16*sizeof( char )
 
-#define MAX_EVENTS                          10240*64
+#define MAX_EVENTS                          10240
+#define MAX_CLIENTS                         10240
 
 #define MAX_PATH_LENGTH                     1024
 #define MAX_PATH_LENGTH_CHAR                1024*sizeof( char )
-#define MAX_CLIENTS                         FD_SETSIZE
 
 #define RFC1123FMT                          "%a, %d %b %Y %H:%M:%S GMT"
 
@@ -230,8 +231,8 @@ extern struct sockaddr_in   server_address;
 extern int                  ip_proto_ver;
 extern HTTP_SESSION         http_session_;
 extern SEND_INFO            send_d[ MAX_CLIENTS ];
-extern OPENED_FILE          opened_files[ FOPEN_MAX ];
-extern FILE_CACHE           cached_files[ FOPEN_MAX ];
+extern OPENED_FILE          opened_files[ MAX_OPEN_FILES ];
+extern FILE_CACHE           cached_files[ MAX_OPEN_FILES ];
 extern fd_set               master;
 extern int                  http_conn_count;
 char*                       server_get_remote_hostname( HTTP_SESSION *http_session );

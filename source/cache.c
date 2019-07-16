@@ -16,7 +16,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #include <stdlib.h>
 #include <string.h>
 
-FILE_CACHE           cached_files[ FOPEN_MAX ];
+FILE_CACHE           cached_files[ MAX_OPEN_FILES ];
 
 /*
 int CACHE_add( FILE *file, const char *filename )
@@ -25,7 +25,7 @@ int CACHE_add( FILE *file, const char *filename )
 @size - rozmiar pliku
 - funkcja wczytuje treść podanego pliku do pamięci. */
 int CACHE_add( FILE *file, const char *filename, size_t size ) {
-    int i = FOPEN_MAX;
+    int i = MAX_OPEN_FILES;
 
     if( !file || !filename || size <= 0 ) {
         LOG_print("[CACHE_add] Error: input parameters are invalid!\n");
@@ -33,14 +33,14 @@ int CACHE_add( FILE *file, const char *filename, size_t size ) {
     }
 
     /* Weryfikacja, czy plik nie został już dodany do cache. */
-    for( i = FOPEN_MAX-1; i >= 0; i-- ) {
+    for( i = MAX_OPEN_FILES-1; i >= 0; i-- ) {
         if( strncmp( cached_files[ i ].filename, filename, FILENAME_MAX ) == 0 ) {
             return 1;
         }
     }
 
     /* Dodanie pliku do cache. */
-    for( i = FOPEN_MAX-1; i >= 0; i-- ) {
+    for( i = MAX_OPEN_FILES-1; i >= 0; i-- ) {
         if( cached_files[ i ].file == NULL ) {
             cached_files[ i ].file = file;
             strncpy( cached_files[ i ].filename, filename, FILENAME_MAX );
@@ -68,13 +68,13 @@ int CACHE_delete( const char *filename )
 @file- deskryptor otwartego pliku
 - funkcja usuwa z pamięci treść podanego pliku. */
 int CACHE_delete( FILE *file ) {
-    int i = FOPEN_MAX;
+    int i = MAX_OPEN_FILES;
 
     if( !file ) {
         return -1;
     }
 
-    for( i = FOPEN_MAX-1; i >= 0; i-- ) {
+    for( i = MAX_OPEN_FILES-1; i >= 0; i-- ) {
         if( cached_files[ i ].file == file ) {
             cached_files[ i ].file = NULL;
             if( cached_files[ i ].content ) {

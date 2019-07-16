@@ -176,7 +176,7 @@ void CGI_execute( HTTP_SESSION *http_session, const char *filename ) {
         RESPONSE_header( http_session, HTTP_200_OK, NULL, result_size-hdr_len-2, ( char* )cgi_body, add_hdr );
         /*RESPONSE_header( http_session, HTTP_200_OK, NULL, result_size-hdr_len-2, NULL, add_hdr );
 
-        send_struct = SESSION_find_response_struct_by_id( http_session->socket_fd );
+        send_struct = SESSION_find_response_struct_by_id( file, http_session->socket_fd );
 
         if( send_struct ) {
             send_struct->file = cgi_script_file;

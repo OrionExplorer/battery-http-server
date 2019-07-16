@@ -33,6 +33,8 @@ short           SESSION_local_path_is_valid( HTTP_SESSION *http_session );
 short           SESSION_http_protocol_is_valid( HTTP_SESSION *http_session );
 short           SESSION_check_connections_limit( HTTP_SESSION *http_session );
 
+int c = 0, d = 0;
+
 /*
 SESSION_http_protocol_is_valid( HTTP_SESSION *http_session )
 @http_session - wskaźnik do podłączonego klienta
@@ -47,8 +49,8 @@ short SESSION_http_protocol_is_valid( HTTP_SESSION *http_session ) {
             SESSION_release( http_session );
             return 0;
         }
-    } else if( ( strcmp( http_session->http_info.protocol_ver, HTTP_VER ) != 0 ) && /* Sprawdzenie, czy protokół jest obsługiwany */
-            ( strcmp( http_session->http_info.protocol_ver, HTTP_VER_1_0 ) != 0 ) ) {
+    } else if( ( strncmp( http_session->http_info.protocol_ver, HTTP_VER, PROTO_BUFF_SIZE ) != 0 ) && /* Sprawdzenie, czy protokół jest obsługiwany */
+            ( strncmp( http_session->http_info.protocol_ver, HTTP_VER_1_0, PROTO_BUFF_SIZE ) != 0 ) ) {
 
         /* Protokół w wersji innej niż HTTP/1.0 i HTTP/1.1 - błąd 505 */
         RESPONSE_error( http_session, HTTP_505_HTTP_VERSION_NOT_SUPPORTED, HTTP_ERR_505_MSG, NULL );
@@ -206,7 +208,6 @@ SESSION_get_connection( HTTP_SESSION *http_session )
 - pobiera informacjê o nagłówku "Connection". */
 static void SESSION_get_connection( HTTP_SESSION *http_session ) {
     char *temp_conn_type_handle;    /* Do wczytania informacji o rodzaju połączenia */
-    SEND_INFO *send_struct;
 
     if( strstr( http_session->http_info.header, HEADER_CONNECTION ) ) {
         /* Pobranie informacji o połączeniu ( "Connection: Keep-Alive/Close" ) - przypisanie do zmiennej tymczasowej */
@@ -224,13 +225,14 @@ static void SESSION_get_connection( HTTP_SESSION *http_session ) {
         temp_conn_type_handle = NULL;
 
     } else {
-        /* Brak - połączenie zamkniï¿½te */
-        http_session->http_info.keep_alive = 0;
-    }
-
-    send_struct = SESSION_find_response_struct_by_id( http_session->socket_fd );
-    if( send_struct ) {
-        send_struct->keep_alive = http_session->http_info.keep_alive;
+        /* Brak nagłówka "Connection":
+        - Jeśli protokół to HTTP/1.0 = połączenie zamknięte.
+        - Jeśli protokół to HTTP/1.1 = połączenie otwarte.  */
+        if( strncmp( http_session->http_info.protocol_ver, HTTP_VER, PROTO_BUFF_SIZE ) == 0 ) {
+            http_session->http_info.keep_alive = 1;
+        } else {
+            http_session->http_info.keep_alive = 0;
+        }
     }
 }
 
@@ -583,16 +585,20 @@ int SESSION_send_response( HTTP_SESSION *http_session, const char *content_data,
 SESSION_find_response_struct_by_id( int socket )
 @socket - identyfikator gniazda
 - funkcja na podstawie identyfikatora gniazda odnajduje strukturę z danymi do wysyłki */
-SEND_INFO* SESSION_find_response_struct_by_id( int socket ) {
+int SESSION_find_response_struct_by_id( int socket_fd ) {
     int i;
 
-    for( i = 0; i <= MAX_CLIENTS; i++ ) {
-        if( send_d[ i ].socket_fd == socket ) {
-            return &send_d[ i ];
+    if( socket_fd == 0 ) {
+        return -1;
+    }
+
+    for( i = 0; i < MAX_CLIENTS; i++ ) {
+        if( send_d[ i ].socket_fd == socket_fd ) {
+            return i;
         }
     }
 
-    return NULL;
+    return -1;
 }
 
 /*
@@ -602,13 +608,16 @@ SESSION_add_new_send_struct( int socket_fd )
 void SESSION_add_new_send_struct( int socket_fd ) {
     int i;
 
-    for( i = 0; i <= MAX_CLIENTS-1; i++ ){
-        if( send_d[ i ].socket_fd == 0 ) {
+    for( i = 0; i < MAX_CLIENTS; i++ ) {
+        if( send_d[ i ].socket_fd == 0 && send_d[ i ].file == NULL ) {
             send_d[ i ].socket_fd = socket_fd;
+            send_d[ i ].file = NULL;
             send_d[ i ].sent_size = 0;
             send_d[ i ].http_content_size = 0;
             send_d[ i ].total_size = 0;
             send_d[ i ].keep_alive = 0;
+            c++;
+            LOG_print("[SEND_INFO+] #%d created = %d, deleted = %d\n", i, c, d );
             return;
         }
     }
@@ -621,21 +630,23 @@ SESSION_add_new_send_struct( int socket_fd )
 void SESSION_delete_send_struct( int socket_fd ) {
     int i;
 
-    for( i = 0; i <= MAX_CLIENTS-1; i++ ){
+    for( i = 0; i < MAX_CLIENTS; i++ ){
         if( send_d[ i ].socket_fd == socket_fd ) {
             battery_fclose( send_d[ i ].file, socket_fd );
 
-            /*if( send_d[ i ].keep_alive <= 0 ) {
-                SOCKET_close_fd( send_d[ i ].socket_fd );
-            }*/
+            if( send_d[ i ].keep_alive <= 0 ) {
+                SOCKET_close_fd( socket_fd );
+            }
 
+            send_d[ i ].file = NULL;
             send_d[ i ].socket_fd = 0;
             send_d[ i ].sent_size = 0;
             send_d[ i ].http_content_size = 0;
             send_d[ i ].keep_alive = 0;
             send_d[ i ].total_size = 0;
-
-            return;
+            send_d[ i ].total_size = 0;
+            d++;
+            LOG_print("[SEND_INFO-] #%d created = %d, deleted = %d\n", i, c, d );
         }
     }
 }

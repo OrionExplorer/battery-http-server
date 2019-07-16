@@ -22,7 +22,7 @@ short   file_params( HTTP_SESSION *http_session, const char *filename, char *ht_
 FILE    *battery_fopen( const char *filename, const char *mode, short add_to_list, int socket_fd, RESOURCE_TYPE type );
 void    battery_fclose( FILE *file, int socket_fd );
 long    battery_ftell( FILE *file );
-size_t	battery_fread( FILE *file, char *dst, size_t s_pos, size_t size );
+size_t	battery_fread( FILE *file, int socket_fd, char *dst, size_t s_pos, size_t size );
 char*   battery_get_filename( FILE *file );
 
 #endif

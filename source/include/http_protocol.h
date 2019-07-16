@@ -53,7 +53,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #define HEADER_AUTHORIZATION                "Authorization: "
 #define HEADER_AUTHENTICATION               "WWW-Authenticate: Basic realm=\"Secure Area\"\r\n"
 
-#define HEADER_KEEP_ALIVE_STR               "Keep-Alive"
+#define HEADER_KEEP_ALIVE_STR               "keep-alive"
 #define KEEP_ALIVE_PREF                     "timeout=9, max=99\r\n"
 
 #define HEADER_STD_CONTENT_TYPE             "text/html"
