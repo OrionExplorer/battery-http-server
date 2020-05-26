@@ -277,9 +277,9 @@ SESSION_prepare( HTTP_SESSION *http_session, const char *content_data )
 + obecność nagłówka "Range"
 + po pomyślnej weryfikacji struktury przekazuje dane do wykonania przez funkcję REQUEST_process */
 void SESSION_prepare( HTTP_SESSION *http_session ) {
-    char *temp_http_method_name;    /* Do wczytania żądanej metody */
-    char *temp_entire_msg;          /* Do przechowania całej wiadomości. Treść będzie traktowana funkcjï¿½ strtok, a oryginalną zawartością zmiennej http_info.content_data chcemy zatrzymać */
-    char *tmp_post_data;            /* Do przechowania POST data */
+    char *temp_http_method_name = NULL;    /* Do wczytania żądanej metody */
+    char *temp_entire_msg = NULL;          /* Do przechowania całej wiadomości. Treść będzie traktowana funkcjï¿½ strtok, a oryginalną zawartością zmiennej http_info.content_data chcemy zatrzymać */
+    char *tmp_post_data = NULL;            /* Do przechowania POST data */
 
     /* Tutaj jest zabezpieczenie przed otrzymaniem metody POST w częściach.
     Zmienna received_all jest ustawiana na 0 przy sprawdzaniu "Content-Length",

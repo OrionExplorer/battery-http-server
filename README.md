@@ -1,5 +1,5 @@
 ## battery-http-server [![Build Status](https://travis-ci.org/OrionExplorer/battery-http-server.png?branch=master)](https://travis-ci.org/OrionExplorer/battery-http-server)
-###### Copyright (C) 2012 - 2019
+###### Copyright (C) 2012 - 2020
 ###### Marcin Kelar (marcin.kelar@gmail.com)
 
 Fast and portable HTTP server.

@@ -102,9 +102,10 @@ short file_params( HTTP_SESSION *http_session, const char *filename, char *ht_ac
     int tmp_socket;
     int i = 0;
 
+    memset( &file_stat, 0, sizeof(struct stat) );
     /* Weryfikacja, czy podany parametr jest prawidłową nazwę pliku */
     stat( filename, &file_stat );
-    if( file_stat.st_mode & S_IFREG );
+    if( file_stat.st_mode & S_IFREG ) { }
     else {/* Nie jest... */
         return 0;
     }

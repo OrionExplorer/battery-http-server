@@ -37,7 +37,7 @@ Autor: Marcin Kelar ( marcin.kelar@gmail.com )
 #endif
 
 #ifdef __linux__
-    int             socket_server;
+    int             socket_server = -1;
 #endif
 int                 active_port;
 struct sockaddr_in  server_address;
@@ -389,6 +389,7 @@ static void _SOCKET_run_epoll( void ) {
         exit( EXIT_FAILURE );
     }
 
+    memset( &server_event, 0, sizeof( struct epoll_event ) );
     server_event.data.fd = socket_server;
     server_event.events = EPOLLIN;
     e_ret = epoll_ctl( epoll_fd, EPOLL_CTL_ADD, socket_server, &server_event );
@@ -499,7 +500,7 @@ static void SOCKET_process( int socket_fd ) {
                 session->http_info.received_all = 1;
             } else if( session->http_info.received_all == -1 ) {
                 /* Dla metod GET i HEAD */
-                session->http_info.content_data = malloc( (session->recv_data_len+1)*sizeof( char ) );
+                session->http_info.content_data = calloc( (session->recv_data_len+1),sizeof( char ) );
                 mem_allocated( session->http_info.content_data, 25 );
                 strncpy( session->http_info.content_data, tmp_buf, session->recv_data_len );
             }
